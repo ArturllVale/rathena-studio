@@ -1,0 +1,12 @@
+# Universal Custom Server Import Layer
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Custom Server override for Red Potion (changing Sell and Weight only)
+  - Id: 501
+    Sell: 30
+    Weight: 50
+    # Custom unknown metadata that must be preserved
+    CustomTag: "EVENT_REWARD"

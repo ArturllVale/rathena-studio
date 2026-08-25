@@ -1,0 +1,31 @@
+# Renewal Item Database Root
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Red Potion in Renewal
+  - Id: 501
+    AegisName: Red_Potion
+    Name: Red Potion
+    Type: Healing
+    Buy: 50
+    Weight: 70
+    Script: |
+      itemheal rand(45,65),0;
+
+  # Renewal specific weapon with MagicAttack
+  - Id: 1601
+    AegisName: Rod
+    Name: Rod
+    Type: Weapon
+    SubType: Staff
+    Buy: 50
+    Weight: 400
+    Attack: 15
+    MagicAttack: 30
+    Range: 1
+    Slots: 3
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 1

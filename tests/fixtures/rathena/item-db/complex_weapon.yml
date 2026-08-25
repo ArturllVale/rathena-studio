@@ -1,0 +1,42 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  - Id: 1100
+    AegisName: Taurus_Sword_J
+    Name: Taurus Sword
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 20
+    Weight: 1000
+    Attack: 10
+    Range: 1
+    Slots: 1
+    Jobs:
+      Alchemist: true
+      Assassin: true
+      Blacksmith: true
+      Crusader: true
+      Knight: true
+      Merchant: true
+      Novice: true
+      Rogue: true
+      SuperNovice: true
+      Swordman: true
+      Thief: true
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 4
+    Refineable: true
+    Flags:
+      DropEffect: YELLOW_PILLAR
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bBaseAtk,50+BaseLevel;
+      bonus2 bAddItemHealRate,501,100;
+      if (eaclass()&EAJL_THIRD && BaseJob == Job_Alchemist) {
+         bonus bHit,20;
+         bonus bAspdRate,10;
+      }

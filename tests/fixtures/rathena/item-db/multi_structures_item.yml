@@ -1,0 +1,67 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  - Id: 2357
+    AegisName: Valkyrian_Armor
+    Name: Valkyrian Armor
+    Type: Armor
+    Buy: 20
+    Weight: 2800
+    Defense: 55
+    Slots: 1
+    Jobs:
+      Swordman: true
+      Merchant: true
+      Thief: true
+      Knight: true
+      Blacksmith: true
+      Assassin: true
+      Crusader: true
+      Alchemist: true
+      Rogue: true
+    Classes:
+      Upper: true
+      Third_Upper: true
+      Fourth: true
+    Gender: Both
+    Locations:
+      Armor: true
+    ArmorLevel: 1
+    EquipLevelMin: 70
+    Refineable: true
+    View: 16
+    Flags:
+      BindOnEquip: false
+      DropAnnounce: true
+      BuyingStore: false
+    Delay:
+      Duration: 0
+    Stack:
+      Amount: 0
+      Inventory: false
+      Cart: false
+      Storage: false
+      GuildStorage: false
+    NoUse:
+      Override: 100
+      Sitting: false
+    Trade:
+      Override: 100
+      NoDrop: false
+      NoTrade: false
+      TradePartner: false
+      NoSell: false
+      NoCart: false
+      NoStorage: false
+      NoGuildStorage: false
+      NoMail: false
+      NoAuction: false
+    Script: |
+      bonus bAllStats,1;
+      bonus bUnbreakableArmor,0;
+    EquipScript: |
+      autobonus "{ bonus bMdef,5; }",100,5000;
+    UnEquipScript: |
+      dispbottom "Valkyrian Armor unequipped.";

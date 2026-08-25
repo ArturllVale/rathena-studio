@@ -1,0 +1,9 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Overrides Attack of existing Sword 1101 without re-declaring AegisName or Name
+  - Id: 1101
+    Attack: 50
+    Weight: 450

@@ -1,0 +1,15 @@
+# Header
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Red Potion - Standard healing consumable
+  - Id: 501
+    AegisName: Red_Potion
+    Name: Red Potion
+    Type: Healing
+    Buy: 50
+    Weight: 70
+    Script: |
+      itemheal rand(45,65),0;

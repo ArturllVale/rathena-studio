@@ -1,0 +1,30 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Invalid entry 1: Missing mandatory AegisName and Name on a new item
+  - Id: 99991
+    Type: Etc
+
+  # Invalid entry 2: Invalid item Type enum
+  - Id: 99992
+    AegisName: Bad_Type_Item
+    Name: Bad Type Item
+    Type: NonExistentType
+
+  # Invalid entry 3: SubType on non-supported type
+  - Id: 99993
+    AegisName: Bad_SubType_Item
+    Name: Bad SubType Item
+    Type: Etc
+    SubType: 1hSword
+
+  # Invalid entry 4: Values exceeding limits
+  - Id: 99994
+    AegisName: Overcapped_Item
+    Name: Overcapped Item
+    Type: Armor
+    Defense: 999999
+    Slots: 10
+    EquipLevelMin: 9999

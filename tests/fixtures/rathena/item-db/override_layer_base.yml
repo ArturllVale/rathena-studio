@@ -1,0 +1,14 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  - Id: 1101
+    AegisName: Sword
+    Name: Sword
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 100
+    Weight: 500
+    Attack: 25
+    Slots: 3

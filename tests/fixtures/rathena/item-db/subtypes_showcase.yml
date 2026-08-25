@@ -1,0 +1,58 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  # Weapon SubType: Dagger
+  - Id: 1201
+    AegisName: Knife
+    Name: Knife
+    Type: Weapon
+    SubType: Dagger
+    Buy: 50
+    Weight: 400
+    Attack: 17
+    Range: 1
+    Slots: 3
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 1
+
+  # Ammo SubType: Arrow
+  - Id: 1750
+    AegisName: Arrow
+    Name: Arrow
+    Type: Ammo
+    SubType: Arrow
+    Buy: 1
+    Weight: 1
+    Attack: 25
+    Locations:
+      Ammo: true
+
+  # Card SubType: Normal
+  - Id: 4001
+    AegisName: Poring_Card
+    Name: Poring Card
+    Type: Card
+    SubType: Normal
+    Buy: 20
+    Weight: 10
+    Locations:
+      Armor: true
+    Script: |
+      bonus bLuk,2;
+      bonus bFlee,1;
+
+  # Card SubType: Enchant
+  - Id: 4700
+    AegisName: Strength_1
+    Name: Strength +1
+    Type: Card
+    SubType: Enchant
+    Buy: 20
+    Weight: 0
+    Locations:
+      Armor: true
+    Script: |
+      bonus bStr,1;
