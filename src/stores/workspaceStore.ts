@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Workspace, WorkspaceValidationResult } from '@/domain/workspace';
 import { workspaceService } from '@/services/workspaceService';
+import { useDatabaseStore } from '@/stores/databaseStore';
 import { AppError } from '@/lib/error';
 
 interface WorkspaceState {
@@ -51,6 +52,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         isLoading: false,
         error: null,
       });
+
+      // Initialize database context for the newly opened workspace (Lazy loading: databases remain unloaded until explicit load)
+      useDatabaseStore.getState().initializeWorkspaceContext(path);
     } catch (err) {
       set({
         error: AppError.fromError(err, 'ERR_WORKSPACE_VALIDATE', 'Failed to validate workspace structure'),
@@ -65,6 +69,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       validationResult: null,
       error: null,
     });
+
+    useDatabaseStore.getState().initializeWorkspaceContext(undefined);
   },
 
   clearError: () => {

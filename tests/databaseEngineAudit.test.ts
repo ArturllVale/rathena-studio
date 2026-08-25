@@ -27,7 +27,7 @@ describe('Database Engine Audit — Real rAthena Compatibility', () => {
 
   // ─── 1. REAL RATHENA DATA PARSING ─────────────────────────────────────────
 
-  describe('1. Real rAthena Data Parsing', () => {
+  describe.skipIf(!fs.existsSync(path.join(RATHENA_ROOT, 'db/item_db.yml')))('1. Real rAthena Data Parsing', () => {
     it('parses the root db/item_db.yml header and footer imports correctly', () => {
       const content = readRathenaFile('db/item_db.yml');
       expect(content.length).toBeGreaterThan(0);
@@ -183,7 +183,7 @@ describe('Database Engine Audit — Real rAthena Compatibility', () => {
       expect(plan.every((l) => l.variant === 'RE' || l.variant === 'UNIVERSAL')).toBe(true);
     });
 
-    it('detects that real rAthena horizonro has custom layers not in standard plan', () => {
+    it.skipIf(!fs.existsSync(path.join(RATHENA_ROOT, 'db/item_db.yml')))('detects that real rAthena horizonro has custom layers not in standard plan', () => {
       // The real horizonro has db/rsm-mod/item_db_vendsystem.yml and db/import/item_db_bg.yml
       // which are NOT in the standard plan. This is expected and documented.
       const rootContent = readRathenaFile('db/item_db.yml');
@@ -215,7 +215,7 @@ describe('Database Engine Audit — Real rAthena Compatibility', () => {
 
   // ─── 3. FULL REPOSITORY LOADING + BENCHMARK ──────────────────────────────
 
-  describe('3. Full Repository Loading & Benchmark', () => {
+  describe.skipIf(!fs.existsSync(path.join(RATHENA_ROOT, 'db/item_db.yml')))('3. Full Repository Loading & Benchmark', () => {
     function createRealProvider() {
       return {
         readFile: (relPath: string) => {
