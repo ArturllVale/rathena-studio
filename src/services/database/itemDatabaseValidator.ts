@@ -140,6 +140,24 @@ export class ItemDatabaseValidator {
   public validateEffectiveItem(item: EffectiveItem): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
     const fields = item.fields;
+    
+    if (fields.Buy !== undefined && fields.Buy < 0) {
+      issues.push({
+        itemId: item.id,
+        severity: 'error',
+        field: 'Buy',
+        message: `Buying price cannot be negative.`,
+      });
+    }
+
+    if (fields.Sell !== undefined && fields.Sell < 0) {
+      issues.push({
+        itemId: item.id,
+        severity: 'error',
+        field: 'Sell',
+        message: `Selling price cannot be negative.`,
+      });
+    }
 
     if (fields.Buy !== undefined && fields.Buy > MAX_ZENY) {
       issues.push({

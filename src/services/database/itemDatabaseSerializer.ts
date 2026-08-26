@@ -3,6 +3,7 @@ import { isLayerCompatibleWithVariant } from '../../domain/database/common/datab
 import { ItemRawFields } from '../../domain/database/item/itemTypes';
 import { RegisteredLayerData } from './layeredItemRepository';
 import { YamlDocumentAdapter } from './yamlDocumentAdapter';
+import { isSeq, YAMLSeq } from 'yaml';
 
 export class ItemDatabaseSerializer {
   public findItemNodeIndex(layerData: RegisteredLayerData, itemId: number): number {
@@ -61,16 +62,25 @@ export class ItemDatabaseSerializer {
     return adapter.deleteIn(['Body', itemIndex, field]);
   }
 
-  public addItem(adapter: YamlDocumentAdapter, item: ItemRawFields): void {
+  public addItem(adapter: YamlDocumentAdapter, item: ItemRawFields): number {
     const rawDoc = adapter.getRawDocument();
     let body = rawDoc.get('Body', true);
 
-    if (!body || typeof body !== 'object') {
-      rawDoc.set('Body', []);
-      body = rawDoc.get('Body', true);
+    if (!body || !isSeq(body)) {
+      body = rawDoc.createNode([]);
+      // We must preserve Header/Body structure. If it was missing entirely, we set it.
+      if (!rawDoc.has('Body')) {
+        if (!rawDoc.has('Header')) {
+            rawDoc.set('Header', rawDoc.createNode({ Type: 'ITEM_DB', Version: 1 }));
+        }
+      }
+      rawDoc.set('Body', body);
     }
 
-    adapter.setIn(['Body', (body as { items?: unknown[] }).items?.length ?? 0], item);
+    const seq = body as YAMLSeq;
+    const index = seq.items.length;
+    seq.add(rawDoc.createNode(item));
+    return index;
   }
 
   public removeItem(adapter: YamlDocumentAdapter, itemIndex: number): boolean {
