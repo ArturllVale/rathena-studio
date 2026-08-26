@@ -89,13 +89,13 @@ export function WorkspaceLandingView() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="flex gap-3">
                   <div className="bg-[#141416] p-2.5 rounded border border-[#27272a] flex items-center gap-2">
                     <Database className="h-4 w-4 text-sky-400 shrink-0" />
                     <div className="truncate">
                       <div className="text-[10px] text-neutral-500 font-mono">Database</div>
                       <div className="text-xs font-mono text-neutral-300 truncate">
-                        {activeWorkspace.detectedPaths.dbPath ? 'db/' : 'Not found'}
+                        {activeWorkspace.detectedPaths?.dbPath ? 'db/' : 'Not found'}
                       </div>
                     </div>
                   </div>
@@ -105,7 +105,7 @@ export function WorkspaceLandingView() {
                     <div className="truncate">
                       <div className="text-[10px] text-neutral-500 font-mono">Configuration</div>
                       <div className="text-xs font-mono text-neutral-300 truncate">
-                        {activeWorkspace.detectedPaths.confPath ? 'conf/' : 'Not found'}
+                        {activeWorkspace.detectedPaths?.confPath ? 'conf/' : 'Not found'}
                       </div>
                     </div>
                   </div>
@@ -115,7 +115,7 @@ export function WorkspaceLandingView() {
                     <div className="truncate">
                       <div className="text-[10px] text-neutral-500 font-mono">NPC Scripts</div>
                       <div className="text-xs font-mono text-neutral-300 truncate">
-                        {activeWorkspace.detectedPaths.npcPath ? 'npc/' : 'Not found'}
+                        {activeWorkspace.detectedPaths?.npcPath ? 'npc/' : 'Not found'}
                       </div>
                     </div>
                   </div>

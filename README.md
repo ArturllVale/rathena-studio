@@ -1,130 +1,140 @@
 # rAthena Studio
 
-**rAthena Studio** is a modern desktop Integrated Development Environment (IDE) tailored for development, editing, validation, and runtime management of rAthena Ragnarok Online emulator servers.
+**rAthena Studio** is a high-performance desktop Integrated Development Environment (IDE) tailored for Ragnarok Online emulator server administration, structured YAML database engineering, and runtime management.
 
 ---
 
-## 1. Objectives
+## 1. Current System Architecture
 
-- Provide a high-performance desktop environment for rAthena server administration and database editing.
-- Deliver structured, schema-validated editing for YAML databases (`item_db.yml`, `mob_db.yml`, `skill_db.yml`, etc.) while preserving comments and original file formatting.
-- Manage server runtime processes (login-server, char-server, map-server, database) with non-blocking log streaming.
-- Integrate validation, reference integrity checks, and search capabilities.
-
----
-
-## 2. Technology Stack
-
-- **Desktop Shell**: Tauri 2 (Rust)
-- **Frontend**: React 19 + TypeScript
-- **Bundler & Dev Server**: Vite (with Hot Module Replacement)
-- **Styling**: Tailwind CSS (IDE dark theme system)
-- **UI Components**: shadcn/ui primitives & Lucide icons
-- **State Management**: Zustand (modular feature-oriented stores)
-- **Testing**: Vitest & React Testing Library
-
----
-
-## 3. Directory Structure
+The application is structured into decoupled core layers:
 
 ```text
-rathena-studio/
-├── .agent/
-│   └── skills/
-│       └── rathena-studio/
-│           └── skill.md          # Engineering standards and domain rules
-├── docs/
-│   └── plan.md                   # Long-term architecture and phased plan
-├── src/
-│   ├── app/                      # Main application shell and routing
-│   ├── components/
-│   │   ├── layout/               # TitleBar, Sidebar, StatusBar, ErrorBoundary
-│   │   └── ui/                   # Reusable UI primitives (Button, Card, Badge, Input)
-│   ├── domain/                   # Domain entities and contracts (Workspace, Settings)
-│   ├── features/
-│   │   ├── workspace/            # Workspace inspection and discovery
-│   │   ├── databases/            # Database engine UI integration (Phase 3+)
-│   │   ├── processes/            # Process manager UI integration (Phase 8+)
-│   │   ├── logs/                 # Streaming log console (Phase 10+)
-│   │   └── settings/             # Environment and paths configuration
-│   ├── lib/                      # Utilities, error classification models
-│   ├── services/                 # Tauri IPC bridges and system services
-│   ├── stores/                   # Feature-oriented Zustand stores
-│   ├── index.css                 # Base theme styles
-│   └── main.tsx                  # React entry point
-├── src-tauri/
-│   ├── capabilities/             # Tauri 2 security capabilities and permissions
-│   ├── src/
-│   │   ├── commands/             # Tauri IPC invoke handlers
-│   │   ├── filesystem/           # Safe filesystem inspection & discovery
-│   │   ├── git/                  # Git integration module
-│   │   ├── logging/              # Log stream normalizer
-│   │   ├── processes/            # Native process manager
-│   │   ├── lib.rs                # Tauri application configuration and plugins
-│   │   └── main.rs               # Rust binary entry point
-│   ├── Cargo.toml                # Rust crate definitions
-│   └── tauri.conf.json           # Tauri 2 application configuration
-├── tests/                        # Unit and integration test suite
-├── index.html                    # Web entry point
-├── package.json                  # Scripts and Node dependencies
-├── tsconfig.json                 # TypeScript compiler configuration
-└── vite.config.ts                # Vite bundler and Vitest configuration
+┌──────────────────────────────────────────────────────────────────┐
+│                      UI & Presentation Layer                     │
+│  - Database Explorer (Virtual List via @tanstack/react-virtual)  │
+│  - Item Inspector (Field Origins, Layer Provenance, Live Diff)   │
+│  - Scoped Shortcuts (Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z)             │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│               State Management & Transaction Layer               │
+│  - useItemEditStore / useDatabaseStore (Zustand: UI State only)  │
+│  - ItemEditSession (Command Pattern: undoStack, redoStack)       │
+│  - ItemEditTransactionService (Validation & Commit Orchestrator) │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│               Database Workspace & Provider Layer                │
+│  - DatabaseRegistry (Provider discovery & metadata catalog)      │
+│  - ItemDatabaseProvider (Lazy-loading & cache management)        │
+│  - DatabaseContextLoader (Layer discovery & ordering)           │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│                   Database Engine & CST Layer                    │
+│  - LayeredItemRepository (25,000+ entities, RE/PRE-RE isolated)  │
+│  - SourceItem vs EffectiveItem (Runtime resolution & provenance) │
+│  - ItemDatabaseSerializer (AST round-trip, comments preserved)   │
+│  - ItemDatabaseValidator (Business logic & exploit guards)       │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│                   Tauri IPC & Native Backend                     │
+│  - Tauri File System Provider & FileContentWriter                │
+│  - Rust Backend (Tauri 2, Process Management, Security Caps)     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. Prerequisites
+## 2. Core Functional Components
 
-- **Node.js**: v18+ (tested with v23.8.0) or Bun
-- **npm** or **bun**
-- **Rust & Cargo**: stable toolchain (1.80+)
-- **OS**: Windows, macOS, or Linux
+### A. Database Engine & Layered Repository (`src/domain/database/`)
+- **Variant Isolation**: Strict partitioning between Renewal (`RE`) and Pre-Renewal (`PRE-RE`).
+- **Layered Inheritance**: Evaluates the priority chain (`BASE` → `MODE_SPECIFIC` → `IMPORT` → `CUSTOM`).
+- **Entity Resolution**:
+  - `SourceItem`: Exact physical state inside an individual YAML layer file.
+  - `EffectiveItem`: Final resolved composite state with `FieldOrigin` mapping indicating the source layer of every individual field.
+- **CST / AST Round-Trip Serializer**: Employs `yaml` AST parsing to modify, insert, or override records while preserving header metadata, comments, whitespace, custom scripts, and unknown attributes. Fully supports empty files and `Body: null` declarations.
+
+### B. Transactional Edit Layer & Undo/Redo (`src/services/database/`, `src/domain/database/workspace/`)
+- **Session-Scoped History**: Undo/Redo is encapsulated within `ItemEditSession` using the Command Pattern (`FieldEditCommand`), tracking fine-grained field deltas without duplicating the repository.
+- **Explicit Target Layer Policy**: Edits targeting fields inherited from base files automatically target the user's `IMPORT` override layer (`db/import/item_db.yml`) rather than modifying base files silently.
+- **Safety Pipeline**:
+  `UI Mutation -> EditCommand -> ItemEditSession -> ItemDatabaseValidator -> AST Mutation -> Atomic I/O`
+- **Failure Resilience**: Persistence errors or validation failures leave the edit session dirty with pending changes and stacks intact.
+
+### C. Database Explorer (`src/features/databases/items/`)
+- **Virtual Scrolling**: Fluid 60 FPS exploration of 25,000+ items using `@tanstack/react-virtual`.
+- **Search & Filtering**: Multi-field querying (ID, AegisName, Name), item type filtering, and sub-type categorization.
+- **Provenance Inspector**: Visual inspector detailing effective values, per-field source origins, layer hierarchy, and semantic live diffs.
 
 ---
 
-## 5. Getting Started
+## 3. Technology Stack
 
-### Install Dependencies
+- **Desktop Shell**: Tauri 2 (Rust)
+- **Frontend**: React 19 + TypeScript
+- **State Management**: Zustand (UI and session metadata only)
+- **Virtualization**: `@tanstack/react-virtual`
+- **Parsing & AST**: `yaml`
+- **Styling**: Tailwind CSS + Lucide Icons
+- **Testing**: Vitest (74 unit and integration characterization tests)
 
+---
+
+## 4. Directory Structure
+
+```text
+rathena-studio/
+├── docs/
+│   ├── database-engine/          # Engine, format, and round-trip specifications
+│   └── plan.md                   # Long-term architecture and phased milestones
+├── src/
+│   ├── app/                      # Main application shell and layout
+│   ├── domain/database/
+│   │   ├── common/               # Context, layers, and variant definitions
+│   │   ├── item/                 # SourceItem, EffectiveItem, FieldOrigin, types
+│   │   ├── provider/             # DatabaseProvider contract and metadata
+│   │   └── workspace/            # ItemEditSession, Command Pattern, Registry, Writers
+│   ├── features/databases/       # Database Explorer, Toolbar, VirtualList, Inspector
+│   ├── services/database/        # ContextLoader, Serializer, Validator, TransactionService
+│   │   └── providers/            # ItemDatabaseProvider, Tauri file providers
+│   └── stores/                   # databaseStore, itemEditStore, workspaceStore
+├── src-tauri/                    # Tauri 2 Rust core and capabilities
+├── tests/                        # Vitest suite (characterization, engine, session, audit)
+└── package.json
+```
+
+---
+
+## 5. Development & Testing
+
+### Installation
 ```bash
 npm install
 ```
 
-### Run in Web Development Mode (Vite HMR)
-
+### Development Modes
 ```bash
+# Web development mode (Vite HMR)
 npm run dev
-```
 
-The web interface will be served at `http://localhost:1420`.
-
-### Run in Desktop Development Mode (Tauri 2 + Vite HMR)
-
-```bash
+# Desktop development mode (Tauri 2 + Vite HMR)
 npm run tauri:dev
 ```
 
-### Run Tests
-
+### Quality Assurance & Validation Suite
 ```bash
+# Run full Vitest suite (74 tests)
 npm run test
-```
 
-### Run Type Checking and Linting
-
-```bash
+# Run TypeScript typecheck
 npm run typecheck
+
+# Run ESLint
 npm run lint
-```
 
-### Build for Production
-
-Frontend build:
-```bash
-npm run build
-```
-
-Desktop package build:
-```bash
-npm run tauri:build
+# Check Rust backend
+cargo check --manifest-path src-tauri/Cargo.toml
 ```

@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DetectedPaths {
     pub db_path: Option<String>,
     pub conf_path: Option<String>,
@@ -13,6 +14,7 @@ pub struct DetectedPaths {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WorkspaceValidationResult {
     pub is_valid: bool,
     pub is_rathena_root: bool,
@@ -36,7 +38,7 @@ pub fn inspect_rathena_workspace(root_path: &str) -> WorkspaceValidationResult {
                 map_server_path: None,
                 import_db_path: None,
             },
-            missing_crucial_paths: vec!["root_directory".to_string()],
+            missing_crucial_paths: vec!["root".to_string()],
             warnings: vec!["Path does not exist or is not a directory".to_string()],
         };
     }

@@ -36,10 +36,5 @@
       "icons/icon.ico"
     ]
   },
-  "plugins": {
-    "opener": {},
-    "dialog": {},
-    "fs": {},
-    "shell": {}
-  }
+  "plugins": {}
 }
