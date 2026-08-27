@@ -1,8 +1,15 @@
 import { useDatabaseStore } from '@/stores/databaseStore';
-import { ITEM_TYPES, WEAPON_SUBTYPES } from '@/domain/database/item/itemTypes';
+import { ITEM_TYPES, WEAPON_SUBTYPES, AMMO_SUBTYPES, CARD_SUBTYPES, ItemType } from '@/domain/database/item/itemTypes';
 import { Input } from '@/components/ui/input';
-import { Search, X, RefreshCw } from 'lucide-react';
+import { Search, X, RefreshCw, Folder } from 'lucide-react';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function ItemToolbar() {
   const { itemFilters, setItemFilters, activeVariant, setVariant, loadDatabase } = useDatabaseStore();
@@ -12,19 +19,13 @@ export function ItemToolbar() {
     setItemFilters({ query: e.target.value });
   };
 
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemFilters({ type: (e.target.value as any) || undefined, subType: undefined });
-  };
-
-  const handleSubTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemFilters({ subType: e.target.value || undefined });
-  };
-
   const clearFilters = () => {
-    setItemFilters({ query: '', type: undefined, subType: undefined });
+    setItemFilters({ query: '', type: undefined, subType: undefined, folder: undefined });
   };
 
-  const hasFilters = itemFilters.query || itemFilters.type || itemFilters.subType;
+  const hasFilters = Boolean(itemFilters.query || itemFilters.type || itemFilters.subType || itemFilters.folder);
+
+  const isSubtypeEnabled = itemFilters.type === 'Weapon' || itemFilters.type === 'Ammo' || itemFilters.type === 'Card';
 
   return (
     <div className="flex flex-col gap-2 p-3 bg-[#1f1f23] border-b border-[#27272a]">
@@ -49,31 +50,92 @@ export function ItemToolbar() {
           </button>
         )}
       </div>
-      <div className="flex gap-2 text-xs">
-        <select 
-          className="flex-1 bg-[#141416] border border-[#27272a] rounded px-2 py-1 text-neutral-300 outline-none focus:border-sky-500/50"
-          value={itemFilters.type || ''}
-          onChange={handleTypeChange}
-        >
-          <option value="">All Types</option>
-          {ITEM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        
-        <select 
-          className="flex-1 bg-[#141416] border border-[#27272a] rounded px-2 py-1 text-neutral-300 outline-none focus:border-sky-500/50"
-          value={itemFilters.subType || ''}
-          onChange={handleSubTypeChange}
-          disabled={itemFilters.type !== 'Weapon' && itemFilters.type !== 'Ammo'}
-        >
-          <option value="">All SubTypes</option>
-          {itemFilters.type === 'Weapon' && WEAPON_SUBTYPES.map(t => <option key={t} value={t}>{t}</option>)}
-          {itemFilters.type === 'Ammo' && <option value="Arrow">Arrow</option>}
-          {itemFilters.type === 'Ammo' && <option value="Bullet">Bullet</option>}
-        </select>
 
+      <div className="flex items-center gap-2 text-xs flex-wrap">
+        {/* Folder Filter */}
+        <div className="w-36">
+          <Select
+            value={itemFilters.folder || 'all'}
+            onValueChange={(val) =>
+              setItemFilters({ folder: val === 'all' ? undefined : (val as 'import' | 'general') })
+            }
+          >
+            <SelectTrigger className="h-7 text-xs">
+              <div className="flex items-center gap-1 truncate">
+                <Folder className="w-3 h-3 text-neutral-400 shrink-0" />
+                <SelectValue placeholder="Folder" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Folders</SelectItem>
+              <SelectItem value="import">Import Folder</SelectItem>
+              <SelectItem value="general">General (PRE-RE / RE)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Type Filter */}
+        <div className="w-32">
+          <Select
+            value={itemFilters.type || 'all'}
+            onValueChange={(val) =>
+              setItemFilters({ type: val === 'all' ? undefined : (val as ItemType), subType: undefined })
+            }
+          >
+            <SelectTrigger className="h-7 text-xs">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              {ITEM_TYPES.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* SubType Filter */}
+        <div className="w-32">
+          <Select
+            value={itemFilters.subType || 'all'}
+            onValueChange={(val) =>
+              setItemFilters({ subType: val === 'all' ? undefined : val })
+            }
+            disabled={!isSubtypeEnabled}
+          >
+            <SelectTrigger className="h-7 text-xs">
+              <SelectValue placeholder="SubType" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All SubTypes</SelectItem>
+              {itemFilters.type === 'Weapon' &&
+                WEAPON_SUBTYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              {itemFilters.type === 'Ammo' &&
+                AMMO_SUBTYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              {itemFilters.type === 'Card' &&
+                CARD_SUBTYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* RE / PRE-RE Variant Switcher */}
         <div className="flex bg-[#141416] rounded border border-[#27272a] ml-auto">
           <button
-            className={`px-3 py-1 rounded-l ${activeVariant === 'RE' ? 'bg-sky-500/20 text-sky-400' : 'text-neutral-500'}`}
+            className={`px-3 py-1 rounded-l ${activeVariant === 'RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'}`}
             onClick={() => {
               setVariant('RE');
               if (activeWorkspace) loadDatabase('item', activeWorkspace.rootPath);
@@ -82,7 +144,7 @@ export function ItemToolbar() {
             RE
           </button>
           <button
-            className={`px-3 py-1 rounded-r ${activeVariant === 'PRE_RE' ? 'bg-sky-500/20 text-sky-400' : 'text-neutral-500'}`}
+            className={`px-3 py-1 rounded-r ${activeVariant === 'PRE_RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'}`}
             onClick={() => {
               setVariant('PRE_RE');
               if (activeWorkspace) loadDatabase('item', activeWorkspace.rootPath);

@@ -177,9 +177,98 @@ export interface ItemTrade {
   readonly NoAuction?: boolean;
 }
 
+export const ITEM_DROP_EFFECTS: readonly ItemDropEffect[] = [
+  'None',
+  'Client',
+  'White_Pillar',
+  'Blue_Pillar',
+  'Yellow_Pillar',
+  'Purple_Pillar',
+  'Orange_Pillar',
+  'Green_Pillar',
+  'Red_Pillar',
+] as const;
+
+export const RATHENA_JOBS = [
+  'Novice',
+  'Swordman',
+  'Mage',
+  'Archer',
+  'Acolyte',
+  'Merchant',
+  'Thief',
+  'Knight',
+  'Priest',
+  'Wizard',
+  'Blacksmith',
+  'Hunter',
+  'Assassin',
+  'Crusader',
+  'Monk',
+  'Sage',
+  'Rogue',
+  'Alchemist',
+  'Bard',
+  'Dancer',
+  'Star_Gladiator',
+  'Soul_Linker',
+  'Taekwon',
+  'Ninja',
+  'Gunslinger',
+  'Super_Novice',
+  'Rebellion',
+  'Kagerou',
+  'Oboro',
+  'Summoner',
+] as const;
+
+export type RathenaJob = (typeof RATHENA_JOBS)[number];
+
+export const RATHENA_CLASSES = [
+  'Normal',
+  'Upper',
+  'Baby',
+  'Third',
+  'Third_Upper',
+  'Third_Baby',
+  'Fourth',
+  'Fourth_Baby',
+] as const;
+
+export type RathenaClass = (typeof RATHENA_CLASSES)[number];
+
+export const RATHENA_LOCATIONS = [
+  'Head_Top',
+  'Head_Mid',
+  'Head_Low',
+  'Armor',
+  'Right_Hand',
+  'Left_Hand',
+  'Garment',
+  'Shoes',
+  'Right_Accessory',
+  'Left_Accessory',
+  'Both_Hand',
+  'Both_Accessory',
+  'Costume_Head_Top',
+  'Costume_Head_Mid',
+  'Costume_Head_Low',
+  'Costume_Garment',
+  'Shadow_Armor',
+  'Shadow_Weapon',
+  'Shadow_Shield',
+  'Shadow_Shoes',
+  'Shadow_Right_Accessory',
+  'Shadow_Left_Accessory',
+] as const;
+
+export type RathenaLocation = (typeof RATHENA_LOCATIONS)[number];
+
 export type ItemJobs = Record<string, boolean>;
 export type ItemClasses = Record<string, boolean>;
 export type ItemLocations = Record<string, boolean>;
+
+
 
 export interface ItemRawFields {
   Id?: number;

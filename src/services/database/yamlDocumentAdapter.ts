@@ -14,6 +14,7 @@ export class YamlDocumentAdapter {
     const doc = YAML.parseDocument(rawYaml, {
       keepSourceTokens: true,
       customTags: ['binary'],
+      uniqueKeys: false,
     });
 
     return new YamlDocumentAdapter(doc, rawYaml);

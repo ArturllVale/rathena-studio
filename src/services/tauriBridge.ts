@@ -40,7 +40,7 @@ export async function openDirectoryDialog(title = 'Select rAthena Root Directory
   // Browser fallback prompt for local testing/dev
   if ('showDirectoryPicker' in window) {
     try {
-      // @ts-ignore
+      // @ts-expect-error - Web File System Access API fallback in dev
       const dirHandle = await window.showDirectoryPicker();
       return `/[Web-Mock-Path]/${dirHandle.name}`;
     } catch (err) {

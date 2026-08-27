@@ -19,23 +19,6 @@ export function App() {
     setIsTauri(isTauriEnvironment());
   }, [setIsTauri]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'workspace':
-        return <WorkspaceLandingView />;
-      case 'databases':
-        return <DatabasesView />;
-      case 'processes':
-        return <ProcessesView />;
-      case 'logs':
-        return <LogsView />;
-      case 'settings':
-        return <SettingsView />;
-      default:
-        return <WorkspaceLandingView />;
-    }
-  };
-
   return (
     <div className="h-screen w-screen flex flex-col bg-[#18181b] text-neutral-100 overflow-hidden font-sans">
       <TitleBar />
@@ -43,7 +26,21 @@ export function App() {
         <Sidebar />
         <main className="flex-1 overflow-hidden relative">
           <ErrorBoundary>
-            {renderContent()}
+            <div className={activeTab === 'workspace' ? 'h-full w-full' : 'hidden'}>
+              <WorkspaceLandingView />
+            </div>
+            <div className={activeTab === 'databases' ? 'h-full w-full' : 'hidden'}>
+              <DatabasesView />
+            </div>
+            <div className={activeTab === 'processes' ? 'h-full w-full' : 'hidden'}>
+              <ProcessesView />
+            </div>
+            <div className={activeTab === 'logs' ? 'h-full w-full' : 'hidden'}>
+              <LogsView />
+            </div>
+            <div className={activeTab === 'settings' ? 'h-full w-full' : 'hidden'}>
+              <SettingsView />
+            </div>
           </ErrorBoundary>
         </main>
       </div>
@@ -51,4 +48,5 @@ export function App() {
     </div>
   );
 }
+
 export default App;

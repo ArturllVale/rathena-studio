@@ -57,7 +57,7 @@ export class ItemEditSession {
     if (originalValue === value) {
       delete this.pendingChanges[field];
     } else {
-      this.pendingChanges[field] = value as any;
+      (this.pendingChanges as Record<string, unknown>)[field] = value;
     }
   }
 

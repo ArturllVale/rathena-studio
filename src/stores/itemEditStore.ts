@@ -12,6 +12,7 @@ interface ItemEditState {
   
   startSession: (item: EffectiveItem) => void;
   cancelSession: () => void;
+  reset: () => void;
   setField: <K extends keyof ItemRawFields>(field: K, value: ItemRawFields[K] | undefined) => void;
   undo: () => void;
   redo: () => void;
@@ -41,6 +42,16 @@ export const useItemEditStore = create<ItemEditState>((set, get) => ({
       validationIssues: [],
       commitError: null,
       isCommitting: false,
+    });
+  },
+
+  reset: () => {
+    const { currentSession } = get();
+    if (!currentSession) return;
+    set({
+      currentSession: new ItemEditSession(currentSession.originalItem),
+      validationIssues: [],
+      commitError: null,
     });
   },
 
