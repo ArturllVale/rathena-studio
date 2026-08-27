@@ -38,6 +38,17 @@ export async function openDirectoryDialog(title = 'Select rAthena Root Directory
   }
 
   // Browser fallback prompt for local testing/dev
+  if ('showDirectoryPicker' in window) {
+    try {
+      // @ts-ignore
+      const dirHandle = await window.showDirectoryPicker();
+      return `/[Web-Mock-Path]/${dirHandle.name}`;
+    } catch (err) {
+      console.warn('Browser directory picker cancelled or failed:', err);
+      return null;
+    }
+  }
+
   const manual = window.prompt('Enter rAthena absolute path (Browser Dev Mode):');
   return manual && manual.trim().length > 0 ? manual.trim() : null;
 }

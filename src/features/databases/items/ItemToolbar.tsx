@@ -13,7 +13,7 @@ export function ItemToolbar() {
   };
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemFilters({ type: (e.target.value as any) || undefined });
+    setItemFilters({ type: (e.target.value as any) || undefined, subType: undefined });
   };
 
   const handleSubTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
