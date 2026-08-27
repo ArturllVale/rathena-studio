@@ -1,661 +1,152 @@
-# rAthena Studio — Plano Mestre de Desenvolvimento
+# rAthena Studio â€” Plano Mestre de Desenvolvimento
 
-## 1. Visão do Projeto
+## 1. VisÃ£o do Projeto
 
-O rAthena Studio é uma aplicação desktop profissional para desenvolvimento, edição, validação e gerenciamento de servidores rAthena.
+O rAthena Studio Ã© uma aplicaÃ§Ã£o desktop profissional para desenvolvimento, ediÃ§Ã£o, validaÃ§Ã£o e gerenciamento de servidores rAthena.
 
-O objetivo NÃO é criar apenas um editor de YAML.
+O objetivo NÃƒO Ã© criar apenas um editor de YAML.
 
-O objetivo é construir um ambiente integrado de desenvolvimento para rAthena, permitindo:
-
-* Gerenciar databases YAML do rAthena.
-* Editar Items, Monsters, Skills, Quests, Instances e demais databases suportadas.
-* Validar estrutura e conteúdo dos databases.
-* Detectar referências quebradas entre databases.
-* Pesquisar rapidamente grandes volumes de dados.
-* Visualizar e editar entidades através de interfaces estruturadas.
-* Preservar a integridade dos arquivos YAML.
-* Abrir o YAML bruto quando necessário.
-* Gerenciar processos do ambiente rAthena.
-* Iniciar e parar Login Server, Char Server e Map Server.
-* Iniciar e parar MariaDB/MySQL e outros serviços configurados.
-* Capturar stdout/stderr dos processos.
-* Exibir logs em tempo real.
-* Monitorar estado dos processos.
-* Detectar automaticamente uma instalação existente do rAthena.
-* Integrar Git ao fluxo de desenvolvimento.
-* Permitir futuramente ferramentas avançadas de desenvolvimento de servidores.
-
-A visão de longo prazo é transformar o rAthena Studio em uma IDE especializada para desenvolvimento e administração de servidores rAthena.
+O objetivo Ã© construir um ambiente integrado de desenvolvimento para rAthena, permitindo:
+- Gerenciar databases YAML do rAthena.
+- Editar Items, Monsters, Skills, Quests, Instances e demais databases de forma estruturada.
+- Validar estrutura e conteÃºdo dos databases contra regras do emulador.
+- Detectar referÃªncias quebradas entre databases.
+- Pesquisar rapidamente grandes volumes de dados (25.000+ registros).
+- Preservar 100% da integridade e formataÃ§Ã£o original dos arquivos YAML (Textual Round-Trip).
+- Visualizar e gerenciar processos do servidor (Login/Char/Map).
+- Integrar Git ao fluxo de desenvolvimento de forma opcional.
 
 ---
 
-# 2. Princípios Fundamentais
+## 2. PrincÃ­pios Fundamentais
 
-## 2.1 Segurança dos dados
+### 2.1 SeguranÃ§a dos Dados
+O aplicativo jamais deve modificar silenciosamente arquivos do usuÃ¡rio ou corromper formataÃ§Ãµes. Toda escrita no AST do YAML preserva comentÃ¡rios, espaÃ§amentos e estilos literais de script (`Script: |`).
 
-O aplicativo jamais deve modificar silenciosamente arquivos do usuário.
+### 2.2 Source of Truth
+Os arquivos do rAthena no repositÃ³rio do usuÃ¡rio continuam sendo a Ãºnica fonte de verdade. NÃ£o hÃ¡ banco de dados local intermediÃ¡rio proprietÃ¡rio.
 
-Toda operação de escrita deve:
-
-1. Validar os dados.
-2. Detectar alterações.
-3. Preservar a integridade do arquivo.
-4. Informar erros claramente.
-5. Evitar perda de dados.
-
-Operações destrutivas devem exigir confirmação quando apropriado.
+### 2.3 Variante e Camadas
+Isolamento estrito entre `Renewal` e `Pre-Renewal`. Suporte nativo Ã  hierarquia de carregamento de camadas do rAthena (`BASE` â†’ `MODE_SPECIFIC` â†’ `IMPORT` â†’ `CUSTOM`). EdiÃ§Ãµes em campos herdados sÃ£o automaticamente salvas na camada de `db/import/` para manter arquivos originais limpos.
 
 ---
 
-## 2.2 Source of Truth
+## 3. Stack TecnolÃ³gica Oficial
 
-Os arquivos do rAthena continuam sendo a fonte de verdade.
-
-O aplicativo NÃO deve criar um banco de dados proprietário que substitua os YAMLs.
-
-O modelo interno deve representar os arquivos, não competir com eles.
-
----
-
-## 2.3 Compatibilidade
-
-O projeto deve ser desenvolvido considerando versões reais e atuais do rAthena.
-
-Não assumir que todos os YAMLs possuem exatamente a mesma estrutura.
-
-O parser, schema e validadores devem ser versionáveis.
+- **Desktop Shell**: Tauri 2 (Rust)
+- **Frontend**: React 19 + TypeScript
+- **State Management**: Zustand
+- **VirtualizaÃ§Ã£o**: `@tanstack/react-virtual`
+- **Parsing/AST**: `yaml` (v2)
+- **EstilizaÃ§Ã£o**: Tailwind CSS + Lucide Icons + Radix UI
 
 ---
 
-## 2.4 Separação de responsabilidades
+## 4. Arquitetura
 
-A aplicação deve separar claramente:
+A estrutura interna do projeto Ã© dividida em camadas desacopladas:
 
-* UI.
-* domínio rAthena.
-* parsing.
-* serialização.
-* validação.
-* filesystem.
-* gerenciamento de processos.
-* logs.
-* Git.
-* persistência das configurações da aplicação.
-
-A UI nunca deve manipular diretamente processos do sistema operacional.
+1. **UI & Presentation Layer**: Componentes React virtuais, painÃ©is do Explorer, formulÃ¡rios de ediÃ§Ã£o e modais de criaÃ§Ã£o.
+2. **State & Transaction Layer**: LÃ³gica de sessÃ£o (`EditSession`), histÃ³rico de Undo/Redo (`Command Pattern`) e orquestraÃ§Ã£o de transaÃ§Ãµes (`TransactionService`).
+3. **Database Workspace & Provider Layer**: Registry de providers, gerenciador de workspaces e carregadores de contextos de arquivos.
+4. **Database Engine & CST Layer**: Parsers estruturados, serializadores AST, repositÃ³rios de heranÃ§a de camadas e regras de validaÃ§Ã£o semÃ¢ntica.
+5. **Tauri IPC & Native Layer**: Acesso ao sistema de arquivos nativo do host.
 
 ---
 
-# 3. Stack Oficial
-
-## Desktop
-
-Tauri 2.
-
-## Frontend
-
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
-* shadcn/ui
-
-## Estado
-
-Zustand.
-
-## Editor de código
-
-Monaco Editor.
-
-## Validação
-
-Zod quando apropriado.
-
-## Parsing
-
-Implementar uma camada própria sobre uma biblioteca YAML madura.
-
-A biblioteca YAML não deve vazar diretamente para toda a aplicação.
-
-## Backend desktop
-
-Rust através do Tauri.
-
-Responsabilidades:
-
-* filesystem;
-* processos;
-* stdout/stderr;
-* filesystem watchers;
-* Git;
-* execução de comandos;
-* gerenciamento do ambiente;
-* operações privilegiadas quando estritamente necessárias.
-
----
-
-# 4. Arquitetura
-
-A arquitetura deve seguir aproximadamente:
-
-rAthena Studio
-¦
-+-- UI
-¦   +-- Dashboard
-¦   +-- Database Explorer
-¦   +-- Entity Editor
-¦   +-- YAML Editor
-¦   +-- Process Manager
-¦   +-- Console
-¦   +-- Logs
-¦   +-- Git
-¦   +-- Settings
-¦
-+-- Domain
-¦   +-- Item
-¦   +-- Monster
-¦   +-- Skill
-¦   +-- Quest
-¦   +-- Instance
-¦   +-- outros databases
-¦
-+-- Database Engine
-¦   +-- Parser
-¦   +-- Serializer
-¦   +-- Schema
-¦   +-- Validator
-¦   +-- Reference Resolver
-¦   +-- Search Index
-¦
-+-- Runtime Engine
-¦   +-- Process Manager
-¦   +-- Process Discovery
-¦   +-- Log Manager
-¦   +-- Environment Manager
-¦
-+-- Integrations
-+-- Git
-+-- Filesystem
-
-````
-
----
-
-# 5. Estrutura inicial de diretórios
-
-A estrutura deve evoluir de forma modular:
+## 5. Estrutura de DiretÃ³rios
 
 ```text
 rathena-studio/
-+-- .agent/
-¦   +-- skills/
-¦       +-- rathena-studio/
-¦           +-- skill.md
-¦
-+-- docs/
-¦   +-- plan.md
-¦
-+-- src/
-¦   +-- app/
-¦   +-- components/
-¦   +-- features/
-¦   +-- stores/
-¦   +-- services/
-¦   +-- domain/
-¦   +-- lib/
-¦   +-- types/
-¦
-+-- src-tauri/
-¦   +-- src/
-¦       +-- commands/
-¦       +-- filesystem/
-¦       +-- processes/
-¦       +-- git/
-¦       +-- logging/
-¦
-+-- tests/
-````
-
-A estrutura pode ser refinada durante a implementação, mas não deve ser transformada em um monólito.
-
----
-
-# 6. Fases de Desenvolvimento
-
-## Fase 0 — Discovery e especificação
-
-Antes de implementar funcionalidades complexas:
-
-* estudar a estrutura real dos databases YAML do rAthena;
-* identificar databases existentes;
-* identificar headers e versões;
-* identificar relações entre databases;
-* identificar particularidades de serialização;
-* identificar campos obrigatórios;
-* identificar enums;
-* identificar referências;
-* identificar diferenças entre versões.
-
-Não inventar schemas.
-
-Os schemas devem ser derivados do comportamento real do rAthena.
-
-### Critério de conclusão
-
-Existe documentação interna suficiente para implementar o primeiro database sem depender de suposições.
-
----
-
-# Fase 1 — Fundação do Desktop
-
-Implementar:
-
-* Tauri 2;
-* React;
-* TypeScript;
-* Vite;
-* Tailwind;
-* shadcn/ui;
-* estrutura de pastas;
-* Zustand;
-* sistema de configuração;
-* tratamento global de erros;
-* logging interno da aplicação.
-
-### Critério de conclusão
-
-A aplicação inicia corretamente como desktop app e possui arquitetura preparada para as próximas fases.
-
----
-
-# Fase 2 — Detecção do rAthena
-
-Criar mecanismo para:
-
-* selecionar diretório do rAthena;
-* validar se é realmente uma instalação válida;
-* detectar databases;
-* detectar executáveis;
-* detectar configuração relevante;
-* armazenar o workspace selecionado.
-
-Exemplo conceitual:
-
-```text
-Workspace
-+-- root
-+-- database
-+-- db
-+-- npc
-+-- conf
-+-- login-server
-+-- char-server
-+-- map-server
-```
-
-Não assumir caminhos fixos.
-
----
-
-# Fase 3 — Database Engine
-
-Esta é uma das partes mais importantes do projeto.
-
-Criar:
-
-* parser;
-* serializer;
-* schema registry;
-* validator;
-* error model;
-* change tracking;
-* filesystem watcher;
-* referência cruzada;
-* search engine.
-
-O Database Engine deve ser independente da UI.
-
-A UI deve consumir APIs de domínio.
-
----
-
-# Fase 4 — Primeiro Database: Items
-
-Implementar primeiro o database de Items.
-
-Funcionalidades:
-
-* listar;
-* pesquisar;
-* ordenar;
-* filtrar;
-* visualizar;
-* editar;
-* criar;
-* duplicar;
-* excluir;
-* validar;
-* salvar;
-* desfazer alterações;
-* refazer alterações;
-* visualizar YAML bruto.
-
-Critério de qualidade:
-
-Uma alteração feita através da UI deve resultar em YAML válido e semanticamente equivalente ao modelo editado.
-
----
-
-# Fase 5 — Database Explorer Genérico
-
-Depois de validar o pipeline com Items, criar uma infraestrutura genérica capaz de suportar:
-
-* Items;
-* Monsters;
-* Skills;
-* Quests;
-* Instances;
-* Maps;
-* Drops;
-* Random Options;
-* Achievements;
-* outros databases relevantes.
-
-Não criar uma implementação independente para cada database se a estrutura puder ser generalizada.
-
-O sistema deve permitir registrar novos databases através de schemas/adapters.
-
----
-
-# Fase 6 — Validação
-
-Implementar validações:
-
-### Estruturais
-
-* YAML inválido;
-* campo desconhecido;
-* campo obrigatório ausente;
-* tipo incorreto;
-* enum inválido.
-
-### Semânticas
-
-* ID duplicado;
-* AegisName duplicado;
-* valores inválidos;
-* combinações incompatíveis.
-
-### Referenciais
-
-* item inexistente;
-* monster inexistente;
-* skill inexistente;
-* mapa inexistente;
-* referência quebrada;
-* referência circular quando não permitida.
-
-Os erros devem possuir:
-
-* severity;
-* arquivo;
-* localização;
-* mensagem;
-* código;
-* possível solução.
-
----
-
-# Fase 7 — YAML Editor
-
-Integrar Monaco Editor.
-
-O editor deve oferecer:
-
-* syntax highlighting;
-* autocomplete;
-* validação;
-* navegação;
-* busca;
-* replace;
-* diagnostics;
-* integração com schemas.
-
-A edição estruturada e a edição textual devem permanecer sincronizadas de maneira segura.
-
----
-
-# Fase 8 — Process Manager
-
-Criar abstração genérica para processos.
-
-Modelo:
-
-```text
-ProcessDefinition
-+-- id
-+-- name
-+-- executable
-+-- arguments
-+-- workingDirectory
-+-- environment
-+-- dependencies
-+-- autoRestart
-```
-
-Suportar:
-
-* start;
-* stop;
-* restart;
-* status;
-* PID;
-* exit code;
-* stdout;
-* stderr;
-* tempo de execução.
-
----
-
-# Fase 9 — rAthena Runtime
-
-Criar perfis:
-
-```text
-Login Server
-Char Server
-Map Server
-Database
-```
-
-Permitir:
-
-* iniciar individualmente;
-* parar individualmente;
-* reiniciar;
-* iniciar todos;
-* parar todos.
-
-Respeitar dependências.
-
-Exemplo:
-
-```text
-Database
-   ?
-Login
-   ?
-Char
-   ?
-Map
+â”œâ”€â”€ docs/
+â”‚   â”œâ”€â”€ database-engine/           # EspecificaÃ§Ãµes e requisitos de round-trip
+â”‚   â”œâ”€â”€ database-schema-audit.md   # Auditoria detalhada de campos e cobertura
+â”‚   â””â”€â”€ plan.md                    # Este plano mestre atualizado
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ app/                       # Layout principal e inicializadores
+â”‚   â”œâ”€â”€ components/ui/             # Componentes reutilizÃ¡veis
+â”‚   â”œâ”€â”€ domain/database/           # Estrutura lÃ³gica de camadas, proveniÃªncia e sessÃµes
+â”‚   â”œâ”€â”€ features/databases/        # VisualizaÃ§Ãµes (Items, Monsters, Skills, Modais)
+â”‚   â”œâ”€â”€ services/database/         # Parsers, Serializers, Repositories e Transactions
+â”‚   â”œâ”€â”€ stores/                    # Zustand Stores (database, edits, workspaces)
+â”‚   â””â”€â”€ utils/                     # UtilitÃ¡rios (semanticDiff, script helpers)
+â”œâ”€â”€ src-tauri/                     # CÃ³digo Rust Tauri 2
+â”œâ”€â”€ tests/                         # SuÃ­te completa de testes (Vitest)
+â””â”€â”€ package.json
 ```
 
 ---
 
-# Fase 10 — Console e Logs
+## 6. Status e Fases de Desenvolvimento
 
-Criar terminal integrado.
+```mermaid
+graph TD
+    F0[Fase 0: Discovery & Spec] --> F1[Fase 1: FundaÃ§Ã£o Tauri/React]
+    F1 --> F2[Fase 2: DetecÃ§Ã£o & Workspace]
+    F2 --> F3[Fase 3: Engine AST Multi-Layer]
+    F3 --> F4[Fase 4: Item Database]
+    F4 --> F5[Fase 5: Monster & Skill DBs]
+    F5 --> F6[Fase 6: CriaÃ§Ã£o & ValidaÃ§Ã£o]
+    F6 --> F7[Fase 7: Combos, Options & Packages]
+    F7 --> F8[Fase 8: Editor Monaco & Scripts]
+    F8 --> F9[Fase 9: Process Manager & Runtime]
+```
 
-Requisitos:
+### [x] Fase 0 â€” Discovery e EspecificaÃ§Ã£o (CONCLUÃDO)
+- Estudo do parser do rAthena (`rapidyaml`), regras de heranÃ§a e carregamento de imports.
+- DefiniÃ§Ã£o do formato canÃ´nico do Header, Body e Footer.
 
-* stdout em tempo real;
-* stderr em tempo real;
-* múltiplos processos;
-* tabs;
-* filtros;
-* busca;
-* níveis;
-* timestamps;
-* auto-scroll;
-* limpar;
-* copiar;
-* salvar;
-* histórico.
+### [x] Fase 1 â€” FundaÃ§Ã£o do Desktop (CONCLUÃDO)
+- Setup do Tauri 2, React, TypeScript, Tailwind CSS e Vitest.
 
-Nunca bloquear a UI por causa de leitura de logs.
+### [x] Fase 2 â€” DetecÃ§Ã£o de rAthena e Workspace (CONCLUÃDO)
+- EstruturaÃ§Ã£o do `WorkspaceStore` e fluxo de setup de diretÃ³rio rAthena com detecÃ§Ã£o de variantes (`Renewal`/`Pre-Renewal`).
 
----
+### [x] Fase 3 â€” Database Engine (CONCLUÃDO)
+- Parser/Serializer usando AST via `yaml` v2 garantindo fidelidade de comentÃ¡rios, quebras de linhas e scripts.
+- ResoluÃ§Ã£o em camadas por campo (`FieldOrigin`) e detecÃ§Ã£o de proveniÃªncia.
 
-# Fase 11 — Git
+### [x] Fase 4 â€” Item Database (CONCLUÃDO)
+- CRUD completo de Itens, editor de subestruturas (`Flags`, `Trade`, `Delay`, `Stack`), checklist de Jobs/Classes e locais de equipamento.
+- Rastreamento de proveniÃªncia de campos em tempo real.
 
-Implementar:
+### [x] Fase 5 â€” Monster e Skill Databases (CONCLUÃDO)
+- **Monstros**: Editor de identidade, atributos, EXP, modos de IA detalhados e tabelas de Drops/MVP Drops com cÃ¡lculo de taxa.
+- **Skills**: Matrizes progressivas por nÃ­vel (`SpCost`, `HpCost`, timings), catalisadores, requisitos de armas e Ã¡rea/unidade.
+- Listagem virtualizada rÃ¡pida para mais de 25.000 registros simultÃ¢neos.
 
-* status;
-* modified files;
-* diff;
-* stage;
-* unstage;
-* commit;
-* branches;
-* pull;
-* push;
-* revert.
+### [x] Fase 6 â€” TransaÃ§Ãµes, Diff SemÃ¢ntico e CriaÃ§Ã£o (+1) (CONCLUÃDO)
+- HistÃ³rico de Undo/Redo no nÃ­vel do campo e mecanismo de **Discard** (reset).
+- Engine de Diff SemÃ¢ntico recursivo com visualizaÃ§Ã£o estilo GitHub (linhas modificadas `-` e `+`).
+- AdiÃ§Ã£o de novos registros (`+ New Item/Monster/Skill`) com verificaÃ§Ã£o em tempo real de ID e AegisName duplicados e auto-sugestÃ£o de prÃ³ximo ID.
+- Carregamento unificado com barra de progresso visual de status de leitura.
 
-O Git deve ser uma integração opcional e não uma dependência obrigatória para funcionamento básico.
+### [ ] Fase 7 â€” Item Combos, Random Options, Item Groups & Packages (PRÃ“XIMA FASE)
+- Parser e editor para `item_combos.yml`, `item_group_db.yml`, `item_packages.yml` e `item_randomopt_db.yml`.
+- ReferÃªncias cruzadas: relacionar itens aos seus respectivos combos e pacotes no Explorer.
 
----
+### [ ] Fase 8 â€” YAML Text Editor & Monaco Integration
+- IntegraÃ§Ã£o do Monaco Editor para visualizaÃ§Ã£o textual raw de arquivos YAML.
+- Autocompletion inteligente em scripts e validaÃ§Ãµes de constantes do rAthena.
 
-# Fase 12 — UX avançada
-
-Após a fundação estar estável:
-
-* command palette;
-* atalhos;
-* tabs;
-* favoritos;
-* recent files;
-* recent databases;
-* dark mode;
-* split editor;
-* preview;
-* breadcrumbs;
-* navegação por referências;
-* global search.
+### [ ] Fase 9 â€” Process Manager & rAthena Runtime
+- InicializaÃ§Ã£o e monitoramento de Login, Char e Map servers do rAthena.
+- Captura de logs e stdout/stderr integrados em console.
 
 ---
 
-# Fase 13 — Testes
+## 7. SuÃ­te de Testes e Qualidade
 
-Cobertura obrigatória para:
-
-* parser;
-* serializer;
-* schema;
-* validator;
-* reference resolver;
-* process manager;
-* log manager;
-* filesystem watcher.
-
-Testar principalmente casos reais e edge cases.
-
-Nunca considerar uma funcionalidade concluída apenas porque a UI funciona.
+- **Cobertura**: 100 testes cobrindo parsing, round-trip AST, transaÃ§Ãµes de ediÃ§Ã£o, validadores e fluxos de criaÃ§Ã£o de entidades.
+- **IntegraÃ§Ã£o contÃ­nua**: ValidaÃ§Ã£o via typecheck estrito (`tsc --noEmit`), lint (`eslint`) e build de produÃ§Ã£o.
 
 ---
 
-# Fase 14 — Performance
+## 8. Definition of Done (DoD)
 
-O aplicativo deve continuar responsivo com databases grandes.
-
-Evitar:
-
-* carregar tudo na UI sem necessidade;
-* re-renderizações desnecessárias;
-* parsing repetitivo;
-* serialização completa quando uma alteração localizada puder ser realizada com segurança;
-* bloqueio da thread principal;
-* watchers duplicados.
-
-Pesquisar e indexar dados de forma eficiente.
-
----
-
-# 7. Critérios Globais de Qualidade
-
-Uma funcionalidade só pode ser considerada concluída quando:
-
-* funciona;
-* está integrada à arquitetura;
-* possui tratamento de erro;
-* possui testes apropriados;
-* não introduz regressões;
-* possui UX consistente;
-* respeita os princípios do projeto;
-* funciona com dados reais;
-* não depende de comportamento inventado.
-
----
-
-# 8. Regra de Ouro
-
-Nunca implementar primeiro e descobrir depois como o rAthena realmente funciona.
-
-Para qualquer funcionalidade relacionada ao rAthena:
-
-1. Inspecionar o código/estrutura real.
-2. Identificar o contrato existente.
-3. Documentar o comportamento.
-4. Implementar.
-5. Testar contra dados reais.
-6. Auditar.
-7. Só então considerar concluído.
-
----
-
-# 9. Definition of Done
-
-Uma tarefa está concluída somente quando:
-
-* [ ] implementação concluída;
-* [ ] integração concluída;
-* [ ] erros tratados;
-* [ ] testes executados;
-* [ ] casos extremos considerados;
-* [ ] nenhuma funcionalidade existente quebrada;
-* [ ] código revisado;
-* [ ] documentação atualizada quando necessário;
-* [ ] comportamento verificado contra dados reais do rAthena.
-
----
-
-# 10. Direção do Produto
-
-O rAthena Studio deve evoluir de:
-
-Editor de YAML
-
-para:
-
-Database IDE
-
-para:
-
-rAthena Development Environment
-
-para:
-
-ambiente completo de desenvolvimento e administração de servidores rAthena.
-
-A arquitetura inicial deve permitir essa evolução sem exigir uma reescrita completa.
+Uma tarefa ou fase Ã© considerada entregue apenas quando:
+1. Compila sem erros TypeScript ou avisos no linter.
+2. Preserva comentÃ¡rios e formataÃ§Ã£o YAML original ao salvar no disco.
+3. Possui testes de unidade e integraÃ§Ã£o cobrindo fluxos felizes e limites de erro.
+4. Passa na validaÃ§Ã£o de unicidade de dados (ID / AegisName).
+5. MantÃ©m a responsividade da UI (scroll virtual de 60 FPS).

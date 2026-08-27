@@ -10,9 +10,9 @@ Projeto: `rAthena Studio`
 
 | Camada | Estado Atual no rAthena Studio | Cobertura |
 | :--- | :--- | :--- |
-| **Item Database (`ITEM_DB`)** | Todos os 33 campos, subestruturas (`Flags`, `Trade`, `Delay`, etc.), maps (`Jobs`, `Classes`, `Locations`), editores de script com autocomplete e componentes Shadcn Select. | **100% (Fase 1 Concluída)** |
-| **Monster Database (`MOB_DB`)** | Tipagem completa (`MobRawFields`), multi-camadas, editor de identidade, atributos, EXP, modos de IA (`01`-`27`) com tooltips em PT-BR, tabelas de Drops & MVP com % em tempo real e serialização YAML tolerante. | **100% (Fase 2 Concluída)** |
-| **Skill Database (`SKILL_DB`)** | Tipagem completa (`SkillRawFields`), parser AST, repositório multi-camadas, timings escalares e matriciais por nível, custos de recursos, catalisadores e armas, áreas de efeito e unidades de solo. | **100% (Fase 3 Concluída)** |
+| **Item Database (`ITEM_DB`)** | Todos os 33 campos, subestruturas (`Flags`, `Trade`, `Delay`, etc.), maps (`Jobs`, `Classes`, `Locations`), editores de script com autocomplete e componentes Shadcn Select. Criação de novos itens (`+ New Item`) com validação de ID e AegisName único em tempo real. | **100% (Fase 1+3 Concluída)** |
+| **Monster Database (`MOB_DB`)** | Tipagem completa (`MobRawFields`), multi-camadas, editor de identidade, atributos, EXP, modos de IA (`01`-`27`) com tooltips em PT-BR, tabelas de Drops & MVP com % em tempo real e serialização YAML tolerante. Criação de novos monstros (`+ New Monster`). | **100% (Fase 2+3 Concluída)** |
+| **Skill Database (`SKILL_DB`)** | Tipagem completa (`SkillRawFields`), parser AST, repositório multi-camadas, timings escalares e matriciais por nível, custos de recursos, catalisadores e armas, áreas de efeito e unidades de solo. Criação de novas habilidades (`+ New Skill`). | **100% (Fase 3 Concluída)** |
 | **Quest Database (`QUEST_DB`)** | Identificador declarado em `DatabaseProviderId`, sem provider/parser/UI. | 0% (Fase 4) |
 | **Instance Database (`INSTANCE_DB`)** | Identificador declarado em `DatabaseProviderId`, sem provider/parser/UI. | 0% (Fase 5) |
 | **Demais Bancos e Tabelas Auxiliares (35+)** | Mapeados no catálogo técnico de esquemas. | 0% (Fase 5) |
@@ -279,7 +279,11 @@ graph TD
   - [x] Listagem virtualizada de alta performance com badges de pasta.
   - [x] Inspetor modular em abas: *General & Identity*, *Timings & Delays* (com conversor entre valor uniforme e matriz por nível 1..MaxLevel), *Requirements & Costs* (SP/HP/AP/Zeny, catalisadores e grade de armas), *Area & Units* (AoE, Units de chão, flags e CopyFlags), *Layers* (proveniência e diff semântico).
 - [x] **3.6 Testes Automatizados e Validação Round-Trip**
-  - [x] Suíte completa Vitest com testes de parsing de arquivos reais de `horizonro/db` e round-trip AST.
+  - [x] Suíte de 100 testes Vitest cobrindo parsing de dados reais do rAthena, edição via AST, Undo/Redo/Discard e criação de novas entidades.
+- [x] **3.7 Sistema de Criação de Entidades (+1 Novo Registro)**
+  - [x] Modais de criação de itens, monstros e habilidades com validação de unicidade de ID e AegisName em tempo real, sugestão automática de ID e seleção da camada de destino (padrão: `db/import/`).
+- [x] **3.8 Carregamento de Banco de Dados Unificado**
+  - [x] Interface simplificada para seleção de variante (`Renewal` ou `Pre-Renewal`) que executa o carregamento sequencial de todos os bancos com barra de progresso e badges de status por banco.
 
 ---
 

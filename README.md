@@ -1,140 +1,234 @@
 # rAthena Studio
 
-**rAthena Studio** is a high-performance desktop Integrated Development Environment (IDE) tailored for Ragnarok Online emulator server administration, structured YAML database engineering, and runtime management.
+**rAthena Studio** é uma IDE desktop de alto desempenho para administração de servidores de Ragnarok Online baseados no emulador [rAthena](https://github.com/rathena/rathena). Permite edição visual das bases de dados YAML (`item_db`, `mob_db`, `skill_db`) com rastreamento de camada por campo, visualização de diff semântico e persistência transacional via AST.
 
 ---
 
-## 1. Current System Architecture
+## Funcionalidades Implementadas
 
-The application is structured into decoupled core layers:
+### Database Explorer com Multi-Layer Inheritance
+- Carregamento unificado de **Item Database**, **Monster Database** e **Skill Database** em uma única ação com seleção de variante `Renewal (RE)` ou `Pre-Renewal (PRE-RE)`.
+- Barra de progresso visual e mensagens de status por etapa durante o carregamento.
+- Suporte a **25.000+ entidades** com scroll virtualizado a 60 FPS via `@tanstack/react-virtual`.
+- **Herança em camadas** com resolução automática de prioridade: `BASE → MODE_SPECIFIC → IMPORT → CUSTOM`.
+
+### Item Inspector
+- Edição completa de todos os campos YAML: identidade, tipo/subtipo, preços, estatísticas de combate, requisitos de job/classe/localização, scripts de equip/heal/use.
+- Filtros de pesquisa por ID, AegisName, Nome, Tipo, SubTipo e Pasta (import / geral).
+- Criação de novos itens (`+ New Item`) com validação de ID único e AegisName único em tempo real.
+
+### Monster Inspector
+- Edição de identidade, atributos base (STR/AGI/VIT/INT/DEX/LUK), estatísticas de combate, drops, MVP drops, modos de AI e classe.
+- Filtros por Elemento, Raça, Tamanho, Classe e Pasta.
+- Criação de novos monstros (`+ New Monster`) com auto-sugestão de ID e validação de unicidade.
+
+### Skill Inspector
+- Edição de identidade, requisitos de nível, custos de SP/HP/AP/Zeny com suporte a valores uniformes e por-nível (Scaled/Uniform).
+- Dropdowns canônicos para Elemento, Área de Splash, Alvos de Unidade, Estado Requerido e Tipo de Munição baseados no `skill_db.txt` real do rAthena.
+- Matrizes de nível editáveis para `SpCost`, `HpCost`, `ApCost`, `ZenyCost`, `SpRateCost`, `HpRateCost`, `SpiritSphereCost`, `MaxHpTrigger`, `AmmoAmount`.
+- Criação de novas habilidades (`+ New Skill`) com seleção de camada de destino.
+
+### Layer Hierarchy (Proveniência por Campo)
+- Cada campo exibe sua origem exata (arquivo e camada) no Inspector.
+- Visualização padronizada com badges numerados, labels de import/base/mode e chips de campos ativos.
+
+### Semantic Diff Engine (GitHub-Style)
+- Diff semântico recursivo (`computeSemanticDiff`) exibido como linhas `-` / `+` em estilo Git para cada campo alterado.
+- Integrado nos inspetores de Item, Monster e Skill na aba **Changes**.
+
+### Transactional Persistence (Atomic AST Writes)
+- **Undo/Redo** por campo via Command Pattern (`FieldEditCommand`, `undoStack`, `redoStack`).
+- **Discard**: restauração total do estado original da sessão via `reset()`.
+- **Save**: validação de business rules → mutação atômica do AST → escrita no disco → recarga da camada afetada.
+- **Target Layer Policy**: edições de campos herdados de camadas base são automaticamente direcionadas para `db/import/` sem modificar os arquivos base.
+- **Criação de Entidades** (`createItem`, `createMob`, `createSkill`): Appends ao AST com validação de duplicatas antes de qualquer I/O.
+
+---
+
+## Arquitetura
 
 ```text
-┌──────────────────────────────────────────────────────────────────┐
-│                      UI & Presentation Layer                     │
-│  - Database Explorer (Virtual List via @tanstack/react-virtual)  │
-│  - Item Inspector (Field Origins, Layer Provenance, Live Diff)   │
-│  - Scoped Shortcuts (Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z)             │
-└─────────────────────────────────┬────────────────────────────────┘
-                                  │
-┌─────────────────────────────────▼────────────────────────────────┐
-│               State Management & Transaction Layer               │
-│  - useItemEditStore / useDatabaseStore (Zustand: UI State only)  │
-│  - ItemEditSession (Command Pattern: undoStack, redoStack)       │
-│  - ItemEditTransactionService (Validation & Commit Orchestrator) │
-└─────────────────────────────────┬────────────────────────────────┘
-                                  │
-┌─────────────────────────────────▼────────────────────────────────┐
-│               Database Workspace & Provider Layer                │
-│  - DatabaseRegistry (Provider discovery & metadata catalog)      │
-│  - ItemDatabaseProvider (Lazy-loading & cache management)        │
-│  - DatabaseContextLoader (Layer discovery & ordering)           │
-└─────────────────────────────────┬────────────────────────────────┘
-                                  │
-┌─────────────────────────────────▼────────────────────────────────┐
-│                   Database Engine & CST Layer                    │
-│  - LayeredItemRepository (25,000+ entities, RE/PRE-RE isolated)  │
-│  - SourceItem vs EffectiveItem (Runtime resolution & provenance) │
-│  - ItemDatabaseSerializer (AST round-trip, comments preserved)   │
-│  - ItemDatabaseValidator (Business logic & exploit guards)       │
-└─────────────────────────────────┬────────────────────────────────┘
-                                  │
-┌─────────────────────────────────▼────────────────────────────────┐
-│                   Tauri IPC & Native Backend                     │
-│  - Tauri File System Provider & FileContentWriter                │
-│  - Rust Backend (Tauri 2, Process Management, Security Caps)     │
-└──────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                       UI & Presentation Layer                        │
+│  - DatabasesView (Unified loader, progress bar, variant selector)    │
+│  - ItemExplorerView / MobExplorerView / SkillExplorerView            │
+│  - Inspector (Identity, Combat, Requirements, Area, Timing, Drops)   │
+│  - SemanticDiffViewer (GitHub-style -/+ diff)                        │
+│  - CreateItemModal / CreateMobModal / CreateSkillModal               │
+│  - Virtual Lists (@tanstack/react-virtual, 60 FPS, 25k+ entities)    │
+└──────────────────────────────────┬───────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────┐
+│                  State Management & Transaction Layer                 │
+│  - useDatabaseStore / useItemEditStore / useMobEditStore             │
+│  - useSkillEditStore (Zustand: UI state + session refs)              │
+│  - ItemEditSession / MobEditSession / SkillEditSession               │
+│    (Command Pattern: FieldEditCommand, undoStack, redoStack)         │
+│  - ItemEditTransactionService / MobEditTransactionService            │
+│  - SkillEditTransactionService (Validate → AST Mutate → Write)      │
+└──────────────────────────────────┬───────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────┐
+│               Database Workspace & Provider Layer                     │
+│  - DatabaseRegistry (Provider discovery & metadata catalog)          │
+│  - ItemDatabaseProvider / MobDatabaseProvider / SkillDatabaseProvider│
+│  - DatabaseContextLoader (Layer discovery & ordering by priority)    │
+└──────────────────────────────────┬───────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────┐
+│                    Database Engine & CST Layer                        │
+│  - LayeredItemRepository (RE/PRE-RE isolated, 25k+ entities)         │
+│  - LayeredMobRepository / LayeredSkillRepository                     │
+│  - SourceItem/Mob/Skill (per-file raw state) vs                      │
+│    EffectiveItem/Mob/Skill (resolved composite with FieldOrigin map) │
+│  - ItemDatabaseSerializer / MobDatabaseSerializer / Skill...         │
+│    (AST round-trip: comments, whitespace, unknown attrs preserved)   │
+│  - ItemDatabaseValidator / MobDatabaseValidator / SkillDatabaseVal.  │
+│  - semanticDiff.ts (recursive deep diff engine)                      │
+└──────────────────────────────────┬───────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────┐
+│                    Tauri IPC & Native Backend                         │
+│  - TauriLayerFileContentProvider / TauriFileContentWriter            │
+│  - Rust Backend (Tauri 2, File System, Security Capabilities)        │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Core Functional Components
+## Stack Tecnológico
 
-### A. Database Engine & Layered Repository (`src/domain/database/`)
-- **Variant Isolation**: Strict partitioning between Renewal (`RE`) and Pre-Renewal (`PRE-RE`).
-- **Layered Inheritance**: Evaluates the priority chain (`BASE` → `MODE_SPECIFIC` → `IMPORT` → `CUSTOM`).
-- **Entity Resolution**:
-  - `SourceItem`: Exact physical state inside an individual YAML layer file.
-  - `EffectiveItem`: Final resolved composite state with `FieldOrigin` mapping indicating the source layer of every individual field.
-- **CST / AST Round-Trip Serializer**: Employs `yaml` AST parsing to modify, insert, or override records while preserving header metadata, comments, whitespace, custom scripts, and unknown attributes. Fully supports empty files and `Body: null` declarations.
-
-### B. Transactional Edit Layer & Undo/Redo (`src/services/database/`, `src/domain/database/workspace/`)
-- **Session-Scoped History**: Undo/Redo is encapsulated within `ItemEditSession` using the Command Pattern (`FieldEditCommand`), tracking fine-grained field deltas without duplicating the repository.
-- **Explicit Target Layer Policy**: Edits targeting fields inherited from base files automatically target the user's `IMPORT` override layer (`db/import/item_db.yml`) rather than modifying base files silently.
-- **Safety Pipeline**:
-  `UI Mutation -> EditCommand -> ItemEditSession -> ItemDatabaseValidator -> AST Mutation -> Atomic I/O`
-- **Failure Resilience**: Persistence errors or validation failures leave the edit session dirty with pending changes and stacks intact.
-
-### C. Database Explorer (`src/features/databases/items/`)
-- **Virtual Scrolling**: Fluid 60 FPS exploration of 25,000+ items using `@tanstack/react-virtual`.
-- **Search & Filtering**: Multi-field querying (ID, AegisName, Name), item type filtering, and sub-type categorization.
-- **Provenance Inspector**: Visual inspector detailing effective values, per-field source origins, layer hierarchy, and semantic live diffs.
+| Camada | Tecnologia |
+|--------|-----------|
+| Desktop Shell | Tauri 2 (Rust) |
+| Frontend | React 19 + TypeScript 5.7 |
+| State Management | Zustand 5 |
+| Virtualização | @tanstack/react-virtual 3 |
+| Parsing & AST | yaml 2 |
+| UI Components | Radix UI (Select) + Lucide Icons |
+| Estilização | Tailwind CSS 3 |
+| Build | Vite 6 |
+| Testes | Vitest 3 (100 testes, 16 suítes) |
 
 ---
 
-## 3. Technology Stack
-
-- **Desktop Shell**: Tauri 2 (Rust)
-- **Frontend**: React 19 + TypeScript
-- **State Management**: Zustand (UI and session metadata only)
-- **Virtualization**: `@tanstack/react-virtual`
-- **Parsing & AST**: `yaml`
-- **Styling**: Tailwind CSS + Lucide Icons
-- **Testing**: Vitest (74 unit and integration characterization tests)
-
----
-
-## 4. Directory Structure
+## Estrutura de Diretórios
 
 ```text
 rathena-studio/
 ├── docs/
-│   ├── database-engine/          # Engine, format, and round-trip specifications
-│   └── plan.md                   # Long-term architecture and phased milestones
+│   ├── database-engine/
+│   │   ├── item-db-specification.md      # Especificação de campos do item_db
+│   │   ├── parser-strategy.md            # Estratégia de parsing em camadas
+│   │   ├── rathena-database-format.md    # Formato YAML real do rAthena
+│   │   └── round-trip-requirements.md    # Requisitos de fidelidade AST
+│   ├── database-schema-audit.md          # Auditoria de campos implementados vs spec
+│   └── plan.md                           # Roadmap e fases de desenvolvimento
 ├── src/
-│   ├── app/                      # Main application shell and layout
+│   ├── app/                              # App shell, layout e roteamento
+│   ├── components/ui/                    # Componentes base (Button, Input, Select, Card)
 │   ├── domain/database/
-│   │   ├── common/               # Context, layers, and variant definitions
-│   │   ├── item/                 # SourceItem, EffectiveItem, FieldOrigin, types
-│   │   ├── provider/             # DatabaseProvider contract and metadata
-│   │   └── workspace/            # ItemEditSession, Command Pattern, Registry, Writers
-│   ├── features/databases/       # Database Explorer, Toolbar, VirtualList, Inspector
-│   ├── services/database/        # ContextLoader, Serializer, Validator, TransactionService
-│   │   └── providers/            # ItemDatabaseProvider, Tauri file providers
-│   └── stores/                   # databaseStore, itemEditStore, workspaceStore
-├── src-tauri/                    # Tauri 2 Rust core and capabilities
-├── tests/                        # Vitest suite (characterization, engine, session, audit)
+│   │   ├── common/                       # Context, layers, variant definitions
+│   │   ├── item/                         # SourceItem, EffectiveItem, FieldOrigin, types
+│   │   ├── mob/                          # SourceMob, EffectiveMob, AI definitions
+│   │   ├── skill/                        # SourceSkill, EffectiveSkill, skill types
+│   │   ├── provider/                     # DatabaseProvider contract & metadata
+│   │   └── workspace/                   # EditSessions, Command Pattern, Writers
+│   ├── features/databases/
+│   │   ├── common/                       # SemanticDiffViewer
+│   │   ├── items/                        # ItemExplorerView, Inspector, CreateItemModal
+│   │   ├── mobs/                         # MobExplorerView, Inspector, CreateMobModal
+│   │   └── skills/                      # SkillExplorerView, Inspector, CreateSkillModal
+│   ├── services/database/
+│   │   ├── item/                         # ItemDatabaseParser, Serializer, Repository
+│   │   ├── mob/                          # MobDatabaseParser, Serializer, Repository
+│   │   ├── skill/                        # SkillDatabaseParser, Serializer, Repository
+│   │   ├── providers/                    # ItemDatabaseProvider, Mob..., Skill..., Tauri...
+│   │   ├── itemEditTransactionService.ts
+│   │   ├── mobEditTransactionService.ts
+│   │   └── skillEditTransactionService.ts
+│   ├── stores/                           # databaseStore, itemEditStore, mobEditStore, skillEditStore, workspaceStore
+│   └── utils/
+│       └── semanticDiff.ts               # Recursive deep diff engine
+├── src-tauri/                            # Tauri 2 Rust core e capabilities
+├── tests/
+│   ├── app.test.tsx
+│   ├── databaseEngineAudit.test.ts       # Real rAthena data compatibility (25k+ items)
+│   ├── databaseEngineCharacterization.test.ts
+│   ├── databaseEngineCore.test.ts        # Layer resolution, variant isolation
+│   ├── databaseWorkspace.test.ts
+│   ├── entityCreation.test.ts            # +1 Item/Mob/Skill creation & uniqueness validation
+│   ├── itemEditAudit.test.ts
+│   ├── itemEditSession.test.ts           # Undo/Redo command pattern
+│   ├── itemEditTransactionService.test.ts
+│   ├── itemExplorerState.test.ts
+│   ├── itemInspectorFullFields.test.ts
+│   ├── mobDatabaseEngine.test.ts
+│   ├── rathenaScriptValidator.test.ts
+│   ├── services.test.ts
+│   ├── skillDatabaseEngine.test.ts
+│   └── stores.test.ts
 └── package.json
 ```
 
 ---
 
-## 5. Development & Testing
+## Desenvolvimento & Testes
 
-### Installation
+### Instalação
+
 ```bash
 npm install
 ```
 
-### Development Modes
+### Modos de Desenvolvimento
+
 ```bash
-# Web development mode (Vite HMR)
+# Web (Vite HMR apenas)
 npm run dev
 
-# Desktop development mode (Tauri 2 + Vite HMR)
+# Desktop (Tauri 2 + Vite HMR)
 npm run tauri:dev
 ```
 
-### Quality Assurance & Validation Suite
+### Suite de Validação
+
 ```bash
-# Run full Vitest suite (74 tests)
+# Vitest — 100 testes, 16 suítes (unit + integration + real rAthena data)
 npm run test
 
-# Run TypeScript typecheck
+# TypeScript strict check
 npm run typecheck
 
-# Run ESLint
+# ESLint
 npm run lint
 
-# Check Rust backend
+# Build de produção
+npm run build
+
+# Rust backend check
 cargo check --manifest-path src-tauri/Cargo.toml
 ```
+
+---
+
+## Bancos de Dados Suportados
+
+| Banco | Arquivos YAML Lidos | Status |
+|-------|--------------------|----|
+| **Item DB** | `item_db_usable.yml`, `item_db_equip.yml`, `item_db_etc.yml`, `item_db.yml`, `db/import/item_db*.yml` | ✅ Completo |
+| **Monster DB** | `mob_db.yml`, `mob_db2.yml`, `mob_avail_db.yml`, `db/import/mob_db.yml` | ✅ Completo |
+| **Skill DB** | `skill_db.yml`, `skill_db2.yml`, `db/import/skill_db.yml` | ✅ Completo |
+| Item Combos | `item_combos.yml` | 🔜 Fase 4 |
+| Random Options | `item_randomopt_db.yml`, `item_randomopt_group.yml` | 🔜 Fase 4 |
+| Item Groups | `item_group_db.yml` | 🔜 Fase 4 |
+| Item Packages | `item_packages.yml` | 🔜 Fase 4 |
+
+---
+
+## Roadmap
+
+- [x] **Fase 1** — Engine de parsing YAML com herança em camadas (Item DB)
+- [x] **Fase 2** — Monster DB e Skill DB com editors completos
+- [x] **Fase 3** — Semantic Diff Engine, Undo/Redo, Discard, Criação de Entidades (+1)
+- [ ] **Fase 4** — Item Combos, Random Options, Item Groups & Packages
