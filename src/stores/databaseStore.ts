@@ -55,6 +55,7 @@ interface DatabaseState {
   setActiveDatabase: (id: DatabaseProviderId) => void;
   setVariant: (variant: DatabaseVariant) => void;
   loadDatabase: (id: DatabaseProviderId, workspacePath: string) => Promise<void>;
+  loadAllDatabases: (workspacePath: string) => Promise<void>;
   refreshMetadata: () => void;
   clearWorkspace: () => void;
 
@@ -126,6 +127,16 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
       await provider.load(context);
     } finally {
       get().refreshMetadata();
+    }
+  },
+
+  loadAllDatabases: async (workspacePath: string) => {
+    const { loadDatabase, registry } = get();
+    if (!registry) return;
+
+    const providers = registry.getAllProviders();
+    for (const provider of providers) {
+      await loadDatabase(provider.id, workspacePath);
     }
   },
 

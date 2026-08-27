@@ -1,11 +1,43 @@
-import { useEffect } from 'react';
-import { Database, Play, Loader2, Sword, Skull, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Database, Play, Loader2, Sword, Skull, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { useDatabaseStore } from '@/stores/databaseStore';
 import { ItemExplorerView } from './items/ItemExplorerView';
 import { MobExplorerView } from './mobs/MobExplorerView';
 import { SkillExplorerView } from './skills/SkillExplorerView';
+
+interface DatabaseLoadItem {
+  id: 'item' | 'mob' | 'skill';
+  name: string;
+  description: string;
+  icon: typeof Sword;
+  color: string;
+}
+
+const AVAILABLE_DATABASES: DatabaseLoadItem[] = [
+  {
+    id: 'item',
+    name: 'Item Database',
+    description: 'item_db.yml, item_db_usable, item_db_equip, item_db_etc, db/import',
+    icon: Sword,
+    color: 'text-sky-400',
+  },
+  {
+    id: 'mob',
+    name: 'Monster Database',
+    description: 'mob_db.yml, mob_avail_db.yml, db/import',
+    icon: Skull,
+    color: 'text-amber-400',
+  },
+  {
+    id: 'skill',
+    name: 'Skill Database',
+    description: 'skill_db.yml, db/import',
+    icon: Zap,
+    color: 'text-emerald-400',
+  },
+];
 
 export function DatabasesView() {
   const { activeWorkspace } = useWorkspaceStore();
@@ -19,6 +51,9 @@ export function DatabasesView() {
     loadDatabase,
     metadataMap,
   } = useDatabaseStore();
+
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [currentLoadingStep, setCurrentLoadingStep] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeWorkspace) {
@@ -40,11 +75,41 @@ export function DatabasesView() {
   const mobMeta = metadataMap['mob'];
   const skillMeta = metadataMap['skill'];
 
-  // Sub-header for switching between active databases when loaded
-  const isAnyLoaded =
-    itemMeta?.state === 'loaded' || mobMeta?.state === 'loaded' || skillMeta?.state === 'loaded';
+  const loadedCount = [itemMeta, mobMeta, skillMeta].filter((m) => m?.state === 'loaded').length;
+  const isAnyLoaded = loadedCount > 0;
+  const totalDatabases = AVAILABLE_DATABASES.length;
+  const loadingProgressPercent = Math.round((loadedCount / totalDatabases) * 100);
 
-  if (isAnyLoaded) {
+  const handleLoadAllDatabases = async () => {
+    if (!activeWorkspace || isBulkLoading) return;
+
+    setIsBulkLoading(true);
+
+    try {
+      // 1. Items
+      setCurrentLoadingStep('Carregando Itens...');
+      await loadDatabase('item', activeWorkspace.rootPath);
+
+      // 2. Monsters
+      setCurrentLoadingStep('Carregando Monstros...');
+      await loadDatabase('mob', activeWorkspace.rootPath);
+
+      // 3. Skills
+      setCurrentLoadingStep('Carregando Habilidades...');
+      await loadDatabase('skill', activeWorkspace.rootPath);
+
+      setCurrentLoadingStep('Finalizando...');
+      setActiveDatabase('item');
+    } catch (err) {
+      console.error('Error loading databases:', err);
+    } finally {
+      setIsBulkLoading(false);
+      setCurrentLoadingStep(null);
+    }
+  };
+
+  // Sub-header for switching between active databases when loaded
+  if (isAnyLoaded && !isBulkLoading) {
     return (
       <div className="h-full w-full flex flex-col bg-[#18181b] overflow-hidden">
         {/* Database Switcher Navigation Bar */}
@@ -162,128 +227,158 @@ export function DatabasesView() {
 
   return (
     <div className="h-full w-full p-6 flex flex-col items-center justify-center bg-[#18181b] overflow-auto">
-      <Card className="max-w-lg w-full bg-[#1f1f23] border-[#27272a]">
+      <Card className="max-w-xl w-full bg-[#1f1f23] border-[#27272a] shadow-xl">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl mb-2 w-fit">
             <Database className="h-6 w-6 text-sky-400" />
           </div>
-          <CardTitle className="text-sm font-medium text-neutral-100">Database Explorer</CardTitle>
-          <CardDescription className="text-xs text-neutral-400">
+          <CardTitle className="text-sm font-semibold text-neutral-100">Database Explorer</CardTitle>
+          <CardDescription className="text-xs text-neutral-400 truncate max-w-md mx-auto" title={activeWorkspace.rootPath}>
             Workspace: {activeWorkspace.rootPath}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 pt-4">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-neutral-300">Target Variant:</span>
-            <div className="flex bg-[#141416] p-1 rounded border border-[#27272a]">
+
+        <CardContent className="space-y-4 pt-2">
+          {/* Target Variant Selector */}
+          <div className="flex items-center justify-between p-3 rounded bg-[#141416] border border-[#27272a] text-xs">
+            <div>
+              <div className="font-medium text-neutral-200">Target Variant</div>
+              <div className="text-[11px] text-neutral-500">Selecione o modo de compatibilidade do servidor</div>
+            </div>
+            <div className="flex bg-[#1f1f23] p-1 rounded border border-[#27272a]">
               <button
-                className={`px-3 py-1 rounded-l ${
-                  activeVariant === 'RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'
+                type="button"
+                className={`px-3 py-1 rounded-l text-xs transition-all ${
+                  activeVariant === 'RE'
+                    ? 'bg-sky-600 text-white font-medium shadow-xs'
+                    : 'text-neutral-400 hover:text-neutral-200'
                 }`}
                 onClick={() => setVariant('RE')}
-                disabled={
-                  itemMeta?.state === 'loading' ||
-                  mobMeta?.state === 'loading' ||
-                  skillMeta?.state === 'loading'
-                }
+                disabled={isBulkLoading}
               >
                 Renewal
               </button>
               <button
-                className={`px-3 py-1 rounded-r ${
-                  activeVariant === 'PRE_RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'
+                type="button"
+                className={`px-3 py-1 rounded-r text-xs transition-all ${
+                  activeVariant === 'PRE_RE'
+                    ? 'bg-sky-600 text-white font-medium shadow-xs'
+                    : 'text-neutral-400 hover:text-neutral-200'
                 }`}
                 onClick={() => setVariant('PRE_RE')}
-                disabled={
-                  itemMeta?.state === 'loading' ||
-                  mobMeta?.state === 'loading' ||
-                  skillMeta?.state === 'loading'
-                }
+                disabled={isBulkLoading}
               >
                 Pre-Renewal
               </button>
             </div>
           </div>
 
-          {/* Item Database Card */}
-          <div className="bg-[#141416] p-4 rounded border border-[#27272a] space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sword className="w-4 h-4 text-sky-400" />
-                <div className="text-sm font-medium text-neutral-200">Item Database</div>
-              </div>
-              {itemMeta?.state === 'not_loaded' && (
-                <button
-                  className="flex items-center gap-1 text-xs bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded font-medium"
-                  onClick={() => {
-                    setActiveDatabase('item');
-                    loadDatabase('item', activeWorkspace.rootPath);
-                  }}
-                >
-                  <Play className="w-3 h-3" /> Load
-                </button>
-              )}
-              {itemMeta?.state === 'loading' && (
-                <div className="flex items-center gap-2 text-xs text-sky-400 font-mono">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Loading...
-                </div>
-              )}
-              {itemMeta?.state === 'error' && <div className="text-xs text-red-400">Error</div>}
+          {/* Included Databases Overview */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-neutral-300">Bancos de Dados para Carregamento</span>
+              <span className="text-[11px] text-neutral-500 font-mono">
+                {loadedCount} de {totalDatabases} prontos
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              {AVAILABLE_DATABASES.map((db) => {
+                const meta = metadataMap[db.id];
+                const IconComponent = db.icon;
+                const isLoaded = meta?.state === 'loaded';
+                const isLoading = meta?.state === 'loading';
+                const isError = meta?.state === 'error';
+
+                return (
+                  <div
+                    key={db.id}
+                    className={`flex items-center justify-between p-2.5 rounded border transition-all ${
+                      isLoading
+                        ? 'bg-sky-950/20 border-sky-500/40'
+                        : isLoaded
+                        ? 'bg-[#141416] border-[#27272a]'
+                        : 'bg-[#141416]/60 border-[#27272a]/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="p-1.5 rounded bg-[#1f1f23] border border-[#27272a] shrink-0">
+                        <IconComponent className={`w-4 h-4 ${db.color}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-neutral-200 truncate">{db.name}</div>
+                        <div className="text-[10px] text-neutral-500 truncate font-mono">{db.description}</div>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 pl-2">
+                      {isLoaded && (
+                        <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>{meta.entityCount} registros</span>
+                        </div>
+                      )}
+                      {isLoading && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-sky-400 font-mono">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Carregando...</span>
+                        </div>
+                      )}
+                      {isError && (
+                        <div className="flex items-center gap-1 text-[11px] text-red-400 font-mono">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>Falha</span>
+                        </div>
+                      )}
+                      {!isLoaded && !isLoading && !isError && (
+                        <span className="text-[11px] text-neutral-500 font-mono">Pendente</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Monster Database Card */}
-          <div className="bg-[#141416] p-4 rounded border border-[#27272a] space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Skull className="w-4 h-4 text-amber-400" />
-                <div className="text-sm font-medium text-neutral-200">Monster Database</div>
+          {/* Progress Bar & Status Text (Visible when loading) */}
+          {isBulkLoading && (
+            <div className="space-y-1.5 p-3 rounded bg-[#141416] border border-[#27272a]">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-sky-400 flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  {currentLoadingStep || 'Processando arquivos...'}
+                </span>
+                <span className="text-neutral-400">{loadingProgressPercent}%</span>
               </div>
-              {mobMeta?.state === 'not_loaded' && (
-                <button
-                  className="flex items-center gap-1 text-xs bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded font-medium"
-                  onClick={() => {
-                    setActiveDatabase('mob');
-                    loadDatabase('mob', activeWorkspace.rootPath);
-                  }}
-                >
-                  <Play className="w-3 h-3" /> Load
-                </button>
-              )}
-              {mobMeta?.state === 'loading' && (
-                <div className="flex items-center gap-2 text-xs text-sky-400 font-mono">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Loading...
-                </div>
-              )}
-              {mobMeta?.state === 'error' && <div className="text-xs text-red-400">Error</div>}
+              <div className="w-full h-1.5 bg-[#27272a] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-sky-500 transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.max(loadingProgressPercent, 10)}%` }}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Skill Database Card */}
-          <div className="bg-[#141416] p-4 rounded border border-[#27272a] space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-emerald-400" />
-                <div className="text-sm font-medium text-neutral-200">Skill Database</div>
-              </div>
-              {skillMeta?.state === 'not_loaded' && (
-                <button
-                  className="flex items-center gap-1 text-xs bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded font-medium"
-                  onClick={() => {
-                    setActiveDatabase('skill');
-                    loadDatabase('skill', activeWorkspace.rootPath);
-                  }}
-                >
-                  <Play className="w-3 h-3" /> Load
-                </button>
+          {/* Unified Action Button */}
+          <div className="pt-2">
+            <button
+              type="button"
+              disabled={isBulkLoading}
+              onClick={handleLoadAllDatabases}
+              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-medium text-xs py-2.5 rounded shadow-sm transition-all"
+            >
+              {isBulkLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Carregando Dados do Servidor ({activeVariant === 'RE' ? 'Renewal' : 'Pre-Renewal'})...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4" />
+                  <span>Carregar Todos os Bancos de Dados ({activeVariant === 'RE' ? 'Renewal' : 'Pre-Renewal'})</span>
+                </>
               )}
-              {skillMeta?.state === 'loading' && (
-                <div className="flex items-center gap-2 text-xs text-sky-400 font-mono">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Loading...
-                </div>
-              )}
-              {skillMeta?.state === 'error' && <div className="text-xs text-red-400">Error</div>}
-            </div>
+            </button>
           </div>
         </CardContent>
       </Card>
