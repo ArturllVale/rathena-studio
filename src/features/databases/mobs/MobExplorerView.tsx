@@ -16,11 +16,11 @@ export function MobExplorerView() {
       </div>
 
       {selectedMobId !== null ? (
-        <div className="w-[440px] flex-shrink-0 bg-[#1f1f23] overflow-y-auto">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] overflow-y-auto">
           <MobInspector mobId={selectedMobId} />
         </div>
       ) : (
-        <div className="w-[440px] flex-shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
           Select a monster to view details
         </div>
       )}

@@ -16,11 +16,11 @@ export function SkillExplorerView() {
       </div>
 
       {selectedSkillId !== null ? (
-        <div className="w-[450px] flex-shrink-0 bg-[#1f1f23] overflow-y-auto">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] overflow-y-auto">
           <SkillInspector skillId={selectedSkillId} />
         </div>
       ) : (
-        <div className="w-[450px] flex-shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
           Select a skill to view details
         </div>
       )}

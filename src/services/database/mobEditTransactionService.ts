@@ -4,6 +4,7 @@ import { MobDatabaseSerializer } from './mob/mobDatabaseSerializer';
 import { FileContentWriter } from '../../domain/database/workspace/fileContentWriter';
 import { MobDatabaseProvider } from './providers/mobDatabaseProvider';
 import { EffectiveMob } from '../../domain/database/mob/effectiveMob';
+import { MobRawFields } from '../../domain/database/mob/mobTypes';
 import { ValidationIssue } from './itemDatabaseValidator';
 import { AppError } from '../../lib/error';
 
@@ -120,5 +121,51 @@ export class MobEditTransactionService {
 
     repo.invalidate();
     session.reset();
+  }
+
+  public async createMob(
+    mob: Partial<MobRawFields> & { Id: number; AegisName: string },
+    targetLayerId: string,
+    provider: MobDatabaseProvider
+  ): Promise<void> {
+    const repo = provider.getRepository();
+    if (!repo) {
+      throw new AppError({
+        code: 'ERR_NO_REPO',
+        message: 'Monster Repository not available',
+        severity: 'error',
+      });
+    }
+
+    if (repo.findById(mob.Id)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_ID',
+        message: `Monster ID ${mob.Id} already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    if (repo.findByAegisName(mob.AegisName)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_NAME',
+        message: `Monster AegisName "${mob.AegisName}" already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    const layerData = repo.getLayer(targetLayerId);
+    if (!layerData) {
+      throw new AppError({
+        code: 'ERR_LAYER_NOT_FOUND',
+        message: `Target layer "${targetLayerId}" not registered in repository.`,
+        severity: 'error',
+      });
+    }
+
+    this.serializer.addMob(layerData.adapter, mob);
+    const yamlContent = layerData.adapter.toString();
+    await this.writer.writeFile(layerData.layer.relativePath, yamlContent);
+    await provider.reloadLayer(targetLayerId);
+    repo.invalidate();
   }
 }

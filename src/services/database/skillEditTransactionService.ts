@@ -4,6 +4,7 @@ import { SkillDatabaseSerializer } from './skill/skillDatabaseSerializer';
 import { FileContentWriter } from '../../domain/database/workspace/fileContentWriter';
 import { SkillDatabaseProvider } from './providers/skillDatabaseProvider';
 import { EffectiveSkill } from '../../domain/database/skill/effectiveSkill';
+import { SkillRawFields } from '../../domain/database/skill/skillTypes';
 import { ValidationIssue } from './itemDatabaseValidator';
 import { AppError } from '../../lib/error';
 
@@ -120,5 +121,51 @@ export class SkillEditTransactionService {
 
     repo.invalidate();
     session.reset();
+  }
+
+  public async createSkill(
+    skill: Partial<SkillRawFields> & { Id: number; Name: string },
+    targetLayerId: string,
+    provider: SkillDatabaseProvider
+  ): Promise<void> {
+    const repo = provider.getRepository();
+    if (!repo) {
+      throw new AppError({
+        code: 'ERR_NO_REPO',
+        message: 'Skill Repository not available',
+        severity: 'error',
+      });
+    }
+
+    if (repo.findById(skill.Id)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_ID',
+        message: `Skill ID ${skill.Id} already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    if (repo.findByName(skill.Name)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_NAME',
+        message: `Skill AegisName "${skill.Name}" already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    const layerData = repo.getLayer(targetLayerId);
+    if (!layerData) {
+      throw new AppError({
+        code: 'ERR_LAYER_NOT_FOUND',
+        message: `Target layer "${targetLayerId}" not registered in repository.`,
+        severity: 'error',
+      });
+    }
+
+    this.serializer.addSkill(layerData.adapter, skill);
+    const yamlContent = layerData.adapter.toString();
+    await this.writer.writeFile(layerData.layer.relativePath, yamlContent);
+    await provider.reloadLayer(targetLayerId);
+    repo.invalidate();
   }
 }

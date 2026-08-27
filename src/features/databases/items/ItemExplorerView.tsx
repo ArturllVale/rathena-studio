@@ -16,11 +16,11 @@ export function ItemExplorerView() {
       </div>
       
       {selectedItemId !== null ? (
-        <div className="w-[400px] flex-shrink-0 bg-[#1f1f23] overflow-y-auto">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] overflow-y-auto">
           <ItemInspector itemId={selectedItemId} />
         </div>
       ) : (
-        <div className="w-[400px] flex-shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
           Select an item to view details
         </div>
       )}

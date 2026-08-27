@@ -4,6 +4,7 @@ import { ItemDatabaseSerializer } from './itemDatabaseSerializer';
 import { FileContentWriter } from '../../domain/database/workspace/fileContentWriter';
 import { ItemDatabaseProvider } from './providers/itemDatabaseProvider';
 import { EffectiveItem } from '../../domain/database/item/effectiveItem';
+import { ItemRawFields } from '../../domain/database/item/itemTypes';
 import { AppError } from '../../lib/error';
 
 export class ItemEditTransactionService {
@@ -100,5 +101,46 @@ export class ItemEditTransactionService {
     for (const layerId of affectedLayers) {
       await provider.reloadLayer(layerId);
     }
+  }
+
+  public async createItem(
+    item: Partial<ItemRawFields> & { Id: number; AegisName: string },
+    targetLayerId: string,
+    provider: ItemDatabaseProvider
+  ): Promise<void> {
+    const repo = provider.getRepository();
+    if (!repo) {
+      throw new AppError({ code: 'ERR_NO_REPO', message: 'Repository not available', severity: 'error' });
+    }
+
+    if (repo.findById(item.Id)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_ID',
+        message: `Item ID ${item.Id} already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    if (repo.findByAegisName(item.AegisName)) {
+      throw new AppError({
+        code: 'ERR_DUPLICATE_NAME',
+        message: `Item AegisName "${item.AegisName}" already exists in the database.`,
+        severity: 'error',
+      });
+    }
+
+    const layerData = repo.getLayer(targetLayerId);
+    if (!layerData) {
+      throw new AppError({
+        code: 'ERR_LAYER_NOT_FOUND',
+        message: `Target layer "${targetLayerId}" not found in repository.`,
+        severity: 'error',
+      });
+    }
+
+    this.serializer.addItem(layerData.adapter, item);
+    const newYaml = this.serializer.serialize(layerData, repo.getVariant());
+    await this.writer.writeFile(layerData.layer.relativePath, newYaml);
+    await provider.reloadLayer(targetLayerId);
   }
 }
