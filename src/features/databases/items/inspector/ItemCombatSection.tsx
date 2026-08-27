@@ -51,7 +51,7 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
                 (setField as (f: keyof ItemRawFields, v: unknown) => void)(fieldName, val);
               }
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-2 py-0.5 h-6.5 w-20 sm:w-24 shrink-0 ${
+            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 h-6.5 w-14 shrink-0 ${
               errorMsg
                 ? 'border-red-500/50 text-red-200'
                 : isModified

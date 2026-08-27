@@ -56,8 +56,8 @@ export function MobIdentitySection({ mob }: MobIdentitySectionProps) {
                 (setField as (f: keyof MobRawFields, v: unknown) => void)(fieldName, val);
               }
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-2 py-0.5 h-6.5 shrink-0 ${
-              isNum ? 'w-20 sm:w-24' : 'w-36 sm:w-44'
+            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 h-6.5 shrink-0 ${
+              isNum ? 'w-14' : 'w-36 sm:w-44'
             } ${
               readOnly
                 ? 'border-transparent text-neutral-500 cursor-not-allowed bg-transparent'

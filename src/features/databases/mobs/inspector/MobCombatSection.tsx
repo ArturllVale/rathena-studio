@@ -71,8 +71,8 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
 
     return (
       <div className="flex flex-col py-1 border-b border-[#27272a]/40 last:border-0">
-        <div className="flex items-center justify-between gap-2">
-          <label className="text-xs text-neutral-400 font-medium truncate" title={label}>
+        <div className="flex items-center justify-between gap-1.5">
+          <label className="text-[11px] text-neutral-400 font-medium select-none truncate" title={label}>
             {label}
           </label>
           <input
@@ -85,7 +85,7 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
                 val === '' ? undefined : Number(val)
               );
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-2 py-0.5 w-20 sm:w-24 shrink-0 h-6.5 ${
+            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 w-14 shrink-0 h-6.5 ${
               errorMsg
                 ? 'border-red-500/50 text-red-200'
                 : isModified
@@ -137,9 +137,9 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
         <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
           Offense &amp; Defense Ratings
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
-          {renderField('Attack (Min/Base)', 'Attack')}
-          {renderField('Attack2 (Max/Matk)', 'Attack2')}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
+          {renderField('Attack (Min)', 'Attack')}
+          {renderField('Attack2 (Max)', 'Attack2')}
           {renderField('Physical DEF', 'Defense')}
           {renderField('Magic MDEF', 'MagicDefense')}
           {renderField('Physical RES', 'Resistance')}
@@ -152,15 +152,15 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
         <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
           Ranges &amp; Speed Motions
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
           {renderField('Attack Range', 'AttackRange')}
           {renderField('Skill Range', 'SkillRange')}
           {renderField('Chase Range', 'ChaseRange')}
           {renderField('Walk Speed', 'WalkSpeed')}
-          {renderField('Attack Delay (ms)', 'AttackDelay')}
-          {renderField('Attack Motion (ms)', 'AttackMotion')}
-          {renderField('Damage Motion (ms)', 'DamageMotion')}
-          {renderField('Damage Taken Rate %', 'DamageTaken')}
+          {renderField('Attack Delay', 'AttackDelay')}
+          {renderField('Attack Motion', 'AttackMotion')}
+          {renderField('Damage Motion', 'DamageMotion')}
+          {renderField('Damage Taken %', 'DamageTaken')}
         </div>
       </div>
     </div>
