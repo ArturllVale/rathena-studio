@@ -37,26 +37,35 @@ export function findEntityLineInYaml(yamlText: string, query: string | number): 
   if (!yamlText) return 1;
   const lines = yamlText.split('\n');
   const strQuery = String(query).trim();
+  if (!strQuery) return 1;
 
-  // 1. Exact match for Id: <id>
-  const idRegex = new RegExp(`^\\s*Id:\\s*${strQuery}\\b`, 'i');
+  // 1. Match for Id: <id> or - Id: <id>
+  const idRegex = new RegExp(`^\\s*(-\\s*)?Id:\\s*${strQuery}\\b`, 'i');
   for (let i = 0; i < lines.length; i++) {
     if (idRegex.test(lines[i])) {
       return i + 1;
     }
   }
 
-  // 2. Exact match for AegisName: <name> or Name: <name>
-  const nameRegex = new RegExp(`^\\s*(AegisName|Name|Group|Package|Option):\\s*['"]?${strQuery}['"]?\\b`, 'i');
+  // 2. Match for AegisName / Name / Group / Package / Option
+  const nameRegex = new RegExp(`^\\s*(-\\s*)?(AegisName|Name|Group|Package|Option):\\s*['"]?${strQuery}['"]?\\b`, 'i');
   for (let i = 0; i < lines.length; i++) {
     if (nameRegex.test(lines[i])) {
       return i + 1;
     }
   }
 
-  // 3. Fallback substring match
+  // 3. Match for combo item or list entry: - <item>
+  const comboItemRegex = new RegExp(`^\\s*-\\s*['"]?${strQuery}['"]?\\b`, 'i');
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].includes(strQuery)) {
+    if (comboItemRegex.test(lines[i])) {
+      return i + 1;
+    }
+  }
+
+  // 4. Fallback substring match
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].toLowerCase().includes(strQuery.toLowerCase())) {
       return i + 1;
     }
   }
@@ -79,13 +88,13 @@ export const useYamlEditorStore = create<YamlEditorState>((set, get) => ({
       const exists = state.files[filePath];
       const newFiles = {
         ...state.files,
-        [filePath]: exists
-          ? state.files[filePath]
+        [filePath]: exists && exists.currentContent.length > 0 && content.length === 0
+          ? exists
           : {
               filePath,
               originalContent: content,
               currentContent: content,
-              layerId,
+              layerId: layerId || exists?.layerId,
               isDirty: false,
               totalLines,
             },
@@ -194,17 +203,42 @@ export const useYamlEditorStore = create<YamlEditorState>((set, get) => ({
       const dbStore = useDatabaseStore.getState();
       if (dbStore.registry) {
         for (const provider of dbStore.registry.getAllProviders()) {
-          const repo = provider.getRepository() as { getRegisteredLayers?: () => Array<{ file: { path: string }; adapter: YamlDocumentAdapter; rawText: string }> } | undefined;
-          if (repo && typeof repo.getRegisteredLayers === 'function') {
-            const layers = repo.getRegisteredLayers();
-            const matchedLayer = layers.find((l) => l.file.path === filePath || l.file.path.endsWith(filePath) || filePath.endsWith(l.file.path));
-            if (matchedLayer) {
-              matchedLayer.rawText = file.currentContent;
-              matchedLayer.adapter = YamlDocumentAdapter.parse(file.currentContent);
-              // Trigger reload for this database provider
-              await dbStore.loadDatabase(provider.id, rootPath);
-              break;
+          const repo = provider.getRepository() as Record<string, unknown> | undefined;
+          if (!repo) continue;
+
+          let layers: Array<{
+            layer: { id: string; name: string; relativePath: string; variant: string };
+            file?: { filePath?: string };
+            adapter?: YamlDocumentAdapter;
+          }> = [];
+
+          if (typeof repo.getAllLayers === 'function') {
+            layers = repo.getAllLayers() as typeof layers;
+          } else {
+            if (typeof repo.getAllOptionLayers === 'function') {
+              layers.push(...(repo.getAllOptionLayers() as typeof layers));
             }
+            if (typeof repo.getAllGroupLayers === 'function') {
+              layers.push(...(repo.getAllGroupLayers() as typeof layers));
+            }
+          }
+
+          const matchedLayer = layers.find((l) =>
+            l.layer.relativePath === filePath ||
+            l.layer.relativePath.endsWith(filePath) ||
+            filePath.endsWith(l.layer.relativePath) ||
+            l.layer.id === filePath ||
+            (l.file && (l.file as { filePath?: string }).filePath === filePath)
+          );
+
+          if (matchedLayer) {
+            matchedLayer.adapter = YamlDocumentAdapter.parse(file.currentContent);
+            if (typeof repo.invalidate === 'function') {
+              repo.invalidate();
+            }
+            // Trigger reload for this database provider
+            await dbStore.loadDatabase(provider.id, rootPath);
+            break;
           }
         }
       }
@@ -236,7 +270,7 @@ export const useYamlEditorStore = create<YamlEditorState>((set, get) => ({
     const state = get();
     let content = fallbackContent;
 
-    if (state.files[filePath]) {
+    if (state.files[filePath] && state.files[filePath].currentContent.length > 0) {
       content = state.files[filePath].currentContent;
     } else {
       get().openFile(filePath, content, layerId);
@@ -251,7 +285,58 @@ export const useYamlEditorStore = create<YamlEditorState>((set, get) => ({
 }));
 
 export function openEntityInYamlEditor(filePath: string, entityQuery: string | number, layerId?: string): void {
-  useYamlEditorStore.getState().openFileAtEntity(filePath, entityQuery, '', layerId);
+  const store = useYamlEditorStore.getState();
+  const dbStore = useDatabaseStore.getState();
+
+  let content = '';
+  let targetPath = filePath;
+  let targetLayerId = layerId;
+
+  // 1. If already open and has content in store, use it
+  if (store.files[filePath] && store.files[filePath].currentContent.length > 0) {
+    content = store.files[filePath].currentContent;
+    targetPath = filePath;
+  } else if (dbStore.registry) {
+    // 2. Discover layer content from DatabaseRegistry repositories
+    for (const provider of dbStore.registry.getAllProviders()) {
+      const repo = provider.getRepository() as Record<string, unknown> | undefined;
+      if (!repo) continue;
+
+      let layers: Array<{
+        layer: { id: string; name: string; relativePath: string; variant: string };
+        file?: { filePath?: string };
+        adapter?: YamlDocumentAdapter;
+      }> = [];
+
+      if (typeof repo.getAllLayers === 'function') {
+        layers = repo.getAllLayers() as typeof layers;
+      } else {
+        if (typeof repo.getAllOptionLayers === 'function') {
+          layers.push(...(repo.getAllOptionLayers() as typeof layers));
+        }
+        if (typeof repo.getAllGroupLayers === 'function') {
+          layers.push(...(repo.getAllGroupLayers() as typeof layers));
+        }
+      }
+
+      const matched = layers.find((l) => {
+        if (layerId && (l.layer.id === layerId || l.layer.name === layerId)) return true;
+        if (l.layer.relativePath === filePath) return true;
+        if (filePath.endsWith(l.layer.relativePath) || l.layer.relativePath.endsWith(filePath)) return true;
+        if (l.file && (l.file as { filePath?: string }).filePath === filePath) return true;
+        return false;
+      });
+
+      if (matched && matched.adapter) {
+        content = matched.adapter.toString();
+        targetPath = matched.layer.relativePath || (matched.file && (matched.file as { filePath?: string }).filePath) || filePath;
+        targetLayerId = matched.layer.id;
+        break;
+      }
+    }
+  }
+
+  store.openFileAtEntity(targetPath, entityQuery, content, targetLayerId);
   useAppStore.getState().setActiveTab('editor');
 }
 

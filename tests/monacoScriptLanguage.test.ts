@@ -7,7 +7,10 @@ import {
 import {
   findEntityLineInYaml,
   useYamlEditorStore,
+  openEntityInYamlEditor,
 } from '@/stores/yamlEditorStore';
+import { useDatabaseStore } from '@/stores/databaseStore';
+import { useAppStore } from '@/stores/appStore';
 
 describe('Monaco rAthena Script Language Definition', () => {
   it('should define language tokens, brackets, and keywords', () => {
@@ -175,5 +178,16 @@ describe('useYamlEditorStore', () => {
     const updated = useYamlEditorStore.getState();
     expect(updated.activeFilePath).toBe('db/re/item_db.yml');
     expect(updated.cursorTarget).toEqual({ line: 5, column: 1 });
+  });
+
+  it('should discover layer content from DatabaseRegistry when calling openEntityInYamlEditor', () => {
+    useDatabaseStore.getState().initializeWorkspace();
+    const registry = useDatabaseStore.getState().registry;
+    expect(registry).toBeDefined();
+
+    openEntityInYamlEditor('db/re/item_db_usable.yml', 'Red_Potion', 're_item_db_usable');
+
+    expect(useAppStore.getState().activeTab).toBe('editor');
+    expect(useYamlEditorStore.getState().activeFilePath).toBe('db/re/item_db_usable.yml');
   });
 });

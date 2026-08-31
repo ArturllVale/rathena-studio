@@ -4,6 +4,7 @@ import type * as monacoType from 'monaco-editor';
 import { useYamlEditorStore } from '@/stores/yamlEditorStore';
 import { useDatabaseStore } from '@/stores/databaseStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
+import { YamlDocumentAdapter } from '@/services/database/yamlDocumentAdapter';
 import {
   FileCode,
   Save,
@@ -30,7 +31,8 @@ interface DiscoveredLayerFile {
 
 export function DatabaseYamlEditorView() {
   const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace);
-  const { registry } = useDatabaseStore();
+  const registry = useDatabaseStore((s) => s.registry);
+  const metadataMap = useDatabaseStore((s) => s.metadataMap);
 
   const {
     openFiles,
@@ -59,31 +61,51 @@ export function DatabaseYamlEditorView() {
     const result: DiscoveredLayerFile[] = [];
 
     for (const provider of registry.getAllProviders()) {
-      const repo = provider.getRepository() as {
-        getRegisteredLayers?: () => Array<{
-          layer: { name: string; variant: string };
-          file: { path: string };
-          rawText: string;
-        }>;
-      };
+      const repo = provider.getRepository() as Record<string, unknown> | undefined;
+      if (!repo) continue;
 
-      if (repo && typeof repo.getRegisteredLayers === 'function') {
-        const layers = repo.getRegisteredLayers();
-        for (const l of layers) {
+      const dbName =
+        (provider as { displayName?: string; name?: string; id: string }).displayName ||
+        (provider as { name?: string }).name ||
+        provider.id;
+
+      let layers: Array<{
+        layer: { id: string; name: string; relativePath: string; variant: string };
+        file?: { filePath?: string };
+        adapter?: YamlDocumentAdapter;
+      }> = [];
+
+      if (typeof repo.getAllLayers === 'function') {
+        layers = repo.getAllLayers() as typeof layers;
+      } else {
+        if (typeof repo.getAllOptionLayers === 'function') {
+          layers.push(...(repo.getAllOptionLayers() as typeof layers));
+        }
+        if (typeof repo.getAllGroupLayers === 'function') {
+          layers.push(...(repo.getAllGroupLayers() as typeof layers));
+        }
+      }
+
+      for (const l of layers) {
+        const filePath = l.layer.relativePath || (l.file && (l.file as { filePath?: string }).filePath) || l.layer.id;
+        const rawText = l.adapter ? l.adapter.toString() : '';
+
+        // Avoid duplicate file entries
+        if (!result.some((r) => r.filePath === filePath)) {
           result.push({
             dbId: provider.id,
-            dbName: (provider as { displayName?: string; name?: string; id: string }).displayName || (provider as { name?: string }).name || provider.id,
-            filePath: l.file.path,
-            layerName: l.layer.name,
+            dbName,
+            filePath,
+            layerName: l.layer.name || l.layer.id,
             variant: l.layer.variant,
-            rawText: l.rawText,
+            rawText,
           });
         }
       }
     }
 
     return result;
-  }, [registry]);
+  }, [registry, metadataMap]);
 
   // Group files by database name
   const groupedFiles = useMemo(() => {
@@ -118,10 +140,14 @@ export function DatabaseYamlEditorView() {
       }
     });
 
-    if (cursorTarget) {
-      editor.revealLineInCenter(cursorTarget.line);
-      editor.setPosition({ lineNumber: cursorTarget.line, column: cursorTarget.column || 1 });
-      setCursorTarget(null);
+    const target = useYamlEditorStore.getState().cursorTarget;
+    if (target) {
+      setTimeout(() => {
+        editor.revealLineInCenter(target.line);
+        editor.setPosition({ lineNumber: target.line, column: target.column || 1 });
+        editor.focus();
+        setCursorTarget(null);
+      }, 50);
     }
   };
 
