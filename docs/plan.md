@@ -121,11 +121,13 @@ graph TD
 - Adição de novos registros (`+ New Item/Monster/Skill`) com verificação em tempo real de ID e AegisName duplicados e auto-sugestão de próximo ID.
 - Carregamento unificado com barra de progresso visual de status de leitura.
 
-### [ ] Fase 7 — Item Combos, Random Options, Item Groups & Packages (PRÓXIMA FASE)
-- Parser e editor para `item_combos.yml`, `item_group_db.yml`, `item_packages.yml` e `item_randomopt_db.yml`.
-- Referências cruzadas: relacionar itens aos seus respectivos combos e pacotes no Explorer.
+### [x] Fase 7 — Item Combos, Random Options, Item Groups & Packages (CONCLUÍDO)
+- Parser e editor para `item_combos.yml`, `item_group_db.yml`, `item_packages.yml` e `item_randomopt_db.yml` / `item_randomopt_group.yml`.
+- CRUD atômico em camadas e preservação estrita de AST.
+- Referências cruzadas completas: relação reversa de itens aos seus combos, caixas/grupos e pacotes na aba do Item Inspector.
+- Visualização e navegação de 7 bancos de dados com barra de progresso unificada.
 
-### [ ] Fase 8 — YAML Text Editor & Monaco Integration
+### [ ] Fase 8 — YAML Text Editor & Monaco Integration (PRÓXIMA FASE)
 - Integração do Monaco Editor para visualização textual raw de arquivos YAML.
 - Autocompletion inteligente em scripts e validações de constantes do rAthena.
 

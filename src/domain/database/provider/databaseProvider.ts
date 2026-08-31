@@ -1,6 +1,15 @@
 import { DatabaseContext } from '../common/databaseContext';
 
-export type DatabaseProviderId = 'item' | 'mob' | 'skill' | 'quest' | 'instance';
+export type DatabaseProviderId =
+  | 'item'
+  | 'mob'
+  | 'skill'
+  | 'combo'
+  | 'group'
+  | 'package'
+  | 'randomopt'
+  | 'quest'
+  | 'instance';
 
 export interface DatabaseMetadata {
   readonly id: DatabaseProviderId;

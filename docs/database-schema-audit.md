@@ -287,8 +287,12 @@ graph TD
 
 ---
 
-#### [ ] Fase 4: Opções Randômicas, Combos & Grupos
-- [ ] Suporte a `item_combos.yml`, `item_group_db.yml`, `item_packages.yml`, `item_randomopt_*.yml`.
+#### [x] Fase 4: Opções Randômicas, Combos & Grupos — CONCLUÍDO (2026-08-31)
+- [x] Suporte completo a `item_combos.yml`, `item_group_db.yml`, `item_packages.yml`, `item_randomopt_db.yml` e `item_randomopt_group.yml`.
+- [x] Repositórios em camadas com reverse indexing de itens para lookup instantâneo.
+- [x] Seção de Sistemas Vinculados e Referências Cruzadas na aba de navegação do Item Inspector.
+- [x] Modais de criação (+1) e serializers tolerantes com preservação de formatação AST.
+- [x] Suíte de testes unitários e de integração validando 100% de integridade round-trip.
 
 #### [ ] Fase 5: Entidades Auxiliares e Configurações de Servidor
 - [ ] Suporte a pets, homunculus, mercenários, elementais, instâncias e tabelas de engine.
