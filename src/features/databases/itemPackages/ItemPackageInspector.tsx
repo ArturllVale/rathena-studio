@@ -8,10 +8,11 @@ import { ItemPackageDatabaseSerializer } from '@/services/database/itemPackage/i
 import { ItemPackageEditTransactionService } from '@/services/database/itemPackageEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Package, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Package, Plus, Trash2, FileCode } from 'lucide-react';
 import { LayeredItemPackageRepository } from '@/services/database/itemPackage/layeredItemPackageRepository';
 import { ItemPackageDatabaseProvider } from '@/services/database/providers/itemPackageDatabaseProvider';
 import { Input } from '@/components/ui/input';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type InspectorTab = 'random_options' | 'groups' | 'layers';
 
@@ -138,10 +139,24 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
             </div>
             <div className="text-xs text-neutral-400 mt-0.5">Item Package Bundle</div>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-purple-400 border border-[#27272a] flex items-center gap-1">
-            <Package className="w-3 h-3" />
-            <span>PACKAGE</span>
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = layerProvenance[0] || 'item_package_db.yml';
+                openEntityInYamlEditor(primaryPath, pkg.package, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-purple-400 border border-[#27272a] flex items-center gap-1">
+              <Package className="w-3 h-3" />
+              <span>PACKAGE</span>
+            </span>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -302,19 +317,100 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
         )}
 
         {currentTab === 'layers' && (
-          <div className="space-y-2.5">
-            <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-              Layer Hierarchy
-            </h3>
-            {layerProvenance.map((layerId, idx) => (
-              <div
-                key={layerId}
-                className="p-3 rounded border border-[#27272a] bg-[#1f1f23] flex items-center justify-between text-xs font-mono"
-              >
-                <span>{layerId}</span>
-                <span className="text-[10px] text-neutral-400">Order: {idx + 1}</span>
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+                  Layer Hierarchy & File Provenance
+                </h3>
+                <span className="text-[10px] font-mono text-neutral-400">
+                  {layerProvenance.length} layer{layerProvenance.length > 1 ? 's' : ''} loaded
+                </span>
               </div>
-            ))}
+
+              <div className="space-y-2.5">
+                {layerProvenance.map((layerId, idx) => {
+                  const repository = provider ? (provider.getRepository() as LayeredItemPackageRepository | undefined) : undefined;
+                  const layerData = repository?.getLayer ? repository.getLayer(layerId) : undefined;
+                  const relativePath =
+                    layerData?.layer.relativePath ||
+                    Object.values(pkg.fieldOrigins).find((o) => o.layerId === layerId)?.filePath ||
+                    layerId;
+                  const layerName = layerData?.layer.name || layerId;
+                  const isFinalLayer = idx === layerProvenance.length - 1;
+                  const isBaseLayer = idx === 0;
+
+                  const contributingFields = Object.entries(pkg.fieldOrigins)
+                    .filter(([_, origin]) => origin.layerId === layerId)
+                    .map(([fieldName]) => fieldName);
+
+                  return (
+                    <div
+                      key={layerId}
+                      className={`p-3 rounded border transition-colors ${
+                        isFinalLayer
+                          ? 'bg-sky-950/20 border-sky-500/30'
+                          : 'bg-[#1f1f23] border-[#27272a]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                              isFinalLayer
+                                ? 'bg-sky-600 text-white'
+                                : 'bg-[#27272a] text-neutral-400'
+                            }`}
+                          >
+                            {idx + 1}
+                          </div>
+                          <div>
+                            <div className="text-xs font-mono font-semibold text-neutral-100">
+                              {relativePath}
+                            </div>
+                            <div className="text-[11px] text-neutral-400">{layerName}</div>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                            relativePath.includes('import')
+                              ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                              : isBaseLayer
+                              ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
+                              : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                          }`}
+                        >
+                          {relativePath.includes('import')
+                            ? 'Import Override'
+                            : isBaseLayer
+                            ? 'Base Layer'
+                            : 'Mode Layer'}
+                        </span>
+                      </div>
+
+                      {contributingFields.length > 0 && (
+                        <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
+                          <div className="text-[10px] text-neutral-500 mb-1">
+                            Active fields from this file ({contributingFields.length}):
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {contributingFields.map((f) => (
+                              <span
+                                key={f}
+                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                              >
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
       </div>

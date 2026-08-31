@@ -6,7 +6,7 @@ import { SkillDatabaseSerializer } from '@/services/database/skill/skillDatabase
 import { SkillEditTransactionService } from '@/services/database/skillEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Layers, Sliders, Clock, ShieldAlert, Crosshair } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Layers, Sliders, Clock, ShieldAlert, Crosshair, FileCode } from 'lucide-react';
 import { SkillIdentitySection } from './inspector/SkillIdentitySection';
 import { SkillTimingSection } from './inspector/SkillTimingSection';
 import { SkillRequirementsSection } from './inspector/SkillRequirementsSection';
@@ -15,6 +15,7 @@ import { LayeredSkillRepository } from '@/services/database/skill/layeredSkillRe
 import { SkillDatabaseProvider } from '@/services/database/providers/skillDatabaseProvider';
 import { SkillFieldOrigin } from '@/domain/database/skill/effectiveSkill';
 import { SemanticDiffViewer } from '../common/SemanticDiffViewer';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type SkillInspectorTab = 'general' | 'timings' | 'requirements' | 'area' | 'provenance';
 
@@ -126,6 +127,18 @@ export function SkillInspector({ skillId }: { skillId: number }) {
             <div className="text-xs font-mono text-sky-400 mt-0.5">{skill.name}</div>
           </div>
           <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = (Object.values(skill.fieldOrigins) as SkillFieldOrigin[])[0]?.filePath || layerProvenance[0] || 'skill_db.yml';
+                openEntityInYamlEditor(primaryPath, skill.id, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
             {fields.Type && (
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-500/30">
                 {fields.Type}

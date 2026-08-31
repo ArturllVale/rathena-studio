@@ -50,6 +50,12 @@
 ### Random Options Inspector
 - Suporte a constantes de opções randômicas (`RANDOM_OPTION_DB`) e grupos com faixas de valores e chances em base 10.000 (`RANDOM_OPTION_GROUP`).
 
+### Editor YAML & IntelliSense de Scripts
+- **Editor YAML Integrado**: Edição e inspeção textual raw de qualquer arquivo do banco de dados rAthena diretamente na aplicação com atalho `Ctrl+S` e sincronização bidirecional em memória.
+- **Navegador de Árvore de Camadas**: Organização visual dos arquivos por camadas (`[BASE]`, `[RE]`, `[PRE-RE]`, `[IMPORT]`) com abas múltiplas e indicador de alterações não salvas (`●`).
+- **Navegação Cruzada Rápida (Jump to Entity)**: Botão `YAML` presente nos 7 inspetores visuais direcionando o cursor diretamente para a linha exata de definição da entidade (`findEntityLineInYaml`).
+- **Tokenizador e IntelliSense de Scripts rAthena**: Suporte avançado à linguagem `rathena-script` no editor com autocompletion de bônus (`item_bonus.txt`), documentação no hover e validação sintática em tempo real (`RathenaScriptValidator`).
+
 ### Layer Hierarchy & Proveniência por Campo
 - Cada campo inspecionado exibe sua origem exata (arquivo e camada) com badges numerados e chips de proveniência.
 
@@ -122,7 +128,7 @@
 | **UI Components** | Radix UI + Lucide Icons |
 | **Estilização** | Tailwind CSS 3 |
 | **Build Tool** | Vite 6 |
-| **Testes Automatizados** | Vitest 3 (**120 testes, 22 suítes**) |
+| **Testes Automatizados** | Vitest 3 (**134 testes, 23 suítes**) |
 
 ---
 
@@ -157,6 +163,9 @@ rathena-studio/
 │   │   ├── mobs/                  # MobExplorerView, MobInspector, CreateMobModal
 │   │   ├── randomOptions/         # RandomOptionExplorerView, RandomOptionInspector, CreateRandomOptModal
 │   │   └── skills/                # SkillExplorerView, SkillInspector, CreateSkillModal
+│   ├── features/editor/           # Monaco Editor Workspace e Tokenizador rAthena Script
+│   │   ├── monaco/                # rathenaScriptLanguage, MonacoScriptEditor
+│   │   └── DatabaseYamlEditorView.tsx
 │   ├── services/database/         # Parsers, Serializers, Repositories e TransactionServices
 │   │   ├── combo/                 # ComboDatabaseParser, Serializer, Repository, Validator
 │   │   ├── item/                  # ItemDatabaseParser, Serializer, Repository, Validator
@@ -166,10 +175,10 @@ rathena-studio/
 │   │   ├── providers/             # Provedores registrados no DatabaseRegistry
 │   │   ├── randomOpt/             # RandomOptDatabaseParser, Serializer, Repository, Validator
 │   │   └── skill/                 # SkillDatabaseParser, Serializer, Repository, Validator
-│   ├── stores/                    # Zustand Stores (databaseStore, editStores, workspaceStore)
+│   ├── stores/                    # Zustand Stores (databaseStore, editStores, yamlEditorStore)
 │   └── utils/                     # Utilitários (semanticDiff, script completions)
 ├── src-tauri/                     # Código Rust Tauri 2 e permissões de filesystem
-├── tests/                         # 22 suítes de testes Vitest
+├── tests/                         # 23 suítes de testes Vitest
 └── package.json
 ```
 
@@ -210,7 +219,7 @@ npm run tauri:dev
 ### Validação da Suite de Testes
 
 ```bash
-# Vitest — 120 testes em 22 suítes (unit + integration + audit real do rAthena)
+# Vitest — 135 testes em 23 suítes (unit + integration + audit real do rAthena + editor)
 npm run test
 
 # Checagem estrita de tipos TypeScript
@@ -237,5 +246,5 @@ cargo check --manifest-path src-tauri/Cargo.toml
 - [x] **Fase 5** — Transações atômicas, Undo/Redo, Diff Semântico e criação de registros (+1)
 - [x] **Fase 6** — Validação e conformidade com dados reais de larga escala (25k+ registros)
 - [x] **Fase 7** — Item Combos, Item Groups, Item Packages, Random Options & Referências Cruzadas
-- [ ] **Fase 8** — Editor Monaco integrado & Autocomplete avançado de scripts
+- [x] **Fase 8** — Editor YAML de texto & Autocomplete avançado de scripts
 - [ ] **Fase 9** — Process Manager para inicialização e monitoramento de Login/Char/Map servers

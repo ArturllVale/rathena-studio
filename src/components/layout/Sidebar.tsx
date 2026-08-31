@@ -6,6 +6,7 @@ import { ITEM_TYPES } from '@/domain/database/item/itemTypes';
 import { 
   FolderKanban, 
   Database, 
+  FileCode,
   Cpu, 
   Terminal, 
   Settings,
@@ -24,6 +25,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { id: 'workspace', label: 'Workspace', icon: FolderKanban },
   { id: 'databases', label: 'Databases', icon: Database },
+  { id: 'editor', label: 'YAML Editor', icon: FileCode },
   { id: 'processes', label: 'Processes', icon: Cpu },
   { id: 'logs', label: 'Log Center', icon: Terminal },
   { id: 'settings', label: 'Settings', icon: Settings },

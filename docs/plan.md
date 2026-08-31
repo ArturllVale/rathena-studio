@@ -29,6 +29,18 @@ Os arquivos do rAthena no repositório do usuário continuam sendo a única font
 ### 2.3 Variante e Camadas
 Isolamento estrito entre `Renewal` e `Pre-Renewal`. Suporte nativo à hierarquia de carregamento de camadas do rAthena (`BASE` → `MODE_SPECIFIC` → `IMPORT` → `CUSTOM`). Edições em campos herdados são automaticamente salvas na camada de `db/import/` para manter arquivos originais limpos.
 
+### 2.4 Padrão Arquitetural de Camadas e Proveniência (Layer Hierarchy & Provenance)
+Todos os databases (Items, Monsters, Skills, Combos, Item Groups, Item Packages, Random Options e futuros bancos) seguem estritamente o mesmo padrão visual e de dados:
+- Aba **Layers** com cabeçalho contendo a contagem total de arquivos/camadas (`N layers loaded`).
+- Cards numerados por ordem de precedência de carregamento (`1`, `2`, `3`...), destacando a camada final ativa.
+- Caminho relativo em mono (`db/re/...`, `db/import/...`) e nome legível da camada.
+- Badges de categoria: `Base Layer` (neutro), `Mode Layer` (sky) e `Import Override` (purple).
+- Lista de campos herdados/ativos contribuídos por aquele arquivo específico (`Active fields from this file (N)`).
+
+### 2.5 Padrão de Layout de UI e Largura dos Painéis de Inspeção
+- **Largura Fixa do Painel Lateral**: A largura do painel lateral de inspeção / detalhes (`Inspector`) é estritamente padronizada em **`440px`** (`w-[440px] shrink-0 bg-[#1f1f23]`) em todas as visualizações de bancos de dados.
+- **Nomenclatura do Editor**: Na interface do usuário, botões, abas e documentação, o editor textual é referenciado exclusivamente como **Editor** ou **YAML Editor** (sem menção desnecessária à tecnologia interna de renderização).
+
 ---
 
 ## 3. Stack Tecnológica Oficial
@@ -127,11 +139,15 @@ graph TD
 - Referências cruzadas completas: relação reversa de itens aos seus combos, caixas/grupos e pacotes na aba do Item Inspector.
 - Visualização e navegação de 7 bancos de dados com barra de progresso unificada.
 
-### [ ] Fase 8 — YAML Text Editor & Monaco Integration (PRÓXIMA FASE)
-- Integração do Monaco Editor para visualização textual raw de arquivos YAML.
-- Autocompletion inteligente em scripts e validações de constantes do rAthena.
+### [x] Fase 8 — YAML Text Editor & Scripting Engine (CONCLUÍDO)
+- **YAML Text Editor**: Visualização e edição textual raw de qualquer arquivo YAML de banco de dados com árvore de arquivos por camadas (`[BASE]`, `[RE]`, `[PRE-RE]`, `[IMPORT]`), abas múltiplas, indicador de alterações não salvas (`●`) e atalho de salvamento (`Ctrl+S`).
+- **Sincronização Bidirecional AST**: Salvamento atômico no disco com validação sintática via `yaml.parseDocument`, atualização em memória do `YamlDocumentAdapter` e recarga automática do provedor no `DatabaseRegistry`.
+- **Tokenizador e IntelliSense de Scripts rAthena**: Linguagem personalizada `rathena-script` no editor com regras para palavras-chave, constantes e operadores; provedor de autocompletion com expansão em snippets (`ALL_SCRIPT_COMPLETIONS`) e provedor de hover documentation.
+- **Validação Sintática em Tempo Real**: Diagnósticos com marcadores de erro e aviso no editor via `RathenaScriptValidator.validate(code)`.
+- **Navegação Cruzada Instantânea (Jump to Entity)**: Botão "YAML" em todos os 7 inspetores visuais (`ItemInspector`, `MobInspector`, `SkillInspector`, `ComboInspector`, `ItemGroupInspector`, `ItemPackageInspector`, `RandomOptionInspector`) abrindo o arquivo exato e focando o cursor diretamente na linha de definição da entidade via `findEntityLineInYaml`.
+- **Editor de Scripts Integrado nos Inspetores**: Editor de código integrado diretamente no `ItemScriptEditorSection`, `ComboInspector` e `RandomOptionInspector`.
 
-### [ ] Fase 9 — Process Manager & rAthena Runtime
+### [ ] Fase 9 — Process Manager & rAthena Runtime (PRÓXIMA FASE)
 - Inicialização e monitoramento de Login, Char e Map servers do rAthena.
 - Captura de logs e stdout/stderr integrados em console.
 
@@ -139,7 +155,7 @@ graph TD
 
 ## 7. Suíte de Testes e Qualidade
 
-- **Cobertura**: 120 testes em 22 suítes cobrindo parsing de dados reais do rAthena/HorizonRO, round-trip AST, transações de edição, validadores e fluxos de criação de entidades.
+- **Cobertura**: 134 testes em 23 suítes cobrindo parsing de dados reais do rAthena/HorizonRO, round-trip AST, transações de edição, validadores, fluxos de criação de entidades, tokenizadores Monaco e localizadores de linhas YAML.
 - **Integração contínua**: Validação via typecheck estrito (`tsc --noEmit`), lint (`eslint`) e build de produção.
 
 ---
