@@ -14,10 +14,12 @@ import { ItemCombatSection } from './inspector/ItemCombatSection';
 import { ItemRequirementsSection } from './inspector/ItemRequirementsSection';
 import { ItemSubstructuresSection } from './inspector/ItemSubstructuresSection';
 import { ItemScriptEditorSection } from './inspector/ItemScriptEditorSection';
+import { ItemLinkedSystemsSection } from './inspector/ItemLinkedSystemsSection';
 import { LayeredItemRepository } from '@/services/database/layeredItemRepository';
 import { ItemDatabaseProvider } from '@/services/database/providers/itemDatabaseProvider';
+import { Link2 } from 'lucide-react';
 
-type InspectorTab = 'general' | 'requirements' | 'flags_trade' | 'scripts' | 'provenance';
+type InspectorTab = 'general' | 'requirements' | 'flags_trade' | 'scripts' | 'linked_systems' | 'provenance';
 
 export function ItemInspector({ itemId }: { itemId: number }) {
   const [currentTab, setCurrentTab] = useState<InspectorTab>('general');
@@ -195,6 +197,19 @@ export function ItemInspector({ itemId }: { itemId: number }) {
 
           <button
             type="button"
+            onClick={() => setCurrentTab('linked_systems')}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+              currentTab === 'linked_systems'
+                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
+                : 'text-neutral-400 hover:text-neutral-200'
+            }`}
+          >
+            <Link2 className="w-3.5 h-3.5" />
+            <span>Combos & Groups</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setCurrentTab('provenance')}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
               currentTab === 'provenance'
@@ -242,6 +257,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
 
         {currentTab === 'scripts' && (
           <ItemScriptEditorSection item={item} />
+        )}
+
+        {currentTab === 'linked_systems' && (
+          <ItemLinkedSystemsSection item={item} />
         )}
 
         {currentTab === 'provenance' && (

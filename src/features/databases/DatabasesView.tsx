@@ -1,14 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Database, Play, Loader2, Sword, Skull, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  Database,
+  Play,
+  Loader2,
+  Sword,
+  Skull,
+  Zap,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Layers,
+  Package,
+  Dices,
+} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { useDatabaseStore } from '@/stores/databaseStore';
+import { DatabaseProviderId } from '@/domain/database/provider/databaseProvider';
 import { ItemExplorerView } from './items/ItemExplorerView';
 import { MobExplorerView } from './mobs/MobExplorerView';
 import { SkillExplorerView } from './skills/SkillExplorerView';
+import { ComboExplorerView } from './combos/ComboExplorerView';
+import { ItemGroupExplorerView } from './itemGroups/ItemGroupExplorerView';
+import { ItemPackageExplorerView } from './itemPackages/ItemPackageExplorerView';
+import { RandomOptionExplorerView } from './randomOptions/RandomOptionExplorerView';
 
 interface DatabaseLoadItem {
-  id: 'item' | 'mob' | 'skill';
+  id: DatabaseProviderId;
   name: string;
   description: string;
   icon: typeof Sword;
@@ -36,6 +54,34 @@ const AVAILABLE_DATABASES: DatabaseLoadItem[] = [
     description: 'skill_db.yml, db/import',
     icon: Zap,
     color: 'text-emerald-400',
+  },
+  {
+    id: 'combo',
+    name: 'Item Combos',
+    description: 'item_combos.yml, db/import/item_combos.yml',
+    icon: Sparkles,
+    color: 'text-yellow-400',
+  },
+  {
+    id: 'group',
+    name: 'Item Groups',
+    description: 'item_group_db.yml, db/import/item_group_db.yml',
+    icon: Layers,
+    color: 'text-teal-400',
+  },
+  {
+    id: 'package',
+    name: 'Item Packages',
+    description: 'item_packages.yml, db/import/item_packages.yml',
+    icon: Package,
+    color: 'text-purple-400',
+  },
+  {
+    id: 'randomopt',
+    name: 'Random Options',
+    description: 'item_randomopt_db.yml, item_randomopt_group.yml, db/import',
+    icon: Dices,
+    color: 'text-pink-400',
   },
 ];
 
@@ -71,11 +117,7 @@ export function DatabasesView() {
     );
   }
 
-  const itemMeta = metadataMap['item'];
-  const mobMeta = metadataMap['mob'];
-  const skillMeta = metadataMap['skill'];
-
-  const loadedCount = [itemMeta, mobMeta, skillMeta].filter((m) => m?.state === 'loaded').length;
+  const loadedCount = Object.values(metadataMap).filter((m) => m?.state === 'loaded').length;
   const isAnyLoaded = loadedCount > 0;
   const totalDatabases = AVAILABLE_DATABASES.length;
   const loadingProgressPercent = Math.round((loadedCount / totalDatabases) * 100);
@@ -86,17 +128,10 @@ export function DatabasesView() {
     setIsBulkLoading(true);
 
     try {
-      // 1. Items
-      setCurrentLoadingStep('Carregando Itens...');
-      await loadDatabase('item', activeWorkspace.rootPath);
-
-      // 2. Monsters
-      setCurrentLoadingStep('Carregando Monstros...');
-      await loadDatabase('mob', activeWorkspace.rootPath);
-
-      // 3. Skills
-      setCurrentLoadingStep('Carregando Habilidades...');
-      await loadDatabase('skill', activeWorkspace.rootPath);
+      for (const db of AVAILABLE_DATABASES) {
+        setCurrentLoadingStep(`Carregando ${db.name}...`);
+        await loadDatabase(db.id, activeWorkspace.rootPath);
+      }
 
       setCurrentLoadingStep('Finalizando...');
       setActiveDatabase('item');
@@ -113,110 +148,59 @@ export function DatabasesView() {
     return (
       <div className="h-full w-full flex flex-col bg-[#18181b] overflow-hidden">
         {/* Database Switcher Navigation Bar */}
-        <div className="flex items-center gap-1 px-3 py-1.5 bg-[#141416] border-b border-[#27272a]">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveDatabase('item');
-              if (itemMeta?.state === 'not_loaded') {
-                loadDatabase('item', activeWorkspace.rootPath);
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
-              activeDatabase === 'item'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-[#1f1f23]'
-            }`}
-          >
-            <Sword className="w-3.5 h-3.5" />
-            <span>Items</span>
-            {itemMeta?.state === 'loaded' && (
-              <span className="text-[10px] opacity-75 font-mono">({itemMeta.entityCount})</span>
-            )}
-            {itemMeta?.state === 'loading' && <Loader2 className="w-3 h-3 animate-spin" />}
-          </button>
+        <div className="flex items-center gap-1 px-3 py-1.5 bg-[#141416] border-b border-[#27272a] overflow-x-auto">
+          {AVAILABLE_DATABASES.map((db) => {
+            const meta = metadataMap[db.id];
+            const Icon = db.icon;
+            const isActive = activeDatabase === db.id;
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveDatabase('mob');
-              if (mobMeta?.state === 'not_loaded') {
-                loadDatabase('mob', activeWorkspace.rootPath);
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
-              activeDatabase === 'mob'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-[#1f1f23]'
-            }`}
-          >
-            <Skull className="w-3.5 h-3.5" />
-            <span>Monsters</span>
-            {mobMeta?.state === 'loaded' && (
-              <span className="text-[10px] opacity-75 font-mono">({mobMeta.entityCount})</span>
-            )}
-            {mobMeta?.state === 'loading' && <Loader2 className="w-3 h-3 animate-spin" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveDatabase('skill');
-              if (skillMeta?.state === 'not_loaded') {
-                loadDatabase('skill', activeWorkspace.rootPath);
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
-              activeDatabase === 'skill'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-[#1f1f23]'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5" />
-            <span>Skills</span>
-            {skillMeta?.state === 'loaded' && (
-              <span className="text-[10px] opacity-75 font-mono">({skillMeta.entityCount})</span>
-            )}
-            {skillMeta?.state === 'loading' && <Loader2 className="w-3 h-3 animate-spin" />}
-          </button>
+            return (
+              <button
+                key={db.id}
+                type="button"
+                onClick={() => {
+                  setActiveDatabase(db.id);
+                  if (meta?.state === 'not_loaded') {
+                    loadDatabase(db.id, activeWorkspace.rootPath);
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors shrink-0 ${
+                  isActive
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-neutral-400 hover:text-neutral-200 hover:bg-[#1f1f23]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{db.name.replace(' Database', '')}</span>
+                {meta?.state === 'loaded' && (
+                  <span className="text-[10px] opacity-75 font-mono">({meta.entityCount})</span>
+                )}
+                {meta?.state === 'loading' && <Loader2 className="w-3 h-3 animate-spin" />}
+              </button>
+            );
+          })}
         </div>
 
         {/* Database View Body */}
         <div className="flex-1 overflow-hidden">
-          {activeDatabase === 'item' && itemMeta?.state === 'loaded' && <ItemExplorerView />}
-          {activeDatabase === 'mob' && mobMeta?.state === 'loaded' && <MobExplorerView />}
-          {activeDatabase === 'skill' && skillMeta?.state === 'loaded' && <SkillExplorerView />}
+          {activeDatabase === 'item' && metadataMap['item']?.state === 'loaded' && <ItemExplorerView />}
+          {activeDatabase === 'mob' && metadataMap['mob']?.state === 'loaded' && <MobExplorerView />}
+          {activeDatabase === 'skill' && metadataMap['skill']?.state === 'loaded' && <SkillExplorerView />}
+          {activeDatabase === 'combo' && metadataMap['combo']?.state === 'loaded' && <ComboExplorerView />}
+          {activeDatabase === 'group' && metadataMap['group']?.state === 'loaded' && <ItemGroupExplorerView />}
+          {activeDatabase === 'package' && metadataMap['package']?.state === 'loaded' && <ItemPackageExplorerView />}
+          {activeDatabase === 'randomopt' && metadataMap['randomopt']?.state === 'loaded' && <RandomOptionExplorerView />}
 
-          {activeDatabase === 'item' && itemMeta?.state !== 'loaded' && (
+          {activeDatabase && metadataMap[activeDatabase]?.state !== 'loaded' && (
             <div className="h-full flex flex-col items-center justify-center space-y-3">
-              <div className="text-neutral-400 text-xs">Item Database is not loaded.</div>
+              <div className="text-neutral-400 text-xs">
+                {AVAILABLE_DATABASES.find((d) => d.id === activeDatabase)?.name} is not loaded.
+              </div>
               <button
-                onClick={() => loadDatabase('item', activeWorkspace.rootPath)}
+                onClick={() => loadDatabase(activeDatabase, activeWorkspace.rootPath)}
                 className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs px-3 py-1.5 rounded font-medium"
               >
-                <Play className="w-3.5 h-3.5" /> Load Item Database
-              </button>
-            </div>
-          )}
-          {activeDatabase === 'mob' && mobMeta?.state !== 'loaded' && (
-            <div className="h-full flex flex-col items-center justify-center space-y-3">
-              <div className="text-neutral-400 text-xs">Monster Database is not loaded.</div>
-              <button
-                onClick={() => loadDatabase('mob', activeWorkspace.rootPath)}
-                className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs px-3 py-1.5 rounded font-medium"
-              >
-                <Play className="w-3.5 h-3.5" /> Load Monster Database
-              </button>
-            </div>
-          )}
-          {activeDatabase === 'skill' && skillMeta?.state !== 'loaded' && (
-            <div className="h-full flex flex-col items-center justify-center space-y-3">
-              <div className="text-neutral-400 text-xs">Skill Database is not loaded.</div>
-              <button
-                onClick={() => loadDatabase('skill', activeWorkspace.rootPath)}
-                className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs px-3 py-1.5 rounded font-medium"
-              >
-                <Play className="w-3.5 h-3.5" /> Load Skill Database
+                <Play className="w-3.5 h-3.5" /> Load Database
               </button>
             </div>
           )}
@@ -282,7 +266,7 @@ export function DatabasesView() {
               </span>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
               {AVAILABLE_DATABASES.map((db) => {
                 const meta = metadataMap[db.id];
                 const IconComponent = db.icon;

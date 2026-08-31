@@ -16,7 +16,7 @@ import {
 import { SourceItem } from '../../domain/database/item/sourceItem';
 
 export interface ValidationIssue {
-  readonly itemId: number;
+  readonly itemId?: number;
   readonly severity: 'error' | 'warning';
   readonly field?: string;
   readonly message: string;
