@@ -7,6 +7,7 @@ import { StatusBar } from '@/components/layout/StatusBar';
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary';
 import { WorkspaceLandingView } from '@/features/workspace/WorkspaceLandingView';
 import { DatabasesView } from '@/features/databases/DatabasesView';
+import { DatabaseYamlEditorView } from '@/features/editor/DatabaseYamlEditorView';
 import { ProcessesView } from '@/features/processes/ProcessesView';
 import { LogsView } from '@/features/logs/LogsView';
 import { SettingsView } from '@/features/settings/SettingsView';
@@ -31,6 +32,9 @@ export function App() {
             </div>
             <div className={activeTab === 'databases' ? 'h-full w-full' : 'hidden'}>
               <DatabasesView />
+            </div>
+            <div className={activeTab === 'editor' ? 'h-full w-full' : 'hidden'}>
+              <DatabaseYamlEditorView />
             </div>
             <div className={activeTab === 'processes' ? 'h-full w-full' : 'hidden'}>
               <ProcessesView />

@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, KeyboardEvent } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useItemEditStore } from '@/stores/itemEditStore';
 import { EffectiveItem } from '@/domain/database/item/effectiveItem';
 import {
@@ -6,8 +6,9 @@ import {
   ScriptCompletionItem,
 } from '@/services/script/rathenaScriptDefinitions';
 import { RathenaScriptValidator } from '@/services/script/rathenaScriptValidator';
-import { Code, AlertTriangle, CheckCircle2, Wand2, Search, Plus, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Code, CheckCircle2, Wand2, Search, Plus, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { MonacoScriptEditor } from '@/features/editor/monaco/MonacoScriptEditor';
 
 interface ItemScriptEditorSectionProps {
   item: EffectiveItem;
@@ -83,23 +84,6 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
       snippet = item.name;
     }
     insertBonusSnippet(snippet);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const textarea = e.currentTarget;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const currentValue = textarea.value;
-
-      const newValue = currentValue.substring(0, start) + '  ' + currentValue.substring(end);
-      setField(activeTab, newValue || undefined);
-
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 2;
-      }, 0);
-    }
   };
 
   const autoFixSemicolons = () => {
@@ -233,38 +217,14 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
         </div>
 
         {/* Code Editor Body */}
-        <div className="relative flex min-h-[140px] max-h-[260px]">
-          {/* Line Numbers */}
-          <div className="w-8 py-2 bg-[#18181b] border-r border-[#27272a] text-[11px] font-mono text-neutral-600 select-none text-right pr-2 space-y-0.5">
-            {Array.from({ length: Math.max(lineCount, 5) }).map((_, idx) => (
-              <div key={idx}>{idx + 1}</div>
-            ))}
-          </div>
-
-          {/* Textarea Input */}
-          <textarea
-            ref={textareaRef}
+        <div className="p-2 bg-[#141416]">
+          <MonacoScriptEditor
             value={currentCode}
-            onChange={(e) => setField(activeTab, e.target.value === '' ? undefined : e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={`// rAthena script for ${activeTab}\n// Example: bonus bStr, 5;\n// Example: percentheal 100, 100;`}
-            spellCheck={false}
-            className="flex-1 p-2 bg-transparent text-xs font-mono text-neutral-200 outline-none resize-none leading-5 overflow-auto whitespace-pre font-medium"
-            rows={Math.max(lineCount, 6)}
+            onChange={(val) => setField(activeTab, val === '' ? undefined : val)}
+            height={180}
+            validateScript={true}
           />
         </div>
-
-        {/* Syntax Diagnostic Output */}
-        {syntaxIssues.length > 0 && (
-          <div className="bg-amber-950/20 border-t border-amber-500/20 px-3 py-1.5 space-y-1">
-            {syntaxIssues.map((issue, idx) => (
-              <div key={idx} className="flex items-center gap-1.5 text-[11px] text-amber-300 font-mono">
-                <AlertTriangle className="w-3 h-3 text-amber-400 flex-shrink-0" />
-                <span>Line {issue.line}: {issue.message}</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Bonus Reference & Quick Insert Drawer */}

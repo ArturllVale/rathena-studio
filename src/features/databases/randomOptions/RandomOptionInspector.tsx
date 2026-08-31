@@ -8,10 +8,12 @@ import { RandomOptDatabaseSerializer } from '@/services/database/randomOpt/rando
 import { RandomOptEditTransactionService } from '@/services/database/randomOptEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Dices, Layers } from 'lucide-react';
+import { Loader2, Dices, Layers, FileCode } from 'lucide-react';
 import { LayeredRandomOptRepository } from '@/services/database/randomOpt/layeredRandomOptRepository';
 import { RandomOptDatabaseProvider } from '@/services/database/providers/randomOptDatabaseProvider';
 import { Input } from '@/components/ui/input';
+import { MonacoScriptEditor } from '@/features/editor/monaco/MonacoScriptEditor';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 export function RandomOptionInspector({
   optionId,
@@ -121,10 +123,24 @@ export function RandomOptionInspector({
               </div>
               <div className="text-xs text-neutral-400 mt-0.5">Random Option #{option.id}</div>
             </div>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-sky-400 border border-[#27272a] flex items-center gap-1">
-              <Dices className="w-3 h-3" />
-              <span>OPTION</span>
-            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  const primaryPath = option.layerProvenance[0] || 'item_randomopt_db.yml';
+                  openEntityInYamlEditor(primaryPath, option.option, option.layerProvenance[0]);
+                }}
+                className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+                title="Open in YAML Monaco Editor"
+              >
+                <FileCode className="w-3 h-3 text-sky-400" />
+                <span>YAML</span>
+              </button>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-sky-400 border border-[#27272a] flex items-center gap-1">
+                <Dices className="w-3 h-3" />
+                <span>OPTION</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -154,12 +170,13 @@ export function RandomOptionInspector({
             </div>
             <div>
               <label className="text-[10px] text-neutral-400 block mb-1">Script</label>
-              <textarea
-                value={effectiveFields.Script || ''}
-                onChange={(e) => setOptionField('Script', e.target.value)}
-                rows={6}
-                className="w-full bg-[#141416] border border-[#27272a] rounded p-2.5 text-xs font-mono text-emerald-400 focus:outline-none focus:border-sky-500"
-              />
+              <div className="border border-[#27272a] rounded overflow-hidden">
+                <MonacoScriptEditor
+                  value={effectiveFields.Script || ''}
+                  onChange={(val) => setOptionField('Script', val)}
+                  height="160px"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -197,10 +214,24 @@ export function RandomOptionInspector({
                 Group #{group.id} • {effectiveFields.Slots.length} Slots
               </div>
             </div>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
-              <Layers className="w-3 h-3" />
-              <span>GROUP</span>
-            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  const primaryPath = group.layerProvenance[0] || 'item_randomopt_group.yml';
+                  openEntityInYamlEditor(primaryPath, group.group, group.layerProvenance[0]);
+                }}
+                className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+                title="Open in YAML Monaco Editor"
+              >
+                <FileCode className="w-3 h-3 text-sky-400" />
+                <span>YAML</span>
+              </button>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                <span>GROUP</span>
+              </span>
+            </div>
           </div>
         </div>
 

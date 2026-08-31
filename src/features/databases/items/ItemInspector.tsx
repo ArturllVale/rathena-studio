@@ -8,7 +8,7 @@ import { ItemDatabaseSerializer } from '@/services/database/itemDatabaseSerializ
 import { ItemEditTransactionService } from '@/services/database/itemEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Layers, Sliders, ShieldCheck, Flag, ScrollText } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Layers, Sliders, ShieldCheck, Flag, ScrollText, FileCode, Link2 } from 'lucide-react';
 import { ItemIdentitySection } from './inspector/ItemIdentitySection';
 import { ItemCombatSection } from './inspector/ItemCombatSection';
 import { ItemRequirementsSection } from './inspector/ItemRequirementsSection';
@@ -17,7 +17,7 @@ import { ItemScriptEditorSection } from './inspector/ItemScriptEditorSection';
 import { ItemLinkedSystemsSection } from './inspector/ItemLinkedSystemsSection';
 import { LayeredItemRepository } from '@/services/database/layeredItemRepository';
 import { ItemDatabaseProvider } from '@/services/database/providers/itemDatabaseProvider';
-import { Link2 } from 'lucide-react';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type InspectorTab = 'general' | 'requirements' | 'flags_trade' | 'scripts' | 'linked_systems' | 'provenance';
 
@@ -135,9 +135,23 @@ export function ItemInspector({ itemId }: { itemId: number }) {
             </div>
             <div className="text-xs font-mono text-sky-400 mt-0.5">{fields.AegisName || 'Unknown'}</div>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400 border border-[#27272a]">
-            #{item.id}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = Object.values(item.fieldOrigins)[0]?.filePath || layerProvenance[0] || 'item_db.yml';
+                openEntityInYamlEditor(primaryPath, item.id, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Monaco Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400 border border-[#27272a]">
+              #{item.id}
+            </span>
+          </div>
         </div>
 
         {/* Tab Navigation */}

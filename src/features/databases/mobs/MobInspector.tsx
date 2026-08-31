@@ -6,7 +6,7 @@ import { MobDatabaseSerializer } from '@/services/database/mob/mobDatabaseSerial
 import { MobEditTransactionService } from '@/services/database/mobEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Layers, Sliders, Shield, Sparkles, Gift } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Layers, Sliders, Shield, Sparkles, Gift, FileCode } from 'lucide-react';
 import { MobIdentitySection } from './inspector/MobIdentitySection';
 import { MobCombatSection } from './inspector/MobCombatSection';
 import { MobAttributesSection } from './inspector/MobAttributesSection';
@@ -16,6 +16,7 @@ import { LayeredMobRepository } from '@/services/database/mob/layeredMobReposito
 import { MobDatabaseProvider } from '@/services/database/providers/mobDatabaseProvider';
 import { MobFieldOrigin } from '@/domain/database/mob/effectiveMob';
 import { SemanticDiffViewer } from '../common/SemanticDiffViewer';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type MobInspectorTab = 'general' | 'attributes' | 'modes' | 'drops' | 'provenance';
 
@@ -127,6 +128,18 @@ export function MobInspector({ mobId }: { mobId: number }) {
             <div className="text-xs font-mono text-sky-400 mt-0.5">{fields.AegisName || 'Unknown'}</div>
           </div>
           <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = (Object.values(mob.fieldOrigins) as MobFieldOrigin[])[0]?.filePath || layerProvenance[0] || 'mob_db.yml';
+                openEntityInYamlEditor(primaryPath, mob.id, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Monaco Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
             {fields.Class && (
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-500/30">
                 {fields.Class}

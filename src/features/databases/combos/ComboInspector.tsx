@@ -9,9 +9,11 @@ import { ComboEditTransactionService } from '@/services/database/comboEditTransa
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { ComboDatabaseProvider } from '@/services/database/providers/comboDatabaseProvider';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Sparkles, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Sparkles, Plus, Trash2, FileCode } from 'lucide-react';
 import { LayeredComboRepository } from '@/services/database/combo/layeredComboRepository';
 import { Input } from '@/components/ui/input';
+import { MonacoScriptEditor } from '@/features/editor/monaco/MonacoScriptEditor';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type InspectorTab = 'general' | 'script' | 'layers';
 
@@ -143,10 +145,24 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
             </div>
             <div className="text-xs text-neutral-400 mt-0.5">{combo.fields.Combo.length} Items in Combo</div>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
-            <Sparkles className="w-3 h-3" />
-            <span>COMBO</span>
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = layerProvenance[0] || 'item_combo_db.yml';
+                openEntityInYamlEditor(primaryPath, combo.fields.Combo[0] || '', layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Monaco Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              <span>COMBO</span>
+            </span>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -248,13 +264,13 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
             <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
               Combo Bonus Script
             </h3>
-            <textarea
-              value={effectiveFields.Script || ''}
-              onChange={(e) => setField('Script', e.target.value)}
-              rows={8}
-              placeholder="bonus bMaxHP, 100; ..."
-              className="w-full bg-[#141416] border border-[#27272a] rounded p-2.5 text-xs font-mono text-emerald-400 focus:outline-none focus:border-sky-500"
-            />
+            <div className="border border-[#27272a] rounded overflow-hidden">
+              <MonacoScriptEditor
+                value={effectiveFields.Script || ''}
+                onChange={(val) => setField('Script', val)}
+                height="220px"
+              />
+            </div>
           </div>
         )}
 

@@ -127,11 +127,15 @@ graph TD
 - Referências cruzadas completas: relação reversa de itens aos seus combos, caixas/grupos e pacotes na aba do Item Inspector.
 - Visualização e navegação de 7 bancos de dados com barra de progresso unificada.
 
-### [ ] Fase 8 — YAML Text Editor & Monaco Integration (PRÓXIMA FASE)
-- Integração do Monaco Editor para visualização textual raw de arquivos YAML.
-- Autocompletion inteligente em scripts e validações de constantes do rAthena.
+### [x] Fase 8 — YAML Text Editor & Monaco Integration (CONCLUÍDO)
+- **Monaco Raw YAML Editor**: Visualização e edição textual raw de qualquer arquivo YAML de banco de dados com árvore de arquivos por camadas (`[BASE]`, `[RE]`, `[PRE-RE]`, `[IMPORT]`), abas múltiplas, indicador de alterações não salvas (`●`) e atalho de salvamento (`Ctrl+S`).
+- **Sincronização Bidirecional AST**: Salvamento atômico no disco com validação sintática via `yaml.parseDocument`, atualização em memória do `YamlDocumentAdapter` e recarga automática do provedor no `DatabaseRegistry`.
+- **Tokenizador e IntelliSense de Scripts rAthena**: Linguagem personalizada `rathena-script` no Monaco com regras Monarch para palavras-chave, constantes e operadores; provedor de autocompletion com expansão em snippets (`ALL_SCRIPT_COMPLETIONS`) e provedor de hover documentation.
+- **Validação Sintática em Tempo Real**: Diagnósticos com marcadores de erro e aviso no Monaco via `RathenaScriptValidator.validate(code)`.
+- **Navegação Cruzada Instantânea (Jump to Entity)**: Botão "YAML" em todos os 7 inspetores visuais (`ItemInspector`, `MobInspector`, `SkillInspector`, `ComboInspector`, `ItemGroupInspector`, `ItemPackageInspector`, `RandomOptionInspector`) abrindo o arquivo exato e focando o cursor diretamente na linha de definição da entidade via `findEntityLineInYaml`.
+- **Monaco Integrado nos Inspetores**: Componente `MonacoScriptEditor` integrado diretamente no `ItemScriptEditorSection`, `ComboInspector` e `RandomOptionInspector`.
 
-### [ ] Fase 9 — Process Manager & rAthena Runtime
+### [ ] Fase 9 — Process Manager & rAthena Runtime (PRÓXIMA FASE)
 - Inicialização e monitoramento de Login, Char e Map servers do rAthena.
 - Captura de logs e stdout/stderr integrados em console.
 
@@ -139,7 +143,7 @@ graph TD
 
 ## 7. Suíte de Testes e Qualidade
 
-- **Cobertura**: 120 testes em 22 suítes cobrindo parsing de dados reais do rAthena/HorizonRO, round-trip AST, transações de edição, validadores e fluxos de criação de entidades.
+- **Cobertura**: 134 testes em 23 suítes cobrindo parsing de dados reais do rAthena/HorizonRO, round-trip AST, transações de edição, validadores, fluxos de criação de entidades, tokenizadores Monaco e localizadores de linhas YAML.
 - **Integração contínua**: Validação via typecheck estrito (`tsc --noEmit`), lint (`eslint`) e build de produção.
 
 ---

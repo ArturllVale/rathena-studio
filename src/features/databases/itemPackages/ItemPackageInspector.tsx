@@ -8,10 +8,11 @@ import { ItemPackageDatabaseSerializer } from '@/services/database/itemPackage/i
 import { ItemPackageEditTransactionService } from '@/services/database/itemPackageEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Package, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Package, Plus, Trash2, FileCode } from 'lucide-react';
 import { LayeredItemPackageRepository } from '@/services/database/itemPackage/layeredItemPackageRepository';
 import { ItemPackageDatabaseProvider } from '@/services/database/providers/itemPackageDatabaseProvider';
 import { Input } from '@/components/ui/input';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type InspectorTab = 'random_options' | 'groups' | 'layers';
 
@@ -138,10 +139,24 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
             </div>
             <div className="text-xs text-neutral-400 mt-0.5">Item Package Bundle</div>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-purple-400 border border-[#27272a] flex items-center gap-1">
-            <Package className="w-3 h-3" />
-            <span>PACKAGE</span>
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = layerProvenance[0] || 'item_package_db.yml';
+                openEntityInYamlEditor(primaryPath, pkg.package, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Monaco Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-purple-400 border border-[#27272a] flex items-center gap-1">
+              <Package className="w-3 h-3" />
+              <span>PACKAGE</span>
+            </span>
+          </div>
         </div>
 
         {/* Tab Navigation */}

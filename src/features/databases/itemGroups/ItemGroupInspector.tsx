@@ -8,11 +8,12 @@ import { ItemGroupDatabaseSerializer } from '@/services/database/itemGroup/itemG
 import { ItemGroupEditTransactionService } from '@/services/database/itemGroupEditTransactionService';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { Loader2, Undo2, Redo2, Layers, Plus, Trash2, FolderPlus } from 'lucide-react';
+import { Loader2, Undo2, Redo2, Layers, Plus, Trash2, FolderPlus, FileCode } from 'lucide-react';
 import { LayeredItemGroupRepository } from '@/services/database/itemGroup/layeredItemGroupRepository';
 import { ItemGroupDatabaseProvider } from '@/services/database/providers/itemGroupDatabaseProvider';
 import { Input } from '@/components/ui/input';
 import { ItemGroupEntry, ItemSubGroup, getItemGroupAllEntries } from '@/domain/database/itemGroup/itemGroupTypes';
+import { openEntityInYamlEditor } from '@/stores/yamlEditorStore';
 
 type InspectorTab = 'items' | 'identity' | 'layers';
 
@@ -396,10 +397,24 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
               {effectiveFields.SubGroups && ` • ${effectiveFields.SubGroups.length} SubGroups`}
             </div>
           </div>
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-emerald-400 border border-[#27272a] flex items-center gap-1">
-            <Layers className="w-3 h-3" />
-            <span>GROUP</span>
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const primaryPath = layerProvenance[0] || 'item_group_db.yml';
+                openEntityInYamlEditor(primaryPath, group.group, layerProvenance[0]);
+              }}
+              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              title="Open in YAML Monaco Editor"
+            >
+              <FileCode className="w-3 h-3 text-sky-400" />
+              <span>YAML</span>
+            </button>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-emerald-400 border border-[#27272a] flex items-center gap-1">
+              <Layers className="w-3 h-3" />
+              <span>GROUP</span>
+            </span>
+          </div>
         </div>
 
         {/* Tab Navigation */}
