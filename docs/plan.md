@@ -139,7 +139,7 @@ graph TD
 
 ## 7. Suíte de Testes e Qualidade
 
-- **Cobertura**: 100 testes cobrindo parsing, round-trip AST, transações de edição, validadores e fluxos de criação de entidades.
+- **Cobertura**: 120 testes em 22 suítes cobrindo parsing de dados reais do rAthena/HorizonRO, round-trip AST, transações de edição, validadores e fluxos de criação de entidades.
 - **Integração contínua**: Validação via typecheck estrito (`tsc --noEmit`), lint (`eslint`) e build de produção.
 
 ---
