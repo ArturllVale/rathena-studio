@@ -134,7 +134,7 @@ export function SkillInspector({ skillId }: { skillId: number }) {
                 openEntityInYamlEditor(primaryPath, skill.id, layerProvenance[0]);
               }}
               className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
-              title="Open in YAML Monaco Editor"
+              title="Open in YAML Editor"
             >
               <FileCode className="w-3 h-3 text-sky-400" />
               <span>YAML</span>

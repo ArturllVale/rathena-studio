@@ -16,11 +16,11 @@ export function ItemPackageExplorerView() {
       </div>
 
       {selectedPackageName !== null ? (
-        <div className="w-[480px] shrink-0 bg-[#1f1f23] overflow-y-auto">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] overflow-y-auto">
           <ItemPackageInspector packageName={selectedPackageName} />
         </div>
       ) : (
-        <div className="w-[480px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
           Select an item package to view details
         </div>
       )}

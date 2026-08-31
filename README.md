@@ -50,11 +50,11 @@
 ### Random Options Inspector
 - Suporte a constantes de opções randômicas (`RANDOM_OPTION_DB`) e grupos com faixas de valores e chances em base 10.000 (`RANDOM_OPTION_GROUP`).
 
-### Monaco Raw YAML Editor & Script Tokenizer
-- **Editor YAML Integrado**: Edição e inspeção textual raw de qualquer arquivo do banco de dados rAthena diretamente na aplicação via Monaco Editor com atalho `Ctrl+S` e sincronização bidirecional em memória.
+### Editor YAML & IntelliSense de Scripts
+- **Editor YAML Integrado**: Edição e inspeção textual raw de qualquer arquivo do banco de dados rAthena diretamente na aplicação com atalho `Ctrl+S` e sincronização bidirecional em memória.
 - **Navegador de Árvore de Camadas**: Organização visual dos arquivos por camadas (`[BASE]`, `[RE]`, `[PRE-RE]`, `[IMPORT]`) com abas múltiplas e indicador de alterações não salvas (`●`).
 - **Navegação Cruzada Rápida (Jump to Entity)**: Botão `YAML` presente nos 7 inspetores visuais direcionando o cursor diretamente para a linha exata de definição da entidade (`findEntityLineInYaml`).
-- **Tokenizador e IntelliSense de Scripts rAthena**: Linguagem `rathena-script` personalizada no Monaco com autocompletion de bônus (`item_bonus.txt`), documentação no hover e validação sintática em tempo real (`RathenaScriptValidator`).
+- **Tokenizador e IntelliSense de Scripts rAthena**: Suporte avançado à linguagem `rathena-script` no editor com autocompletion de bônus (`item_bonus.txt`), documentação no hover e validação sintática em tempo real (`RathenaScriptValidator`).
 
 ### Layer Hierarchy & Proveniência por Campo
 - Cada campo inspecionado exibe sua origem exata (arquivo e camada) com badges numerados e chips de proveniência.
@@ -219,7 +219,7 @@ npm run tauri:dev
 ### Validação da Suite de Testes
 
 ```bash
-# Vitest — 134 testes em 23 suítes (unit + integration + audit real do rAthena + Monaco)
+# Vitest — 135 testes em 23 suítes (unit + integration + audit real do rAthena + editor)
 npm run test
 
 # Checagem estrita de tipos TypeScript
@@ -246,5 +246,5 @@ cargo check --manifest-path src-tauri/Cargo.toml
 - [x] **Fase 5** — Transações atômicas, Undo/Redo, Diff Semântico e criação de registros (+1)
 - [x] **Fase 6** — Validação e conformidade com dados reais de larga escala (25k+ registros)
 - [x] **Fase 7** — Item Combos, Item Groups, Item Packages, Random Options & Referências Cruzadas
-- [x] **Fase 8** — Editor Monaco integrado & Autocomplete avançado de scripts
+- [x] **Fase 8** — Editor YAML de texto & Autocomplete avançado de scripts
 - [ ] **Fase 9** — Process Manager para inicialização e monitoramento de Login/Char/Map servers

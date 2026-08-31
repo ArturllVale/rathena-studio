@@ -20,14 +20,14 @@ export function RandomOptionExplorerView() {
       </div>
 
       {hasSelection ? (
-        <div className="w-[480px] shrink-0 bg-[#1f1f23] overflow-y-auto">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] overflow-y-auto">
           <RandomOptionInspector
             optionId={!isGroupTab ? selectedRandomOptId : null}
             groupId={isGroupTab ? selectedRandomGroupId : null}
           />
         </div>
       ) : (
-        <div className="w-[480px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
+        <div className="w-[440px] shrink-0 bg-[#1f1f23] flex items-center justify-center text-neutral-500 text-sm border-l border-[#27272a]">
           Select an item to view details
         </div>
       )}
