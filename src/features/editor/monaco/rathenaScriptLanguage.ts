@@ -142,7 +142,7 @@ export const rathenaMonarchTokensProvider: monacoType.languages.IMonarchLanguage
       }],
       { include: '@whitespace' },
       [/[{}()[\]]/, '@brackets'],
-      [/@operators/, 'operator'],
+      [/@symbols/, { cases: { '@operators': 'operator', '@default': '' } }],
       [/\d*\.\d+([eE][-+]?\d+)?/, 'number.float'],
       [/0[xX][0-9a-fA-F]+/, 'number.hex'],
       [/\d+/, 'number'],
