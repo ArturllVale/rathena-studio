@@ -131,6 +131,7 @@ export const rathenaLanguageConfiguration: monacoType.languages.LanguageConfigur
 export const rathenaMonarchTokensProvider: monacoType.languages.IMonarchLanguage = {
   keywords: RATHENA_KEYWORDS,
   operators: ['=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=', '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%', '<<', '>>'],
+  symbols: /[=><!~?:&|+\-*^%/]+/,
   tokenizer: {
     root: [
       [/[a-zA-Z_]\w*/, {
@@ -141,7 +142,6 @@ export const rathenaMonarchTokensProvider: monacoType.languages.IMonarchLanguage
       }],
       { include: '@whitespace' },
       [/[{}()[\]]/, '@brackets'],
-      [/[<>](?!@symbols)/, '@brackets'],
       [/@operators/, 'operator'],
       [/\d*\.\d+([eE][-+]?\d+)?/, 'number.float'],
       [/0[xX][0-9a-fA-F]+/, 'number.hex'],

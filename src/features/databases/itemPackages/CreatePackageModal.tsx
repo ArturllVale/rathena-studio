@@ -88,36 +88,36 @@ export function CreatePackageModal({ isOpen, onClose }: CreatePackageModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-      <div className="bg-[#1f1f23] border border-[#27272a] rounded-lg max-w-lg w-full p-4 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-[#27272a] pb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded bg-purple-500/10 text-purple-400">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-card border border-border/80 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-border/80 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-pastel-lavender/15 text-pastel-lavender border border-pastel-lavender/30">
               <Package className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-neutral-100">Create New Item Package</h2>
-              <p className="text-[11px] text-neutral-400">Bundle item package with random rolls or fixed group slots</p>
+              <h2 className="text-sm font-semibold text-foreground">Create New Item Package</h2>
+              <p className="text-[11px] text-muted-foreground">Bundle item package with random rolls or fixed group slots</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 text-neutral-400 hover:text-neutral-200">
+          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {errorMessage && (
-          <div className="bg-red-950/20 border border-red-500/20 p-2.5 rounded text-xs text-red-400">
+          <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-xl text-xs text-destructive">
             {errorMessage}
           </div>
         )}
 
-        <div className="space-y-3 text-xs">
+        <div className="space-y-3.5 text-xs">
           <div>
-            <label className="block text-neutral-400 mb-1">Target File Layer</label>
+            <label className="block text-muted-foreground mb-1 font-medium">Target File Layer</label>
             <select
               value={selectedLayerId}
               onChange={(e) => setSelectedLayerId(e.target.value)}
-              className="w-full bg-[#141416] border border-[#27272a] rounded px-2.5 py-1.5 text-neutral-200"
+              className="w-full h-9 bg-background border border-border/80 rounded-xl px-3 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-pastel-blue/40"
             >
               {availableLayers.map((l) => (
                 <option key={l.layer.id} value={l.layer.id}>
@@ -128,42 +128,42 @@ export function CreatePackageModal({ isOpen, onClose }: CreatePackageModalProps)
           </div>
 
           <div>
-            <label className="block text-neutral-400 mb-1">Package AegisName</label>
+            <label className="block text-muted-foreground mb-1 font-medium">Package AegisName</label>
             <Input
               value={packageName}
               onChange={(e) => setPackageName(e.target.value)}
               placeholder="e.g. Starter_Package_Box"
-              className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+              className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-xl"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-neutral-400 mb-1">Initial Item</label>
+              <label className="block text-muted-foreground mb-1 font-medium">Initial Item</label>
               <Input
                 value={firstItem}
                 onChange={(e) => setFirstItem(e.target.value)}
                 placeholder="e.g. Red_Potion"
-                className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-xl"
               />
             </div>
             <div>
-              <label className="block text-neutral-400 mb-1">Rate (10000 = 100%)</label>
+              <label className="block text-muted-foreground mb-1 font-medium">Rate (10000 = 100%)</label>
               <Input
                 type="number"
                 value={firstRate}
                 onChange={(e) => setFirstRate(Number(e.target.value))}
-                className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-xl"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-[#27272a] pt-3">
+        <div className="flex items-center justify-end gap-2 border-t border-border/80 pt-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             Cancel
           </button>
@@ -171,7 +171,7 @@ export function CreatePackageModal({ isOpen, onClose }: CreatePackageModalProps)
             type="button"
             disabled={isSubmitting}
             onClick={handleCreate}
-            className="px-3 py-1.5 rounded text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-pastel-blue/20 text-pastel-blue border border-pastel-blue/30 hover:bg-pastel-blue/30 flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
             <span>Create Package</span>

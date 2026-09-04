@@ -47,10 +47,10 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
     const errorMsg = getFieldError(fieldName);
 
     return (
-      <div className="flex flex-col py-1.5 border-b border-[#27272a] last:border-0 relative">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-neutral-400 whitespace-nowrap flex items-center gap-1">
-            {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+      <div className="flex flex-col py-2.5 border-b border-border/60 last:border-0 relative">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap flex items-center gap-1.5">
+            {isModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
             {label}
           </span>
           <input
@@ -67,18 +67,18 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
                 (setField as (f: keyof ItemRawFields, v: unknown) => void)(fieldName, val);
               }
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 h-6.5 w-14 shrink-0 ${
+            className={`text-xs font-mono text-right bg-background border rounded-lg px-3 py-1.5 h-9 w-20 shrink-0 transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40 ${
               errorMsg
-                ? 'border-red-500/50 text-red-200'
+                ? 'border-destructive/60 text-destructive'
                 : isModified
-                ? 'border-sky-500/50 text-sky-200'
-                : 'border-[#27272a] text-neutral-200'
+                ? 'border-pastel-blue/80 text-pastel-blue font-semibold bg-pastel-blue/5'
+                : 'border-border/80 text-foreground'
             }`}
           />
         </div>
-        {errorMsg && <div className="text-[10px] text-red-400 mt-1 text-right">{errorMsg}</div>}
+        {errorMsg && <div className="text-[10px] text-destructive mt-1 text-right">{errorMsg}</div>}
         {!isModified && origin && origin.layerId !== 'item-db-base-root' && origin.layerId !== layerProvenance[0] && (
-          <div className="text-[9px] text-neutral-500 mt-0.5 text-right truncate font-mono">
+          <div className="text-[10px] text-muted-foreground/80 mt-1 text-right truncate font-mono">
             via {origin.filePath || origin.layerId}
           </div>
         )}
@@ -164,25 +164,25 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-          Level & Gender Requirements
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
+          Level &amp; Gender Requirements
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a] space-y-2">
+        <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs space-y-1">
           {renderField('Min Level (EquipLevelMin)', 'EquipLevelMin', 'number', '0')}
           {renderField('Max Level (EquipLevelMax)', 'EquipLevelMax', 'number', '0')}
 
-          <div className="flex items-center justify-between gap-2 py-1 border-b border-[#27272a]">
-            <span className="text-xs text-neutral-400 flex items-center gap-1">
-              {isGenderModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center justify-between gap-3 py-2.5 border-b border-border/60 last:border-0">
+            <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              {isGenderModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Gender
             </span>
             <select
               value={currentGender}
               onChange={(e) => setField('Gender', e.target.value as GenderRestriction)}
-              className={`text-xs font-mono bg-[#141416] border rounded px-2 py-1 w-32 ${
-                isGenderModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+              className={`text-xs font-mono bg-background border rounded-lg px-3 py-1.5 h-9 w-36 transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40 ${
+                isGenderModified ? 'border-pastel-blue/80 text-pastel-blue font-semibold bg-pastel-blue/5' : 'border-border/80 text-foreground'
               }`}
             >
               {GENDER_RESTRICTIONS.map((g) => (
@@ -196,33 +196,33 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
       </div>
 
       {/* Jobs Restriction */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setJobsExpanded(!jobsExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {jobsExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isJobsModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {jobsExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isJobsModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Job Restrictions
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {isJobsAll ? 'All Jobs' : `${Object.keys(currentJobs).length} selected`}
           </span>
         </button>
 
         {jobsExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-3">
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-neutral-400">Equip by All Jobs</span>
+              <span className="text-xs text-muted-foreground">Equip by All Jobs</span>
               <button
                 type="button"
                 onClick={toggleJobAll}
-                className={`text-xs px-2.5 py-1 rounded font-mono ${
-                  isJobsAll ? 'bg-sky-600 text-white' : 'bg-[#27272a] text-neutral-400 hover:text-neutral-200'
+                className={`text-xs px-3 py-1 rounded-lg font-mono transition-colors ${
+                  isJobsAll ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }`}
               >
                 All: {isJobsAll ? 'true' : 'false'}
@@ -230,7 +230,7 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
             </div>
 
             {!isJobsAll && (
-              <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
+              <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
                 {RATHENA_JOBS.map((j) => {
                   const checked = Boolean(currentJobs[j]);
                   return (
@@ -238,12 +238,12 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
                       key={j}
                       type="button"
                       onClick={() => toggleJob(j)}
-                      className={`flex items-center gap-1.5 px-2 py-1 rounded text-left text-[11px] font-mono transition-colors ${
-                        checked ? 'bg-sky-950/60 border border-sky-500/40 text-sky-200' : 'bg-[#1f1f23] border border-[#27272a] text-neutral-400 hover:text-neutral-200'
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs font-mono transition-colors ${
+                        checked ? 'bg-pastel-blue/15 border border-pastel-blue/40 text-pastel-blue font-semibold' : 'bg-background border border-border/80 text-muted-foreground hover:text-foreground hover:border-border'
                       }`}
                     >
-                      <span className={`w-3 h-3 rounded flex items-center justify-center border ${checked ? 'border-sky-500 bg-sky-600 text-white' : 'border-neutral-600'}`}>
-                        {checked && <Check className="w-2.5 h-2.5" />}
+                      <span className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors ${checked ? 'border-pastel-blue bg-pastel-blue text-pastel-blue-foreground' : 'border-border bg-background'}`}>
+                        {checked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                       </span>
                       <span className="truncate">{j}</span>
                     </button>
@@ -256,33 +256,33 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
       </div>
 
       {/* Classes Restriction */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setClassesExpanded(!classesExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {classesExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isClassesModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {classesExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isClassesModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Upper Class Types (Classes)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {isClassesAll ? 'All Classes' : `${Object.keys(currentClasses).length} selected`}
           </span>
         </button>
 
         {classesExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-3">
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-neutral-400">Equip by All Classes</span>
+              <span className="text-xs text-muted-foreground">Equip by All Classes</span>
               <button
                 type="button"
                 onClick={toggleClassesAll}
-                className={`text-xs px-2.5 py-1 rounded font-mono ${
-                  isClassesAll ? 'bg-sky-600 text-white' : 'bg-[#27272a] text-neutral-400 hover:text-neutral-200'
+                className={`text-xs px-3 py-1 rounded-lg font-mono transition-colors ${
+                  isClassesAll ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }`}
               >
                 All: {isClassesAll ? 'true' : 'false'}
@@ -290,7 +290,7 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
             </div>
 
             {!isClassesAll && (
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 {RATHENA_CLASSES.map((cls) => {
                   const checked = Boolean(currentClasses[cls]);
                   return (
@@ -298,12 +298,12 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
                       key={cls}
                       type="button"
                       onClick={() => toggleClass(cls)}
-                      className={`flex items-center gap-1.5 px-2 py-1 rounded text-left text-[11px] font-mono transition-colors ${
-                        checked ? 'bg-sky-950/60 border border-sky-500/40 text-sky-200' : 'bg-[#1f1f23] border border-[#27272a] text-neutral-400 hover:text-neutral-200'
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs font-mono transition-colors ${
+                        checked ? 'bg-pastel-blue/15 border border-pastel-blue/40 text-pastel-blue font-semibold' : 'bg-background border border-border/80 text-muted-foreground hover:text-foreground hover:border-border'
                       }`}
                     >
-                      <span className={`w-3 h-3 rounded flex items-center justify-center border ${checked ? 'border-sky-500 bg-sky-600 text-white' : 'border-neutral-600'}`}>
-                        {checked && <Check className="w-2.5 h-2.5" />}
+                      <span className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors ${checked ? 'border-pastel-blue bg-pastel-blue text-pastel-blue-foreground' : 'border-border bg-background'}`}>
+                        {checked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                       </span>
                       <span className="truncate">{cls}</span>
                     </button>
@@ -316,27 +316,27 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
       </div>
 
       {/* Equipment Locations */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setLocationsExpanded(!locationsExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {locationsExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isLocationsModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {locationsExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isLocationsModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Equipment Placement (Locations)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {Object.keys(currentLocations).length === 0 ? 'None' : `${Object.keys(currentLocations).length} active`}
           </span>
         </button>
 
         {locationsExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50">
-            <div className="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+          <div className="p-4 border-t border-border/60 bg-muted/20">
+            <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
               {RATHENA_LOCATIONS.map((loc) => {
                 const checked = Boolean(currentLocations[loc]);
                 return (
@@ -344,12 +344,12 @@ export function ItemRequirementsSection({ item }: ItemRequirementsSectionProps) 
                     key={loc}
                     type="button"
                     onClick={() => toggleLocation(loc)}
-                    className={`flex items-center gap-1.5 px-2 py-1 rounded text-left text-[11px] font-mono transition-colors ${
-                      checked ? 'bg-sky-950/60 border border-sky-500/40 text-sky-200' : 'bg-[#1f1f23] border border-[#27272a] text-neutral-400 hover:text-neutral-200'
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs font-mono transition-colors ${
+                      checked ? 'bg-pastel-blue/15 border border-pastel-blue/40 text-pastel-blue font-semibold' : 'bg-background border border-border/80 text-muted-foreground hover:text-foreground hover:border-border'
                     }`}
                   >
-                    <span className={`w-3 h-3 rounded flex items-center justify-center border ${checked ? 'border-sky-500 bg-sky-600 text-white' : 'border-neutral-600'}`}>
-                      {checked && <Check className="w-2.5 h-2.5" />}
+                    <span className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors ${checked ? 'border-pastel-blue bg-pastel-blue text-pastel-blue-foreground' : 'border-border bg-background'}`}>
+                      {checked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                     </span>
                     <span className="truncate">{loc}</span>
                   </button>

@@ -108,49 +108,51 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-      <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+      <div className="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a] bg-[#1f1f23]">
-          <div className="flex items-center gap-2">
-            <Plus className="w-4 h-4 text-sky-400" />
-            <h2 className="text-sm font-semibold text-neutral-100">Create New Monster</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-pastel-rose/15 text-pastel-rose border border-pastel-rose/30">
+              <Plus className="w-4 h-4" />
+            </div>
+            <h2 className="text-sm font-semibold text-foreground">Create New Monster</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded text-neutral-400 hover:text-neutral-200 hover:bg-[#27272a] transition-colors"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-3.5 text-xs">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
           {errorMessage && (
-            <div className="flex items-start gap-2 p-2.5 rounded bg-red-950/40 border border-red-500/40 text-red-300 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* ID */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">
-              Monster ID <span className="text-red-400">*</span>
+            <label className="text-[11px] font-medium text-foreground">
+              Monster ID <span className="text-destructive">*</span>
             </label>
             <input
               type="number"
               value={id}
               onChange={(e) => setId(Number(e.target.value))}
               placeholder="e.g. 3001"
-              className={`w-full h-8 px-2.5 rounded bg-[#141416] border font-mono text-xs text-neutral-100 outline-none ${
-                existingMobById ? 'border-red-500 text-red-300' : 'border-[#27272a] focus:border-sky-500'
+              className={`w-full h-9 px-3 rounded-xl bg-background border font-mono text-xs text-foreground outline-none transition-colors ${
+                existingMobById ? 'border-destructive text-destructive' : 'border-border/80 focus:border-pastel-blue/60'
               }`}
               required
             />
             {existingMobById && (
-              <span className="text-[10px] text-red-400 font-mono">
+              <span className="text-[10px] text-destructive font-mono">
                 ID #{id} already exists ({existingMobById.fields.Name || existingMobById.fields.AegisName})!
               </span>
             )}
@@ -158,21 +160,21 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
 
           {/* AegisName */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">
-              Aegis Name (Identifier) <span className="text-red-400">*</span>
+            <label className="text-[11px] font-medium text-foreground">
+              Aegis Name (Identifier) <span className="text-destructive">*</span>
             </label>
             <input
               type="text"
               value={aegisName}
               onChange={(e) => setAegisName(e.target.value)}
               placeholder="e.g. CUSTOM_PORING"
-              className={`w-full h-8 px-2.5 rounded bg-[#141416] border font-mono text-xs text-neutral-100 outline-none ${
-                existingMobByName ? 'border-red-500 text-red-300' : 'border-[#27272a] focus:border-sky-500'
+              className={`w-full h-9 px-3 rounded-xl bg-background border font-mono text-xs text-foreground outline-none transition-colors ${
+                existingMobByName ? 'border-destructive text-destructive' : 'border-border/80 focus:border-pastel-blue/60'
               }`}
               required
             />
             {existingMobByName && (
-              <span className="text-[10px] text-red-400 font-mono">
+              <span className="text-[10px] text-destructive font-mono">
                 AegisName &quot;{aegisName}&quot; already in use by ID #{existingMobByName.id}!
               </span>
             )}
@@ -180,44 +182,44 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
 
           {/* Display Name */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">Display Name</label>
+            <label className="text-[11px] font-medium text-foreground">Display Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Golden Poring"
-              className="w-full h-8 px-2.5 rounded bg-[#141416] border border-[#27272a] text-xs text-neutral-100 outline-none focus:border-sky-500"
+              className="w-full h-9 px-3 rounded-xl bg-background border border-border/80 text-xs text-foreground outline-none focus:border-pastel-blue/60 transition-colors"
             />
           </div>
 
           {/* Stats: Level & HP */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Level</label>
+              <label className="text-[11px] font-medium text-foreground">Level</label>
               <input
                 type="number"
                 value={level}
                 onChange={(e) => setLevel(Number(e.target.value))}
-                className="w-full h-8 px-2.5 rounded bg-[#141416] border border-[#27272a] font-mono text-xs text-neutral-100 outline-none focus:border-sky-500"
+                className="w-full h-9 px-3 rounded-xl bg-background border border-border/80 font-mono text-xs text-foreground outline-none focus:border-pastel-blue/60 transition-colors"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Max HP</label>
+              <label className="text-[11px] font-medium text-foreground">Max HP</label>
               <input
                 type="number"
                 value={hp}
                 onChange={(e) => setHp(Number(e.target.value))}
-                className="w-full h-8 px-2.5 rounded bg-[#141416] border border-[#27272a] font-mono text-xs text-neutral-100 outline-none focus:border-sky-500"
+                className="w-full h-9 px-3 rounded-xl bg-background border border-border/80 font-mono text-xs text-foreground outline-none focus:border-pastel-blue/60 transition-colors"
               />
             </div>
           </div>
 
           {/* Element, Race, Size */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Element</label>
+              <label className="text-[11px] font-medium text-foreground">Element</label>
               <Select value={element} onValueChange={(val) => setElement(val as MobElement)}>
-                <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                   <SelectValue placeholder="Element" />
                 </SelectTrigger>
                 <SelectContent>
@@ -231,9 +233,9 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Race</label>
+              <label className="text-[11px] font-medium text-foreground">Race</label>
               <Select value={race} onValueChange={(val) => setRace(val as MobRace)}>
-                <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                   <SelectValue placeholder="Race" />
                 </SelectTrigger>
                 <SelectContent>
@@ -247,9 +249,9 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Size</label>
+              <label className="text-[11px] font-medium text-foreground">Size</label>
               <Select value={size} onValueChange={(val) => setSize(val as MobSize)}>
-                <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                   <SelectValue placeholder="Size" />
                 </SelectTrigger>
                 <SelectContent>
@@ -264,15 +266,15 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
           </div>
 
           {/* Target Layer / File Destination */}
-          <div className="space-y-1 pt-1 border-t border-[#27272a]/60">
+          <div className="space-y-1 pt-1 border-t border-border/60">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-medium text-neutral-300">Target File / Layer</label>
-              <span className="text-[10px] text-sky-400 font-mono">
+              <label className="text-[11px] font-medium text-foreground">Target File / Layer</label>
+              <span className="text-[10px] text-pastel-blue font-mono">
                 {targetLayerId === 'mob-db-import' ? 'Default: Import' : 'Direct Layer'}
               </span>
             </div>
             <Select value={targetLayerId} onValueChange={setTargetLayerId}>
-              <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                 <SelectValue placeholder="Select Destination" />
               </SelectTrigger>
               <SelectContent>
@@ -286,18 +288,18 @@ export function CreateMobModal({ isOpen, onClose }: CreateMobModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#27272a]">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/80">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 rounded text-xs text-neutral-400 hover:text-neutral-200 hover:bg-[#27272a] transition-colors"
+              className="px-3.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-medium text-xs px-4 py-1.5 rounded shadow-sm transition-colors"
+              className="flex items-center gap-1.5 bg-pastel-rose/20 text-pastel-rose border border-pastel-rose/30 hover:bg-pastel-rose/30 disabled:opacity-40 font-semibold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors"
             >
               {isSubmitting ? (
                 <>

@@ -19,7 +19,7 @@ export function getItemFolderInfo(item: EffectiveItem): ItemFolderInfo {
     return {
       label: 'Import',
       isImport: true,
-      colorClass: 'bg-purple-950/60 text-purple-300 border-purple-500/30',
+      colorClass: 'bg-purple-500/12 text-purple-700 dark:text-purple-300 border-purple-500/25',
     };
   }
 
@@ -31,14 +31,14 @@ export function getItemFolderInfo(item: EffectiveItem): ItemFolderInfo {
     return {
       label: 'PRE-RE',
       isImport: false,
-      colorClass: 'bg-amber-950/40 text-amber-300 border-amber-500/20',
+      colorClass: 'bg-amber-500/12 text-amber-700 dark:text-amber-300 border-amber-500/25',
     };
   }
 
   return {
     label: 'RE',
     isImport: false,
-    colorClass: 'bg-sky-950/40 text-sky-300 border-sky-500/20',
+    colorClass: 'bg-sky-500/12 text-sky-700 dark:text-sky-300 border-sky-500/25',
   };
 }
 
@@ -81,7 +81,7 @@ function useFilteredItems(): EffectiveItem[] {
     }
     
     return items;
-  }, [provider, itemMeta?.state, itemFilters]);
+  }, [provider, itemMeta, itemFilters]);
 }
 
 const ItemRow = memo(({ item, style, isSelected, onClick }: { item: EffectiveItem, style: React.CSSProperties, isSelected: boolean, onClick: (id: number) => void }) => {
@@ -90,15 +90,19 @@ const ItemRow = memo(({ item, style, isSelected, onClick }: { item: EffectiveIte
   return (
     <div 
       style={style}
-      className={`flex items-center px-3 cursor-pointer text-xs border-b border-[#27272a] hover:bg-[#27272a] ${isSelected ? 'bg-sky-500/10 border-l-2 border-l-sky-500' : 'border-l-2 border-l-transparent'}`}
+      className={`flex items-center px-4 cursor-pointer text-xs border-b border-border/60 transition-colors ${
+        isSelected
+          ? 'bg-primary/10 border-l-4 border-l-primary text-foreground font-medium'
+          : 'border-l-4 border-l-transparent hover:bg-accent/60 text-muted-foreground'
+      }`}
       onClick={() => onClick(item.id)}
     >
-      <div className="w-16 text-neutral-400 font-mono">{item.id}</div>
-      <div className="flex-1 truncate font-medium text-neutral-200" title={item.fields.AegisName}>{item.fields.AegisName}</div>
-      <div className="flex-1 truncate text-neutral-400" title={item.fields.Name}>{item.fields.Name}</div>
-      <div className="w-24 truncate text-neutral-400 text-center">{item.fields.Type || 'Usable'}</div>
-      <div className="w-20 text-right pr-1">
-        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border ${folderInfo.colorClass}`}>
+      <div className="w-20 font-mono text-xs text-muted-foreground font-semibold">#{item.id}</div>
+      <div className="flex-1 truncate font-medium text-foreground text-sm" title={item.fields.AegisName}>{item.fields.AegisName}</div>
+      <div className="flex-1 truncate text-xs text-muted-foreground" title={item.fields.Name}>{item.fields.Name}</div>
+      <div className="w-28 truncate text-xs text-muted-foreground text-center font-medium">{item.fields.Type || 'Usable'}</div>
+      <div className="w-24 text-right pr-2">
+        <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-mono border ${folderInfo.colorClass}`}>
           {folderInfo.label}
         </span>
       </div>
@@ -114,18 +118,18 @@ export function ItemVirtualList() {
   const rowVirtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 32, // 32px height per row
+    estimateSize: () => 44, // 44px comfortable height per row
     overscan: 10,
   });
 
   return (
-    <div className="h-full flex flex-col bg-[#141416]">
-      <div className="flex items-center px-3 py-2 bg-[#1f1f23] text-[11px] font-semibold text-neutral-500 border-b border-[#27272a] uppercase tracking-wider">
-        <div className="w-16">ID</div>
+    <div className="h-full flex flex-col bg-background">
+      <div className="flex items-center px-4 py-3 bg-secondary/50 text-xs font-semibold text-muted-foreground border-b border-border/80 uppercase tracking-wider select-none">
+        <div className="w-20">ID</div>
         <div className="flex-1">AEGIS NAME</div>
         <div className="flex-1">NAME</div>
-        <div className="w-24 text-center">TYPE</div>
-        <div className="w-20 text-right pr-2">FOLDER</div>
+        <div className="w-28 text-center">TYPE</div>
+        <div className="w-24 text-right pr-3">FOLDER</div>
       </div>
       
       <div ref={parentRef} className="flex-1 overflow-auto">
@@ -157,7 +161,7 @@ export function ItemVirtualList() {
           })}
         </div>
         {items.length === 0 && (
-          <div className="p-4 text-center text-xs text-neutral-500">
+          <div className="p-8 text-center text-sm text-muted-foreground">
             No items found matching the filters.
           </div>
         )}

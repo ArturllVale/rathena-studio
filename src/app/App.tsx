@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAppStore } from '@/stores/appStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 import { isTauriEnvironment } from '@/services/tauriBridge';
 import { TitleBar } from '@/components/layout/TitleBar';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -15,13 +16,29 @@ import { SettingsView } from '@/features/settings/SettingsView';
 export function App() {
   const activeTab = useAppStore((s) => s.activeTab);
   const setIsTauri = useAppStore((s) => s.setIsTauri);
+  const theme = useSettingsStore((s) => s.settings.ui.theme);
 
   useEffect(() => {
     setIsTauri(isTauriEnvironment());
   }, [setIsTauri]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'system') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const applySystem = () => {
+        root.classList.toggle('dark', media.matches);
+      };
+      applySystem();
+      media.addEventListener('change', applySystem);
+      return () => media.removeEventListener('change', applySystem);
+    } else {
+      root.classList.toggle('dark', theme === 'dark');
+    }
+  }, [theme]);
+
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#18181b] text-neutral-100 overflow-hidden font-sans">
+    <div className="h-screen w-screen flex flex-col bg-background text-foreground overflow-hidden font-sans">
       <TitleBar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />

@@ -37,12 +37,14 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
     setIsCommitting,
   } = useComboEditStore();
 
+  const comboMeta = useDatabaseStore((s) => s.metadataMap['combo']);
+
   const combo: EffectiveItemCombo | undefined = useMemo(() => {
     if (!provider || !comboKey) return undefined;
     const repository = provider.getRepository() as LayeredComboRepository | undefined;
     if (!repository || typeof repository.findByKey !== 'function') return undefined;
     return repository.findByKey(comboKey);
-  }, [provider, comboKey]);
+  }, [provider, comboKey, comboMeta]);
 
   useEffect(() => {
     if (combo) {
@@ -88,6 +90,8 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
 
       await service.commitSession(currentSession, provider as unknown as ComboDatabaseProvider);
 
+      useDatabaseStore.getState().refreshMetadata();
+
       const repo = provider.getRepository() as LayeredComboRepository | undefined;
       const updatedCombo = repo?.findByKey(comboKey);
       if (updatedCombo) {
@@ -132,18 +136,18 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
 
   return (
     <div
-      className="flex flex-col h-full bg-[#141416] outline-none select-none"
+      className="flex flex-col h-full bg-card outline-none select-none text-foreground"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
+      <div className="p-4 border-b border-border/80 bg-card">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-base font-bold text-neutral-100 font-mono leading-tight">
+            <div className="text-base font-bold text-foreground font-mono leading-tight">
               {combo.fields.Combo.join(' + ')}
             </div>
-            <div className="text-xs text-neutral-400 mt-0.5">{combo.fields.Combo.length} Items in Combo</div>
+            <div className="text-xs text-muted-foreground mt-0.5">{combo.fields.Combo.length} Items in Combo</div>
           </div>
           <div className="flex items-center gap-1.5">
             <button
@@ -152,54 +156,39 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
                 const primaryPath = layerProvenance[0] || 'item_combo_db.yml';
                 openEntityInYamlEditor(primaryPath, combo.fields.Combo[0] || '', layerProvenance[0]);
               }}
-              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              className="text-xs font-mono px-2.5 py-1 rounded-lg bg-background text-foreground hover:border-pastel-blue/60 border border-border/80 flex items-center gap-1.5 transition-colors shadow-2xs"
               title="Open in YAML Editor"
             >
-              <FileCode className="w-3 h-3 text-sky-400" />
+              <FileCode className="w-3.5 h-3.5 text-pastel-blue" />
               <span>YAML</span>
             </button>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
+            <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-pastel-amber/15 text-pastel-amber border border-pastel-amber/30 flex items-center gap-1.5 font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
               <span>COMBO</span>
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
-          <button
-            type="button"
-            onClick={() => setCurrentTab('general')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
-              currentTab === 'general'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
-            }`}
-          >
-            Combo Items
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrentTab('script')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
-              currentTab === 'script'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
-            }`}
-          >
-            Script
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrentTab('layers')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
-              currentTab === 'layers'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
-            }`}
-          >
-            Layers
-          </button>
+        <div className="flex items-center gap-1.5 mt-3.5 border-t border-border/60 pt-3">
+          {(['general', 'script', 'layers'] as const).map((tab) => {
+            const active = currentTab === tab;
+            const labels = { general: 'Combo Items', script: 'Script', layers: 'Layers' };
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setCurrentTab(tab)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  active
+                    ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                }`}
+              >
+                {labels[tab]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -214,43 +203,43 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
         )}
 
         {commitError && (
-          <div className="bg-red-950/20 p-3 rounded border border-red-500/20 text-xs text-red-400 break-all">
+          <div className="bg-destructive/10 p-3.5 rounded-xl border border-destructive/30 text-xs text-destructive break-all">
             {commitError}
           </div>
         )}
 
         {currentTab === 'general' && (
-          <div className="space-y-3 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
+          <div className="space-y-3.5 bg-muted/20 p-4 rounded-xl border border-border/80 shadow-xs">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Combo Items List
               </h3>
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300"
+                className="flex items-center gap-1.5 text-xs text-pastel-blue hover:underline font-medium"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Item</span>
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {(effectiveFields.Combo || []).map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-neutral-500 w-4">{idx + 1}.</span>
+                <div key={idx} className="flex items-center gap-2.5">
+                  <span className="text-xs font-mono text-muted-foreground w-5 text-right">{idx + 1}.</span>
                   <Input
                     value={String(item)}
                     onChange={(e) => handleItemChange(idx, e.target.value)}
-                    className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                    className="h-9 bg-background border-border/80 text-xs font-mono"
                   />
                   {(effectiveFields.Combo || []).length > 2 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(idx)}
-                      className="p-1.5 text-neutral-500 hover:text-red-400"
+                      className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
@@ -260,11 +249,11 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
         )}
 
         {currentTab === 'script' && (
-          <div className="space-y-2 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
-            <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+          <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/80 shadow-xs">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Combo Bonus Script
             </h3>
-            <div className="border border-[#27272a] rounded overflow-hidden">
+            <div className="rounded-xl overflow-hidden">
               <MonacoScriptEditor
                 value={effectiveFields.Script || ''}
                 onChange={(val) => setField('Script', val)}
@@ -277,16 +266,16 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
         {currentTab === 'layers' && (
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-                  Layer Hierarchy & File Provenance
+              <div className="flex items-center justify-between mb-2.5">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Layer Hierarchy &amp; File Provenance
                 </h3>
-                <span className="text-[10px] font-mono text-neutral-400">
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
                   {layerProvenance.length} layer{layerProvenance.length > 1 ? 's' : ''} loaded
                 </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {layerProvenance.map((layerId, idx) => {
                   const repository = provider ? (provider.getRepository() as LayeredComboRepository | undefined) : undefined;
                   const layerData = repository?.getLayer ? repository.getLayer(layerId) : undefined;
@@ -305,38 +294,38 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
                   return (
                     <div
                       key={layerId}
-                      className={`p-3 rounded border transition-colors ${
+                      className={`p-3.5 rounded-xl border transition-colors ${
                         isFinalLayer
-                          ? 'bg-sky-950/20 border-sky-500/30'
-                          : 'bg-[#1f1f23] border-[#27272a]'
+                          ? 'bg-pastel-blue/10 border-pastel-blue/40 shadow-xs'
+                          : 'bg-background border-border/80'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5">
                           <div
-                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono font-medium ${
                               isFinalLayer
-                                ? 'bg-sky-600 text-white'
-                                : 'bg-[#27272a] text-neutral-400'
+                                ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs'
+                                : 'bg-secondary text-secondary-foreground'
                             }`}
                           >
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="text-xs font-mono font-semibold text-neutral-100">
+                            <div className="text-xs font-mono font-semibold text-foreground">
                               {relativePath}
                             </div>
-                            <div className="text-[11px] text-neutral-400">{layerName}</div>
+                            <div className="text-xs text-muted-foreground">{layerName}</div>
                           </div>
                         </div>
 
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                          className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
                             relativePath.includes('import')
-                              ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                              ? 'bg-lavender/15 text-lavender border-lavender/30 font-semibold'
                               : isBaseLayer
-                              ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                              : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                              ? 'bg-secondary text-secondary-foreground border-border/80'
+                              : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30 font-semibold'
                           }`}
                         >
                           {relativePath.includes('import')
@@ -348,15 +337,15 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
                       </div>
 
                       {contributingFields.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                          <div className="text-[10px] text-neutral-500 mb-1">
+                        <div className="mt-3 pt-2.5 border-t border-border/60">
+                          <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
                             Active fields from this file ({contributingFields.length}):
                           </div>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {contributingFields.map((f) => (
                               <span
                                 key={f}
-                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-secondary text-secondary-foreground border border-border/80"
                               >
                                 {f}
                               </span>
@@ -374,12 +363,12 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-between">
-        <div className="flex items-center gap-1">
+      <div className="p-3.5 border-t border-border/80 bg-card flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canUndo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canUndo ? 'text-foreground hover:bg-secondary' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={undo}
             disabled={!currentSession.canUndo}
@@ -389,8 +378,8 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canRedo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canRedo ? 'text-foreground hover:bg-secondary' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={redo}
             disabled={!currentSession.canRedo}
@@ -400,10 +389,10 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
-            className="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => {
               cancelSession();
               startSession(combo);
@@ -414,10 +403,10 @@ export function ComboInspector({ comboKey }: { comboKey: string }) {
           </button>
           <button
             type="button"
-            className={`px-3 py-1.5 text-xs rounded font-medium flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
               currentSession.isDirty && validationIssues.length === 0
-                ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                : 'bg-[#27272a] text-neutral-500 cursor-not-allowed'
+                ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90'
+                : 'bg-secondary text-muted-foreground cursor-not-allowed'
             }`}
             onClick={handleSave}
             disabled={!currentSession.isDirty || validationIssues.length > 0 || isCommitting}

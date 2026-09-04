@@ -18,20 +18,21 @@ export function RandomOptionVirtualList() {
   const isGroupTab = randomOptFilters.tab === 'groups';
 
   const randomOptProvider = registry?.getProvider('randomopt');
+  const randomOptMeta = useDatabaseStore((s) => s.metadataMap['randomopt']);
   const repo = useMemo(() => {
-    if (!randomOptProvider) return undefined;
+    if (!randomOptProvider || randomOptMeta?.state !== 'loaded') return undefined;
     return randomOptProvider.getRepository() as LayeredRandomOptRepository | undefined;
-  }, [randomOptProvider]);
+  }, [randomOptProvider, randomOptMeta]);
 
   const options = useMemo(() => {
     if (!repo || typeof repo.getAllEffectiveOptions !== 'function') return [];
     return repo.getAllEffectiveOptions();
-  }, [repo]);
+  }, [repo, randomOptMeta]);
 
   const groups = useMemo(() => {
     if (!repo || typeof repo.getAllEffectiveGroups !== 'function') return [];
     return repo.getAllEffectiveGroups();
-  }, [repo]);
+  }, [repo, randomOptMeta]);
 
   const filteredItems = useMemo(() => {
     const q = (randomOptFilters.query || '').toLowerCase();
@@ -84,7 +85,7 @@ export function RandomOptionVirtualList() {
 
   if (filteredItems.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-neutral-500 text-xs">
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-xs">
         <Dices className="w-8 h-8 mb-2 opacity-30" />
         <span>No {isGroupTab ? 'option groups' : 'random options'} match current filter criteria.</span>
       </div>
@@ -92,7 +93,7 @@ export function RandomOptionVirtualList() {
   }
 
   return (
-    <div ref={parentRef} className="h-full w-full overflow-auto bg-[#141416]">
+    <div ref={parentRef} className="h-full w-full overflow-auto bg-background/50">
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
@@ -125,21 +126,21 @@ export function RandomOptionVirtualList() {
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
               }}
-              className={`flex items-center justify-between px-3 py-2 border-b border-[#27272a]/60 cursor-pointer text-xs transition-colors ${
+              className={`flex items-center justify-between px-3.5 py-2 border-b border-border/40 cursor-pointer text-xs transition-colors ${
                 isSelected
-                  ? 'bg-sky-950/40 border-l-2 border-l-sky-500 text-neutral-100'
-                  : 'hover:bg-[#1f1f23]/60 text-neutral-300'
+                  ? 'bg-pastel-blue/15 border-l-2 border-l-pastel-blue text-foreground font-medium'
+                  : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="font-mono text-[11px] text-neutral-500 w-9 text-right shrink-0">
+                <span className="font-mono text-[11px] text-muted-foreground w-9 text-right shrink-0">
                   #{item.id}
                 </span>
                 <div className="min-w-0">
-                  <div className="font-mono font-medium truncate text-neutral-200">
+                  <div className="font-mono font-medium truncate text-foreground">
                     {'group' in item ? item.group : item.option}
                   </div>
-                  <div className="text-[10px] text-neutral-500 truncate font-mono">
+                  <div className="text-[10px] text-muted-foreground truncate font-mono">
                     {'group' in item
                       ? `${item.fields.Slots?.length || 0} Slots configured`
                       : item.fields.Script?.replace(/\n/g, ' ') || 'No script'}
@@ -149,10 +150,10 @@ export function RandomOptionVirtualList() {
 
               <div className="flex items-center gap-1.5 shrink-0 pl-2">
                 <span
-                  className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+                  className={`text-[9px] font-mono px-2 py-0.5 rounded-md border ${
                     isImport
-                      ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
-                      : 'bg-[#1f1f23] text-neutral-400 border-[#27272a]'
+                      ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
+                      : 'bg-muted/60 text-muted-foreground border-border/70'
                   }`}
                 >
                   {isImport ? 'IMPORT' : 'BASE'}

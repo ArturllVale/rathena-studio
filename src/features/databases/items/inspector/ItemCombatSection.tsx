@@ -31,10 +31,10 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
     const errorMsg = getFieldError(fieldName);
 
     return (
-      <div className="flex flex-col py-1.5 border-b border-[#27272a] last:border-0 relative">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-neutral-400 whitespace-nowrap flex items-center gap-1">
-            {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+      <div className="flex flex-col py-2.5 border-b border-border/60 last:border-0 relative">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap flex items-center gap-1.5">
+            {isModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
             {label}
           </span>
           <input
@@ -51,18 +51,18 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
                 (setField as (f: keyof ItemRawFields, v: unknown) => void)(fieldName, val);
               }
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 h-6.5 w-14 shrink-0 ${
+            className={`text-xs font-mono text-right bg-background border rounded-lg px-3 py-1.5 h-9 w-20 shrink-0 transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40 ${
               errorMsg
-                ? 'border-red-500/50 text-red-200'
+                ? 'border-destructive/60 text-destructive'
                 : isModified
-                ? 'border-sky-500/50 text-sky-200'
-                : 'border-[#27272a] text-neutral-200'
+                ? 'border-pastel-blue/80 text-pastel-blue font-semibold bg-pastel-blue/5'
+                : 'border-border/80 text-foreground'
             }`}
           />
         </div>
-        {errorMsg && <div className="text-[10px] text-red-400 mt-1 text-right">{errorMsg}</div>}
+        {errorMsg && <div className="text-[10px] text-destructive mt-1 text-right">{errorMsg}</div>}
         {!isModified && origin && origin.layerId !== 'item-db-base-root' && origin.layerId !== layerProvenance[0] && (
-          <div className="text-[9px] text-neutral-500 mt-0.5 text-right truncate font-mono">
+          <div className="text-[10px] text-muted-foreground/80 mt-1 text-right truncate font-mono">
             via {origin.filePath || origin.layerId}
           </div>
         )}
@@ -75,21 +75,21 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
     const effectiveValue = isModified ? Boolean(pendingChanges[fieldName]) : Boolean(fields[fieldName]);
 
     return (
-      <div className="flex items-center justify-between py-1.5 border-b border-[#27272a] last:border-0">
-        <span className="text-xs text-neutral-400 flex items-center gap-1">
-          {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+      <div className="flex items-center justify-between py-2.5 border-b border-border/60 last:border-0">
+        <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+          {isModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
           {label}
         </span>
         <button
           type="button"
           onClick={() => (setField as (f: keyof ItemRawFields, v: unknown) => void)(fieldName, !effectiveValue)}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-            effectiveValue ? 'bg-sky-600' : 'bg-[#27272a]'
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pastel-blue/30 ${
+            effectiveValue ? 'bg-pastel-blue' : 'bg-secondary border border-border/80'
           }`}
         >
           <span
-            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-              effectiveValue ? 'translate-x-4' : 'translate-x-1'
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform ${
+              effectiveValue ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
         </button>
@@ -98,12 +98,12 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-          Combat Stats & Modifiers
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
+          Combat Stats &amp; Modifiers
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a]">
+        <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs">
           {renderField('Physical Attack (Atk)', 'Attack', 'number', '0')}
           {renderField('Magic Attack (Matk)', 'MagicAttack', 'number', '0')}
           {renderField('Physical Defense (Def)', 'Defense', 'number', '0')}
@@ -112,10 +112,10 @@ export function ItemCombatSection({ item }: ItemCombatSectionProps) {
       </div>
 
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-          Equipment Levels & Refinement
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
+          Equipment Levels &amp; Refinement
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a]">
+        <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs">
           {renderField('Weapon Level (1~5)', 'WeaponLevel', 'number', '0')}
           {renderField('Armor Level (1~2)', 'ArmorLevel', 'number', '0')}
           {renderToggle('Refineable', 'Refineable')}

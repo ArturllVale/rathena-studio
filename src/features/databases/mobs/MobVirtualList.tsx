@@ -19,7 +19,7 @@ export function getMobFolderInfo(mob: EffectiveMob): MobFolderInfo {
     return {
       label: 'Import',
       isImport: true,
-      colorClass: 'bg-purple-950/60 text-purple-300 border-purple-500/30',
+      colorClass: 'bg-lavender/15 text-lavender border-lavender/30 font-semibold',
     };
   }
 
@@ -31,14 +31,14 @@ export function getMobFolderInfo(mob: EffectiveMob): MobFolderInfo {
     return {
       label: 'PRE-RE',
       isImport: false,
-      colorClass: 'bg-amber-950/40 text-amber-300 border-amber-500/20',
+      colorClass: 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30 font-medium',
     };
   }
 
   return {
     label: 'RE',
     isImport: false,
-    colorClass: 'bg-sky-950/40 text-sky-300 border-sky-500/20',
+    colorClass: 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30 font-medium',
   };
 }
 
@@ -89,7 +89,7 @@ function useFilteredMobs(): EffectiveMob[] {
     }
 
     return mobs;
-  }, [provider, mobMeta?.state, mobFilters]);
+  }, [provider, mobMeta, mobFilters]);
 }
 
 const MobRow = memo(
@@ -109,26 +109,26 @@ const MobRow = memo(
     return (
       <div
         style={style}
-        className={`flex items-center px-3 cursor-pointer text-xs border-b border-[#27272a] hover:bg-[#27272a] ${
-          isSelected ? 'bg-sky-500/10 border-l-2 border-l-sky-500' : 'border-l-2 border-l-transparent'
+        className={`flex items-center px-4 cursor-pointer text-xs border-b border-border/60 hover:bg-accent/40 transition-colors ${
+          isSelected ? 'bg-pastel-blue/15 border-l-2 border-l-pastel-blue text-foreground font-semibold' : 'border-l-2 border-l-transparent text-foreground'
         }`}
         onClick={() => onClick(mob.id)}
       >
-        <div className="w-14 text-neutral-400 font-mono">{mob.id}</div>
-        <div className="flex-1 truncate font-medium text-neutral-200" title={mob.fields.AegisName}>
+        <div className="w-16 text-muted-foreground font-mono font-medium">{mob.id}</div>
+        <div className="flex-1 truncate font-medium text-foreground" title={mob.fields.AegisName}>
           {mob.fields.AegisName}
         </div>
-        <div className="flex-1 truncate text-neutral-400" title={mob.fields.Name}>
+        <div className="flex-1 truncate text-muted-foreground" title={mob.fields.Name}>
           {mob.fields.Name}
         </div>
-        <div className="w-12 text-center text-neutral-400 font-mono">{mob.fields.Level ?? '-'}</div>
-        <div className="w-20 text-right text-neutral-300 font-mono pr-2">
+        <div className="w-12 text-center text-muted-foreground font-mono">{mob.fields.Level ?? '-'}</div>
+        <div className="w-20 text-right text-foreground font-mono pr-3">
           {mob.fields.Hp !== undefined ? mob.fields.Hp.toLocaleString() : '-'}
         </div>
-        <div className="w-16 text-center text-neutral-400 truncate">{mob.fields.Element || 'Neutral'}</div>
-        <div className="w-20 text-center text-neutral-400 truncate">{mob.fields.Race || 'Formless'}</div>
-        <div className="w-18 text-right pr-1">
-          <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border ${folderInfo.colorClass}`}>
+        <div className="w-16 text-center text-muted-foreground truncate">{mob.fields.Element || 'Neutral'}</div>
+        <div className="w-20 text-center text-muted-foreground truncate">{mob.fields.Race || 'Formless'}</div>
+        <div className="w-20 text-right pr-1">
+          <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-mono border ${folderInfo.colorClass}`}>
             {folderInfo.label}
           </span>
         </div>
@@ -147,22 +147,22 @@ export function MobVirtualList() {
   const rowVirtualizer = useVirtualizer({
     count: mobs.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 32,
+    estimateSize: () => 44,
     overscan: 10,
   });
 
   return (
-    <div className="h-full flex flex-col bg-[#141416]">
+    <div className="h-full flex flex-col bg-background text-foreground">
       {/* Table Header */}
-      <div className="flex items-center px-3 py-2 bg-[#1f1f23] text-[11px] font-semibold text-neutral-500 border-b border-[#27272a] uppercase tracking-wider">
-        <div className="w-14">ID</div>
+      <div className="flex items-center px-4 py-2.5 bg-muted/30 text-xs font-semibold text-muted-foreground border-b border-border/80 uppercase tracking-wider">
+        <div className="w-16">ID</div>
         <div className="flex-1">AEGIS NAME</div>
         <div className="flex-1">NAME</div>
         <div className="w-12 text-center">LVL</div>
-        <div className="w-20 text-right pr-2">HP</div>
+        <div className="w-20 text-right pr-3">HP</div>
         <div className="w-16 text-center">ELE</div>
         <div className="w-20 text-center">RACE</div>
-        <div className="w-18 text-right pr-2">FOLDER</div>
+        <div className="w-20 text-right pr-2">FOLDER</div>
       </div>
 
       <div ref={parentRef} className="flex-1 overflow-auto">
@@ -194,7 +194,7 @@ export function MobVirtualList() {
           })}
         </div>
         {mobs.length === 0 && (
-          <div className="p-4 text-center text-xs text-neutral-500">
+          <div className="p-8 text-center text-xs text-muted-foreground">
             No monsters found matching the filters.
           </div>
         )}

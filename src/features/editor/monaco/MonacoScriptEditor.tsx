@@ -3,6 +3,7 @@ import Editor, { OnMount, Monaco } from '@monaco-editor/react';
 import type * as monacoType from 'monaco-editor';
 import { registerRathenaScriptLanguage, RATHENA_SCRIPT_LANGUAGE_ID } from './rathenaScriptLanguage';
 import { RathenaScriptValidator } from '@/services/script/rathenaScriptValidator';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 interface MonacoScriptEditorProps {
   value: string;
@@ -22,6 +23,10 @@ export function MonacoScriptEditor({
 }: MonacoScriptEditorProps) {
   const monacoRef = useRef<Monaco | null>(null);
   const editorRef = useRef<monacoType.editor.IStandaloneCodeEditor | null>(null);
+
+  const theme = useSettingsStore((s) => s.settings.ui.theme);
+  const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const monacoTheme = isDark ? 'vs-dark' : 'vs';
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -57,11 +62,11 @@ export function MonacoScriptEditor({
   }, [value, validateScript]);
 
   return (
-    <div className="w-full rounded border border-[#27272a] bg-[#141416] overflow-hidden">
+    <div className="w-full rounded-lg border border-border/80 bg-card overflow-hidden shadow-xs">
       <Editor
         height={height}
         language={RATHENA_SCRIPT_LANGUAGE_ID}
-        theme="vs-dark"
+        theme={monacoTheme}
         value={value}
         onChange={(val) => {
           const next = val ?? '';

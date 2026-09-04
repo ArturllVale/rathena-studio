@@ -45,15 +45,17 @@ export function RandomOptionInspector({
     return provider.getRepository() as LayeredRandomOptRepository | undefined;
   }, [provider]);
 
+  const optMeta = useDatabaseStore((s) => s.metadataMap['randomOption']);
+
   const option: EffectiveRandomOption | undefined = useMemo(() => {
     if (!repo || !optionId) return undefined;
     return repo.findOptionById(optionId);
-  }, [repo, optionId]);
+  }, [repo, optionId, optMeta]);
 
   const group: EffectiveRandomOptionGroup | undefined = useMemo(() => {
     if (!repo || !groupId) return undefined;
     return repo.findGroupById(groupId);
-  }, [repo, groupId]);
+  }, [repo, groupId, optMeta]);
 
   useEffect(() => {
     if (optionId && option) {
@@ -80,6 +82,9 @@ export function RandomOptionInspector({
     }
   }, [currentOptionSession, currentGroupSession, setValidationIssues]);
 
+  const [optionTab, setOptionTab] = useState<'general' | 'layers'>('general');
+  const [groupTab, setGroupTab] = useState<'slots' | 'layers'>('slots');
+
   if ((!option && !group) || (!currentOptionSession && !currentGroupSession)) {
     return (
       <div className="flex h-full items-center justify-center text-neutral-500 text-sm">
@@ -100,6 +105,8 @@ export function RandomOptionInspector({
 
       await service.commitOptionSession(currentOptionSession, provider as unknown as RandomOptDatabaseProvider);
 
+      useDatabaseStore.getState().refreshMetadata();
+
       if (optionId && repo) {
         const updated = repo.findOptionById(optionId);
         if (updated) startOptionSession(updated);
@@ -111,20 +118,17 @@ export function RandomOptionInspector({
     }
   };
 
-  const [optionTab, setOptionTab] = useState<'general' | 'layers'>('general');
-  const [groupTab, setGroupTab] = useState<'slots' | 'layers'>('slots');
-
   if (currentOptionSession && option) {
     const effectiveFields = currentOptionSession.getEffectiveFields();
     return (
-      <div className="flex flex-col h-full bg-[#141416] select-none">
-        <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
+      <div className="flex flex-col h-full bg-card/60 select-none">
+        <div className="p-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-base font-bold text-neutral-100 font-mono leading-tight">
+              <div className="text-base font-bold text-foreground font-mono leading-tight">
                 {option.option}
               </div>
-              <div className="text-xs text-neutral-400 mt-0.5">Random Option #{option.id}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">Random Option #{option.id}</div>
             </div>
             <div className="flex items-center gap-1.5">
               <button
@@ -133,27 +137,27 @@ export function RandomOptionInspector({
                   const primaryPath = option.layerProvenance[0] || 'item_randomopt_db.yml';
                   openEntityInYamlEditor(primaryPath, option.option, option.layerProvenance[0]);
                 }}
-                className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+                className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-background text-muted-foreground hover:text-pastel-blue border border-border/80 hover:border-pastel-blue/40 flex items-center gap-1.5 transition-colors"
                 title="Open in YAML Editor"
               >
-                <FileCode className="w-3 h-3 text-sky-400" />
+                <FileCode className="w-3.5 h-3.5 text-pastel-blue" />
                 <span>YAML</span>
               </button>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-sky-400 border border-[#27272a] flex items-center gap-1">
-                <Dices className="w-3 h-3" />
+              <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-pastel-blue/15 text-pastel-blue border border-pastel-blue/30 flex items-center gap-1.5 font-semibold">
+                <Dices className="w-3.5 h-3.5" />
                 <span>OPTION</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+          <div className="flex items-center gap-1.5 mt-3.5 border-t border-border/60 pt-2.5">
             <button
               type="button"
               onClick={() => setOptionTab('general')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                 optionTab === 'general'
-                  ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`}
             >
               Option Identity & Script
@@ -161,10 +165,10 @@ export function RandomOptionInspector({
             <button
               type="button"
               onClick={() => setOptionTab('layers')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                 optionTab === 'layers'
-                  ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`}
             >
               Layers
@@ -182,24 +186,24 @@ export function RandomOptionInspector({
           )}
 
           {commitError && (
-            <div className="bg-red-950/20 p-3 rounded border border-red-500/20 text-xs text-red-400">
+            <div className="bg-destructive/10 p-3 rounded-xl border border-destructive/20 text-xs text-destructive">
               {commitError}
             </div>
           )}
 
           {optionTab === 'general' && (
-            <div className="space-y-3 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
+            <div className="space-y-3 bg-card p-4 rounded-xl border border-border/80 shadow-xs">
               <div>
-                <label className="text-[10px] text-neutral-400 block mb-1">Option Constant Name</label>
+                <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Option Constant Name</label>
                 <Input
                   value={effectiveFields.Option || ''}
                   onChange={(e) => setOptionField('Option', e.target.value)}
-                  className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                  className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-neutral-400 block mb-1">Script</label>
-                <div className="border border-[#27272a] rounded overflow-hidden">
+                <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Script</label>
+                <div className="border border-border/80 rounded-xl overflow-hidden">
                   <MonacoScriptEditor
                     value={effectiveFields.Script || ''}
                     onChange={(val) => setOptionField('Script', val)}
@@ -214,10 +218,10 @@ export function RandomOptionInspector({
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+                  <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                     Layer Hierarchy & File Provenance
                   </h3>
-                  <span className="text-[10px] font-mono text-neutral-400">
+                  <span className="text-[10px] font-mono text-muted-foreground">
                     {option.layerProvenance.length} layer{option.layerProvenance.length > 1 ? 's' : ''} loaded
                   </span>
                 </div>
@@ -240,38 +244,38 @@ export function RandomOptionInspector({
                     return (
                       <div
                         key={layerId}
-                        className={`p-3 rounded border transition-colors ${
+                        className={`p-3.5 rounded-xl border transition-colors shadow-xs ${
                           isFinalLayer
-                            ? 'bg-sky-950/20 border-sky-500/30'
-                            : 'bg-[#1f1f23] border-[#27272a]'
+                            ? 'bg-pastel-blue/5 border-pastel-blue/40'
+                            : 'bg-card border-border/80'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5">
                             <div
-                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
                                 isFinalLayer
-                                  ? 'bg-sky-600 text-white'
-                                  : 'bg-[#27272a] text-neutral-400'
+                                  ? 'bg-pastel-blue text-background font-bold'
+                                  : 'bg-muted text-muted-foreground'
                               }`}
                             >
                               {idx + 1}
                             </div>
                             <div>
-                              <div className="text-xs font-mono font-semibold text-neutral-100">
+                              <div className="text-xs font-mono font-semibold text-foreground">
                                 {relativePath}
                               </div>
-                              <div className="text-[11px] text-neutral-400">{layerName}</div>
+                              <div className="text-[11px] text-muted-foreground">{layerName}</div>
                             </div>
                           </div>
 
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                            className={`text-[10px] font-mono px-2 py-0.5 rounded-md border whitespace-nowrap ${
                               relativePath.includes('import')
-                                ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
                                 : isBaseLayer
-                                ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                                : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                                ? 'bg-muted/60 text-muted-foreground border-border/70'
+                                : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30'
                             }`}
                           >
                             {relativePath.includes('import')
@@ -283,15 +287,15 @@ export function RandomOptionInspector({
                         </div>
 
                         {contributingFields.length > 0 && (
-                          <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                            <div className="text-[10px] text-neutral-500 mb-1">
+                          <div className="mt-2.5 pt-2 border-t border-border/60">
+                            <div className="text-[10px] text-muted-foreground mb-1.5">
                               Active fields from this file ({contributingFields.length}):
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {contributingFields.map((f) => (
                                 <span
                                   key={f}
-                                  className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                  className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-background text-foreground border border-border/80"
                                 >
                                   {f}
                                 </span>
@@ -308,13 +312,13 @@ export function RandomOptionInspector({
           )}
         </div>
 
-        <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-end gap-2">
+        <div className="p-3.5 border-t border-border/80 bg-card/90 backdrop-blur-xs flex items-center justify-end gap-2">
           <button
             type="button"
-            className={`px-3 py-1.5 text-xs rounded font-medium flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs rounded-xl font-medium flex items-center gap-1.5 transition-colors ${
               currentOptionSession.isDirty && validationIssues.length === 0
-                ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                : 'bg-[#27272a] text-neutral-500 cursor-not-allowed'
+                ? 'bg-pastel-blue/20 text-pastel-blue hover:bg-pastel-blue/30 border border-pastel-blue/30 shadow-sm'
+                : 'bg-muted/40 text-muted-foreground/50 border border-border/50 cursor-not-allowed'
             }`}
             onClick={handleSaveOption}
             disabled={!currentOptionSession.isDirty || validationIssues.length > 0 || isCommitting}
@@ -330,14 +334,14 @@ export function RandomOptionInspector({
   if (currentGroupSession && group) {
     const effectiveFields = currentGroupSession.getEffectiveFields();
     return (
-      <div className="flex flex-col h-full bg-[#141416] select-none">
-        <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
+      <div className="flex flex-col h-full bg-card/60 select-none">
+        <div className="p-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-base font-bold text-neutral-100 font-mono leading-tight">
+              <div className="text-base font-bold text-foreground font-mono leading-tight">
                 {group.group}
               </div>
-              <div className="text-xs text-neutral-400 mt-0.5">
+              <div className="text-xs text-muted-foreground mt-0.5">
                 Group #{group.id} • {effectiveFields.Slots.length} Slots
               </div>
             </div>
@@ -348,27 +352,27 @@ export function RandomOptionInspector({
                   const primaryPath = group.layerProvenance[0] || 'item_randomopt_group.yml';
                   openEntityInYamlEditor(primaryPath, group.group, group.layerProvenance[0]);
                 }}
-                className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+                className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-background text-muted-foreground hover:text-pastel-blue border border-border/80 hover:border-pastel-blue/40 flex items-center gap-1.5 transition-colors"
                 title="Open in YAML Editor"
               >
-                <FileCode className="w-3 h-3 text-sky-400" />
+                <FileCode className="w-3.5 h-3.5 text-pastel-blue" />
                 <span>YAML</span>
               </button>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-amber-400 border border-[#27272a] flex items-center gap-1">
-                <Layers className="w-3 h-3" />
+              <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-pastel-amber/15 text-pastel-amber border border-pastel-amber/30 flex items-center gap-1.5 font-semibold">
+                <Layers className="w-3.5 h-3.5" />
                 <span>GROUP</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+          <div className="flex items-center gap-1.5 mt-3.5 border-t border-border/60 pt-2.5">
             <button
               type="button"
               onClick={() => setGroupTab('slots')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                 groupTab === 'slots'
-                  ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`}
             >
               Slots ({effectiveFields.Slots.length})
@@ -376,10 +380,10 @@ export function RandomOptionInspector({
             <button
               type="button"
               onClick={() => setGroupTab('layers')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                 groupTab === 'layers'
-                  ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`}
             >
               Layers
@@ -390,17 +394,17 @@ export function RandomOptionInspector({
         <div className="flex-1 overflow-y-auto p-4 space-y-4 select-text">
           {groupTab === 'slots' && (
             <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                 Configured Slots
               </h3>
               {effectiveFields.Slots.map((slot, sIdx) => (
-                <div key={sIdx} className="p-3 rounded bg-[#1f1f23] border border-[#27272a] space-y-2 text-xs">
-                  <div className="font-semibold text-neutral-300">Slot #{slot.Slot} ({slot.Options.length} Options)</div>
-                  <div className="space-y-1.5">
+                <div key={sIdx} className="p-4 rounded-xl bg-card border border-border/80 space-y-2.5 text-xs shadow-xs">
+                  <div className="font-semibold text-foreground">Slot #{slot.Slot} ({slot.Options.length} Options)</div>
+                  <div className="space-y-2">
                     {slot.Options.map((opt, oIdx) => (
-                      <div key={oIdx} className="p-2 rounded bg-[#141416] border border-[#27272a] text-[11px] font-mono">
-                        <div className="text-sky-300 font-medium">{opt.Option}</div>
-                        <div className="text-neutral-500 mt-0.5">
+                      <div key={oIdx} className="p-3 rounded-lg bg-background border border-border/80 text-[11px] font-mono shadow-xs">
+                        <div className="text-pastel-blue font-semibold">{opt.Option}</div>
+                        <div className="text-muted-foreground mt-0.5">
                           Range: {opt.MinValue} ~ {opt.MaxValue} • Chance: {opt.Chance / 100}%
                         </div>
                       </div>
@@ -415,10 +419,10 @@ export function RandomOptionInspector({
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+                  <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                     Layer Hierarchy & File Provenance
                   </h3>
-                  <span className="text-[10px] font-mono text-neutral-400">
+                  <span className="text-[10px] font-mono text-muted-foreground">
                     {group.layerProvenance.length} layer{group.layerProvenance.length > 1 ? 's' : ''} loaded
                   </span>
                 </div>
@@ -441,38 +445,38 @@ export function RandomOptionInspector({
                     return (
                       <div
                         key={layerId}
-                        className={`p-3 rounded border transition-colors ${
+                        className={`p-3.5 rounded-xl border transition-colors shadow-xs ${
                           isFinalLayer
-                            ? 'bg-sky-950/20 border-sky-500/30'
-                            : 'bg-[#1f1f23] border-[#27272a]'
+                            ? 'bg-pastel-blue/5 border-pastel-blue/40'
+                            : 'bg-card border-border/80'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5">
                             <div
-                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
                                 isFinalLayer
-                                  ? 'bg-sky-600 text-white'
-                                  : 'bg-[#27272a] text-neutral-400'
+                                  ? 'bg-pastel-blue text-background font-bold'
+                                  : 'bg-muted text-muted-foreground'
                               }`}
                             >
                               {idx + 1}
                             </div>
                             <div>
-                              <div className="text-xs font-mono font-semibold text-neutral-100">
+                              <div className="text-xs font-mono font-semibold text-foreground">
                                 {relativePath}
                               </div>
-                              <div className="text-[11px] text-neutral-400">{layerName}</div>
+                              <div className="text-[11px] text-muted-foreground">{layerName}</div>
                             </div>
                           </div>
 
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                            className={`text-[10px] font-mono px-2 py-0.5 rounded-md border whitespace-nowrap ${
                               relativePath.includes('import')
-                                ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
                                 : isBaseLayer
-                                ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                                : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                                ? 'bg-muted/60 text-muted-foreground border-border/70'
+                                : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30'
                             }`}
                           >
                             {relativePath.includes('import')
@@ -484,15 +488,15 @@ export function RandomOptionInspector({
                         </div>
 
                         {contributingFields.length > 0 && (
-                          <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                            <div className="text-[10px] text-neutral-500 mb-1">
+                          <div className="mt-2.5 pt-2 border-t border-border/60">
+                            <div className="text-[10px] text-muted-foreground mb-1.5">
                               Active fields from this file ({contributingFields.length}):
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {contributingFields.map((f) => (
                                 <span
                                   key={f}
-                                  className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                  className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-background text-foreground border border-border/80"
                                 >
                                   {f}
                                 </span>

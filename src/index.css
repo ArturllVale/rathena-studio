@@ -4,26 +4,70 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217 91% 60%;
+    /* Light Mode - Warm paper & pastel aesthetics */
+    --background: 220 25% 97.5%;
+    --foreground: 224 35% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 35% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 35% 15%;
+    --primary: 235 78% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
-    --radius: 0.375rem;
+    --secondary: 220 18% 93%;
+    --secondary-foreground: 224 30% 20%;
+    --muted: 220 18% 93.5%;
+    --muted-foreground: 220 15% 46%;
+    --accent: 235 85% 96%;
+    --accent-foreground: 235 75% 48%;
+    --destructive: 350 78% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 16% 88%;
+    --input: 220 16% 88%;
+    --ring: 235 78% 62%;
+    --radius: 0.5rem;
+    --sidebar-bg: 220 22% 95%;
+
+    /* Pastel Semantics (Light) */
+    --pastel-blue: 212 90% 55%;
+    --pastel-lavender: 252 75% 65%;
+    --pastel-mint: 152 55% 42%;
+    --pastel-peach: 24 90% 58%;
+    --pastel-rose: 346 75% 60%;
+    --pastel-amber: 38 88% 48%;
+    --pastel-periwinkle: 232 75% 62%;
+  }
+
+  .dark {
+    /* Dark Mode - Soft velvety slate/graphite */
+    --background: 230 18% 11%;
+    --foreground: 220 24% 94%;
+    --card: 230 16% 15.5%;
+    --card-foreground: 220 24% 95%;
+    --popover: 230 16% 15.5%;
+    --popover-foreground: 220 24% 95%;
+    --primary: 235 85% 75%;
+    --primary-foreground: 230 25% 12%;
+    --secondary: 230 14% 20.5%;
+    --secondary-foreground: 220 20% 92%;
+    --muted: 230 14% 19%;
+    --muted-foreground: 220 12% 66%;
+    --accent: 230 16% 22%;
+    --accent-foreground: 235 85% 82%;
+    --destructive: 350 75% 66%;
+    --destructive-foreground: 230 25% 12%;
+    --border: 230 14% 22%;
+    --input: 230 14% 22%;
+    --ring: 235 85% 75%;
+    --sidebar-bg: 230 18% 13%;
+
+    /* Pastel Semantics (Dark) */
+    --pastel-blue: 212 92% 76%;
+    --pastel-lavender: 250 88% 82%;
+    --pastel-mint: 146 62% 76%;
+    --pastel-peach: 24 88% 75%;
+    --pastel-rose: 346 84% 78%;
+    --pastel-amber: 40 90% 74%;
+    --pastel-periwinkle: 232 86% 80%;
   }
 }
 
@@ -32,28 +76,35 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   user-select: none;
   -webkit-user-select: none;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  letter-spacing: -0.01em;
 }
 
-/* Custom Scrollbar for IDE feel */
+/* Custom Adaptive Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #141416;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 4px;
+  background: hsl(var(--border) / 0.8);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: hsl(var(--muted-foreground) / 0.45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 /* Utility to hide scrollbar while keeping scroll functionality */

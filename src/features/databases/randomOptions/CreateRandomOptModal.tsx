@@ -119,35 +119,35 @@ export function CreateRandomOptModal({ isOpen, onClose }: CreateRandomOptModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-      <div className="bg-[#1f1f23] border border-[#27272a] rounded-lg max-w-lg w-full p-4 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-[#27272a] pb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded bg-sky-500/10 text-sky-400">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-card border border-border/80 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-border/80 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-pastel-blue/15 text-pastel-blue border border-pastel-blue/30">
               <Dices className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-neutral-100">
+              <h2 className="text-sm font-semibold text-foreground">
                 Create New {mode === 'option' ? 'Random Option' : 'Option Group'}
               </h2>
-              <p className="text-[11px] text-neutral-400">Configure parameters, scripts and probabilities</p>
+              <p className="text-[11px] text-muted-foreground">Configure parameters, scripts and probabilities</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 text-neutral-400 hover:text-neutral-200">
+          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex bg-[#141416] p-1 rounded border border-[#27272a] text-xs">
+        <div className="flex bg-muted/60 p-1 rounded-xl border border-border/80 text-xs">
           <button
             type="button"
             onClick={() => {
               setMode('option');
               setSelectedLayerId('randomopt-db-import');
             }}
-            className={`flex-1 py-1 rounded font-medium transition-colors ${
-              mode === 'option' ? 'bg-sky-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${
+              mode === 'option' ? 'bg-pastel-blue/20 text-pastel-blue font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Random Option (`item_randomopt_db.yml`)
@@ -158,8 +158,8 @@ export function CreateRandomOptModal({ isOpen, onClose }: CreateRandomOptModalPr
               setMode('group');
               setSelectedLayerId('randomopt-grp-db-import');
             }}
-            className={`flex-1 py-1 rounded font-medium transition-colors ${
-              mode === 'group' ? 'bg-sky-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${
+              mode === 'group' ? 'bg-pastel-blue/20 text-pastel-blue font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Option Group (`item_randomopt_group.yml`)
@@ -167,18 +167,18 @@ export function CreateRandomOptModal({ isOpen, onClose }: CreateRandomOptModalPr
         </div>
 
         {errorMessage && (
-          <div className="bg-red-950/20 border border-red-500/20 p-2.5 rounded text-xs text-red-400">
+          <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-xl text-xs text-destructive">
             {errorMessage}
           </div>
         )}
 
-        <div className="space-y-3 text-xs">
+        <div className="space-y-3.5 text-xs">
           <div>
-            <label className="block text-neutral-400 mb-1">Target File Layer</label>
+            <label className="block text-muted-foreground mb-1 font-medium">Target File Layer</label>
             <select
               value={selectedLayerId}
               onChange={(e) => setSelectedLayerId(e.target.value)}
-              className="w-full bg-[#141416] border border-[#27272a] rounded px-2.5 py-1.5 text-neutral-200"
+              className="w-full h-9 bg-background border border-border/80 rounded-xl px-3 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-pastel-blue/40"
             >
               {(mode === 'option' ? availableOptionLayers : availableGroupLayers).map((l) => (
                 <option key={l.layer.id} value={l.layer.id}>
@@ -190,46 +190,46 @@ export function CreateRandomOptModal({ isOpen, onClose }: CreateRandomOptModalPr
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-neutral-400 mb-1">Numeric ID</label>
+              <label className="block text-muted-foreground mb-1 font-medium">Numeric ID</label>
               <Input
                 type="number"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 placeholder="e.g. 101"
-                className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-xl"
               />
             </div>
             <div>
-              <label className="block text-neutral-400 mb-1">
+              <label className="block text-muted-foreground mb-1 font-medium">
                 {mode === 'option' ? 'Option Constant' : 'Group Name'}
               </label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={mode === 'option' ? 'e.g. VAR_MAXHPAMOUNT' : 'e.g. ROPTG_PHYSICAL'}
-                className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-xl"
               />
             </div>
           </div>
 
           {mode === 'option' && (
             <div>
-              <label className="block text-neutral-400 mb-1">Option Script</label>
+              <label className="block text-muted-foreground mb-1 font-medium">Option Script</label>
               <textarea
                 value={script}
                 onChange={(e) => setScript(e.target.value)}
                 rows={3}
-                className="w-full bg-[#141416] border border-[#27272a] rounded p-2 text-xs font-mono text-emerald-400"
+                className="w-full bg-background border border-border/80 rounded-xl p-3 text-xs font-mono text-emerald-500 dark:text-emerald-400 focus-visible:ring-1 focus-visible:ring-pastel-blue/40"
               />
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-[#27272a] pt-3">
+        <div className="flex items-center justify-end gap-2 border-t border-border/80 pt-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             Cancel
           </button>
@@ -237,7 +237,7 @@ export function CreateRandomOptModal({ isOpen, onClose }: CreateRandomOptModalPr
             type="button"
             disabled={isSubmitting}
             onClick={handleCreate}
-            className="px-3 py-1.5 rounded text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-pastel-blue/20 text-pastel-blue border border-pastel-blue/30 hover:bg-pastel-blue/30 flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
             <span>Create {mode === 'option' ? 'Option' : 'Group'}</span>

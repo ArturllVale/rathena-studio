@@ -37,9 +37,22 @@ Todos os databases (Items, Monsters, Skills, Combos, Item Groups, Item Packages,
 - Badges de categoria: `Base Layer` (neutro), `Mode Layer` (sky) e `Import Override` (purple).
 - Lista de campos herdados/ativos contribuídos por aquele arquivo específico (`Active fields from this file (N)`).
 
-### 2.5 Padrão de Layout de UI e Largura dos Painéis de Inspeção
-- **Largura Fixa do Painel Lateral**: A largura do painel lateral de inspeção / detalhes (`Inspector`) é estritamente padronizada em **`440px`** (`w-[440px] shrink-0 bg-[#1f1f23]`) em todas as visualizações de bancos de dados.
-- **Nomenclatura do Editor**: Na interface do usuário, botões, abas e documentação, o editor textual é referenciado exclusivamente como **Editor** ou **YAML Editor** (sem menção desnecessária à tecnologia interna de renderização).
+### 2.5 Padrão de Layout de UI, Ergonomia e Design System
+- **Arquitetura Espaçosa e Anti-Compacta (Breathing Room)**: Eliminação do modelo ultracompacto/comprimido. Elementos possuem respiro visual generoso, touch/click targets confortáveis (mínimo de `36px` a `40px` para inputs e botões de ação), espaçamentos proporcionais (`p-4` a `p-6`) e altura de linha relaxada (`leading-relaxed`).
+- **Painel de Inspeção Adaptativo e Fluido**: Substituição da largura estática de 440px por um sistema responsivo/redimensionável (largura base flexível de `480px` a `560px` em telas Full HD, com suporte a grids de 2 colunas para grupos de atributos em Ultrawide e recolhimento ergonômico em HD).
+- **Suporte Nativo a Dual-Theme (Dark & Light) com Cores Pastel**:
+  - Paleta baseada em tokens semânticos CSS (`--background`, `--foreground`, `--card`, `--muted`, `--accent`, `--border`), abolindo hexadecimais estáticos nos componentes.
+  - Tons escuros com preto suave e aveludado (estilo charcoal/slate), sem contraste agressivo.
+  - Tons claros suaves em base papel quente/off-white (`#fafafa` / `#f8fafc`), evitando brancos ofuscantes.
+  - Acentos e badges em tons pastéis harmônicos (lavanda, menta/sage, pêssego, coral suave, periwinkle, lilás para imports e ciano suave para layers RE).
+- **Tipografia Moderna e Confortável**:
+  - UI Sans: Família tipográfica humanista/geométrica moderna (`Inter` / `Plus Jakarta Sans`) com escala visual equilibrada (base `14px`, subtítulos `16px`, títulos de seção `18px+`).
+  - Monospace: `JetBrains Mono` com números tabulares (`tnum`) para IDs, scripts, flags e registros YAML.
+- **Responsividade HD até Ultrawide**:
+  - HD (1280x720 / 1366x768): Otimização de layouts com colunas adaptativas e preservação de visibilidade da tabela principal.
+  - Full HD (1920x1080): Distribuição balanceada de viewport entre listagem, explorer e inspeção.
+  - Ultrawide (2560x1080 / 3440x1440+): Aproveitamento de largura via formulários em multi-colunas no Inspector, tabela de dados enriquecida e controle de largura máxima para evitar vazios desnecessários.
+- **Nomenclatura do Editor**: Na interface do usuário, botões, abas e documentação, o editor textual é referenciado exclusivamente como **Editor** ou **YAML Editor**.
 
 ---
 
@@ -50,7 +63,8 @@ Todos os databases (Items, Monsters, Skills, Combos, Item Groups, Item Packages,
 - **State Management**: Zustand
 - **Virtualização**: `@tanstack/react-virtual`
 - **Parsing/AST**: `yaml` (v2)
-- **Estilização**: Tailwind CSS + Lucide Icons + Radix UI
+- **Estilização & Design System**: Tailwind CSS + Lucide Icons + Radix UI
+- **Tipografia**: Inter / Plus Jakarta Sans + JetBrains Mono
 
 ---
 
@@ -101,7 +115,8 @@ graph TD
     F5 --> F6[Fase 6: Criação & Validação]
     F6 --> F7[Fase 7: Combos, Options & Packages]
     F7 --> F8[Fase 8: Editor Monaco & Scripts]
-    F8 --> F9[Fase 9: Process Manager & Runtime]
+    F8 --> F9[Fase 9: Modern UI/UX Redesign & Design System]
+    F9 --> F10[Fase 10: Process Manager & Runtime]
 ```
 
 ### [x] Fase 0 — Discovery e Especificação (CONCLUÍDO)
@@ -147,7 +162,28 @@ graph TD
 - **Navegação Cruzada Instantânea (Jump to Entity)**: Botão "YAML" em todos os 7 inspetores visuais (`ItemInspector`, `MobInspector`, `SkillInspector`, `ComboInspector`, `ItemGroupInspector`, `ItemPackageInspector`, `RandomOptionInspector`) abrindo o arquivo exato e focando o cursor diretamente na linha de definição da entidade via `findEntityLineInYaml`.
 - **Editor de Scripts Integrado nos Inspetores**: Editor de código integrado diretamente no `ItemScriptEditorSection`, `ComboInspector` e `RandomOptionInspector`.
 
-### [ ] Fase 9 — Process Manager & rAthena Runtime (PRÓXIMA FASE)
+### [ ] Fase 9 — Modern UI/UX Redesign & Design System (EM PLANEJAMENTO)
+- **Design Tokens & Dual-Theme Engine**:
+  - Reestruturação de CSS variables no `:root` e `.dark` com paleta pastel equilibrada (Light e Dark).
+  - Remoção de hexadecimais estáticos em todo o código-fonte React/Tailwind substituindo por classes semânticas.
+  - Sincronização automática do tema com `SettingsStore`, classe no elemento raiz HTML e persistência local.
+  - Suporte a tema no Monaco Editor (`vs` pastel claro vs `vs-dark` pastel aveludado).
+- **Tipografia & Sistema Visual**:
+  - Inclusão oficial de fontes de alta legibilidade (`Inter` / `Plus Jakarta Sans` para UI e `JetBrains Mono` para dados/código).
+  - Recalibração de hierarquia de fontes: eliminação de microtextos ilegíveis (`text-[10px]`) e adoção de base sólida de 14px com subtítulos e títulos bem proporcionados.
+- **Layout Espaçoso & Não-Compacto (De-densificação)**:
+  - Expansão de touch/click targets: botões, abas e inputs com altura confortável (`h-9` / `h-10`) e preenchimento arejado (`p-4` a `p-6`).
+  - Reestruturação dos cartões de formulário com separações suaves e sombras elegantes em vez de bordas duplas densas.
+  - Linhas de listagem virtualizada com altura de linha espaçosa e legível (`40px` a `48px`).
+- **Responsividade Multi-Resolução (HD a Ultrawide)**:
+  - HD (1280x720 / 1366x768): Otimização de viewport garantindo visibilidade prioritária da tabela e painel de inspeção proporcional.
+  - Full HD (1920x1080): Equilíbrio de densidade com visualização confortável simultânea de lista e inspetor.
+  - Ultrawide (2560x1080 / 3440x1440+): Inspector adaptativo com grids de duas colunas para grupos de propriedades e tabelas virtuais preenchendo o espaço de forma harmônica.
+- **Componentes Centrais e Vistas**:
+  - Refatoração de `Sidebar`, `TitleBar`, `StatusBar`, `DatabasesView`, Explorer Views e Inspetores de todas as 7 bases.
+  - Painel de controle de aparência em `SettingsView` (seletor de tema Light / Dark / System e fonte).
+
+### [ ] Fase 10 — Process Manager & rAthena Runtime (FUTURA FASE)
 - Inicialização e monitoramento de Login, Char e Map servers do rAthena.
 - Captura de logs e stdout/stderr integrados em console.
 

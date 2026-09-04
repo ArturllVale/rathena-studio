@@ -143,13 +143,13 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
   if (!currentSession) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Tab Switcher Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="flex items-center justify-between px-0.5">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           rAthena Scripts
         </h3>
-        <div className="flex items-center gap-1 bg-[#141416] p-0.5 rounded border border-[#27272a]">
+        <div className="flex items-center gap-1.5 bg-secondary/50 p-1 rounded-xl border border-border/80">
           {(['Script', 'EquipScript', 'UnEquipScript'] as ScriptTab[]).map((tab) => {
             const modified = isTabModified(tab);
             const active = activeTab === tab;
@@ -160,14 +160,14 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
                   active
-                    ? 'bg-sky-600 text-white font-medium shadow-sm'
-                    : 'text-neutral-400 hover:text-neutral-200'
+                    ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                 }`}
               >
-                {modified && <span className="w-1.5 h-1.5 rounded-full bg-sky-300" title="Modified" />}
-                {!modified && filled && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" title="Has script" />}
+                {modified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
+                {!modified && filled && <span className="w-2 h-2 rounded-full bg-mint" title="Has script" />}
                 <span>{tab === 'Script' ? 'Use / Script' : tab === 'EquipScript' ? 'OnEquip' : 'OnUnEquip'}</span>
               </button>
             );
@@ -176,39 +176,39 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
       </div>
 
       {/* Code Editor Box */}
-      <div className="bg-[#141416] rounded border border-[#27272a] overflow-hidden flex flex-col focus-within:border-sky-500/50 transition-colors">
+      <div className="bg-card rounded-xl border border-border/80 overflow-hidden flex flex-col focus-within:border-pastel-blue/60 transition-colors shadow-xs">
         {/* Editor Toolbar */}
-        <div className="px-3 py-1.5 bg-[#1f1f23] border-b border-[#27272a] flex items-center justify-between text-[11px]">
-          <div className="flex items-center gap-2 text-neutral-400 font-mono">
-            <Code className="w-3.5 h-3.5 text-sky-400" />
-            <span className="text-neutral-200 font-medium">{activeTab}</span>
-            <span className="text-neutral-600">•</span>
-            <span className="text-neutral-500">{lineCount} line{lineCount > 1 ? 's' : ''}</span>
-            <span className="text-neutral-600">•</span>
-            <span className="text-neutral-500">{currentCode.length} chars</span>
+        <div className="px-4 py-2.5 bg-muted/30 border-b border-border/80 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground font-mono">
+            <Code className="w-4 h-4 text-pastel-blue" />
+            <span className="text-foreground font-semibold">{activeTab}</span>
+            <span className="text-muted-foreground/40">•</span>
+            <span className="text-muted-foreground">{lineCount} line{lineCount > 1 ? 's' : ''}</span>
+            <span className="text-muted-foreground/40">•</span>
+            <span className="text-muted-foreground">{currentCode.length} chars</span>
           </div>
 
           <div className="flex items-center gap-2">
             {syntaxIssues.length === 0 && currentCode.trim().length > 0 && (
-              <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
-                <CheckCircle2 className="w-3 h-3" /> Valid Syntax
+              <span className="flex items-center gap-1.5 text-xs text-mint font-mono font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Valid Syntax
               </span>
             )}
             {syntaxIssues.length > 0 && (
               <button
                 type="button"
                 onClick={autoFixSemicolons}
-                className="flex items-center gap-1 text-[10px] text-amber-400 hover:text-amber-300 font-mono px-1.5 py-0.5 rounded bg-amber-950/30 border border-amber-500/20"
+                className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-600 font-mono px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 transition-colors"
                 title="Auto-fix missing semicolons"
               >
-                <Wand2 className="w-3 h-3" /> Auto-Fix Semicolons
+                <Wand2 className="w-3.5 h-3.5" /> Auto-Fix Semicolons
               </button>
             )}
             {currentCode.trim().length > 0 && (
               <button
                 type="button"
                 onClick={() => setField(activeTab, undefined)}
-                className="text-[10px] text-red-400 hover:text-red-300 font-mono px-1.5 py-0.5 rounded hover:bg-red-950/20"
+                className="text-xs text-destructive hover:text-destructive/80 font-mono px-2 py-1 rounded-lg hover:bg-destructive/10 transition-colors"
               >
                 Clear
               </button>
@@ -217,55 +217,55 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
         </div>
 
         {/* Code Editor Body */}
-        <div className="p-2 bg-[#141416]">
+        <div className="p-2.5 bg-card">
           <MonacoScriptEditor
             value={currentCode}
             onChange={(val) => setField(activeTab, val === '' ? undefined : val)}
-            height={180}
+            height={200}
             validateScript={true}
           />
         </div>
       </div>
 
       {/* Bonus Reference & Quick Insert Drawer */}
-      <div className="bg-[#18181b] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 overflow-hidden shadow-xs">
         <div 
           onClick={() => setShowLibrary(!showLibrary)}
-          className="px-3 py-2 bg-[#1f1f23] border-b border-[#27272a] flex items-center justify-between cursor-pointer hover:bg-[#27272a] transition-colors"
+          className="px-4 py-3 bg-card border-b border-border/80 flex items-center justify-between cursor-pointer hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-200">
-            <BookOpen className="w-3.5 h-3.5 text-sky-400" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <BookOpen className="w-4 h-4 text-pastel-blue" />
             <span>Bonus Library &amp; Quick Insert (item_bonus.txt)</span>
           </div>
-          {showLibrary ? <ChevronUp className="w-4 h-4 text-neutral-400" /> : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+          {showLibrary ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
         </div>
 
         {showLibrary && (
-          <div className="p-3 space-y-2.5">
+          <div className="p-4 space-y-3 bg-muted/15">
             {/* Search and Category Filter */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-neutral-500" />
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search bonus (e.g. str, crit, heal, cast, autospell, ele)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 h-7 bg-[#141416] border-[#27272a] text-xs text-neutral-200"
+                  className="pl-9 h-9 bg-background border-border/80 text-xs text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
               {/* Category Pills */}
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors ${
                       selectedCategory === cat
-                        ? 'bg-sky-600 text-white font-medium'
-                        : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border border-[#27272a]'
+                        ? 'bg-pastel-blue text-pastel-blue-foreground font-semibold shadow-xs'
+                        : 'bg-background text-muted-foreground hover:text-foreground border border-border/80'
                     }`}
                   >
                     {cat}
@@ -275,21 +275,21 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
             </div>
 
             {/* Bonus Grid Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
               {filteredBonuses.map((b) => (
                 <div
                   key={b.name}
-                  className="p-2 rounded bg-[#141416] border border-[#27272a] hover:border-sky-500/40 flex items-start justify-between gap-2 group transition-colors"
+                  className="p-2.5 rounded-lg bg-background border border-border/80 hover:border-pastel-blue/60 flex items-start justify-between gap-2.5 group transition-colors shadow-2xs"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-semibold text-xs text-neutral-100">{b.name}</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded font-mono text-neutral-500 bg-[#1f1f23]">
+                      <span className="font-mono font-semibold text-xs text-foreground">{b.name}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-mono text-muted-foreground bg-secondary">
                         {b.kind}
                       </span>
                     </div>
-                    <div className="text-[10px] font-mono text-sky-400 truncate mt-0.5">{b.detail}</div>
-                    <div className="text-[10px] text-neutral-400 truncate mt-0.5" title={b.documentation}>
+                    <div className="text-xs font-mono text-pastel-blue truncate mt-1">{b.detail}</div>
+                    <div className="text-xs text-muted-foreground truncate mt-0.5" title={b.documentation}>
                       {b.documentation}
                     </div>
                   </div>
@@ -297,16 +297,16 @@ export function ItemScriptEditorSection({ item }: ItemScriptEditorSectionProps) 
                   <button
                     type="button"
                     onClick={() => insertCompletionItem(b)}
-                    className="p-1 rounded bg-[#1f1f23] hover:bg-sky-600 text-neutral-300 hover:text-white border border-[#27272a] hover:border-sky-500 flex items-center justify-center flex-shrink-0 transition-colors"
+                    className="p-1.5 rounded-lg bg-secondary hover:bg-pastel-blue hover:text-pastel-blue-foreground text-foreground border border-border/80 hover:border-pastel-blue flex items-center justify-center flex-shrink-0 transition-colors"
                     title={`Insert ${b.name}`}
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
               ))}
 
               {filteredBonuses.length === 0 && (
-                <div className="col-span-2 text-center py-4 text-xs text-neutral-500">
+                <div className="col-span-2 text-center py-6 text-xs text-muted-foreground">
                   No bonuses matching &quot;{searchQuery}&quot;
                 </div>
               )}

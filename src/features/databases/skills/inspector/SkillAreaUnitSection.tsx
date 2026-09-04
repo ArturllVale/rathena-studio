@@ -134,8 +134,11 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
     const isScalar = typeof val === 'number' || typeof val === 'string' || val === undefined;
 
     return (
-      <div className="flex items-center justify-between py-1 border-b border-[#27272a]/40 last:border-0">
-        <span className="text-xs text-neutral-400 font-medium">{label}</span>
+      <div className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+        <span className="text-sm text-muted-foreground font-medium flex items-center gap-1.5">
+          {isModified && <span className="w-1.5 h-1.5 rounded-full bg-pastel-blue shrink-0" />}
+          {label}
+        </span>
         {isScalar ? (
           <input
             type={isNum ? 'number' : 'text'}
@@ -148,22 +151,22 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
                 v === '' ? undefined : isNum ? Number(v) : v
               );
             }}
-            className="w-20 sm:w-24 text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+            className="w-24 sm:w-28 text-sm font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
           />
         ) : (
-          <span className="text-[11px] font-mono text-sky-400">Scaled Array</span>
+          <span className="text-xs font-mono text-pastel-blue">Scaled Array</span>
         )}
       </div>
     );
   };
 
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
       {/* Area & Combat Ranges */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
-        <div className="flex items-center gap-1.5 mb-1">
-          <Crosshair className="w-3.5 h-3.5 text-sky-400" />
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Crosshair className="w-4 h-4 text-pastel-blue" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Range, Splash &amp; Element
           </h3>
         </div>
@@ -172,15 +175,15 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
         {renderSimpleField('Hit Count (strikes)', 'HitCount')}
 
         {/* Skill Element Dropdown */}
-        <div className="flex items-center justify-between py-1 border-b border-[#27272a]/40">
-          <span className="text-xs text-neutral-400 font-medium">Element</span>
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <span className="text-sm text-muted-foreground font-medium">Element</span>
           {isElementScalar ? (
-            <div className="w-36">
+            <div className="w-40">
               <Select
                 value={elementValue}
                 onValueChange={(val) => setField('Element', val as SkillElement)}
               >
-                <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                   <SelectValue placeholder="Element" />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,20 +196,20 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
               </Select>
             </div>
           ) : (
-            <span className="text-[11px] font-mono text-sky-400">Scaled Array</span>
+            <span className="text-xs font-mono text-pastel-blue">Scaled Array</span>
           )}
         </div>
 
         {/* Splash Area Dropdown */}
-        <div className="flex items-center justify-between py-1 border-b border-[#27272a]/40">
-          <span className="text-xs text-neutral-400 font-medium">Splash Area (AoE)</span>
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <span className="text-sm text-muted-foreground font-medium">Splash Area (AoE)</span>
           {isSplashScalar ? (
-            <div className="w-48">
+            <div className="w-52">
               <Select
                 value={String(splashValue)}
                 onValueChange={(val) => setField('SplashArea', Number(val))}
               >
-                <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                   <SelectValue placeholder="Splash Area" />
                 </SelectTrigger>
                 <SelectContent>
@@ -219,7 +222,7 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
               </Select>
             </div>
           ) : (
-            <span className="text-[11px] font-mono text-sky-400">Scaled Array</span>
+            <span className="text-xs font-mono text-pastel-blue">Scaled Array</span>
           )}
         </div>
 
@@ -229,33 +232,33 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
       </div>
 
       {/* Ground Unit / Field Trap Properties */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2.5">
-        <div className="flex items-center gap-1.5 mb-1">
-          <Layers className="w-3.5 h-3.5 text-amber-400" />
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Layers className="w-4 h-4 text-pastel-amber" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Ground Unit &amp; AoE Objects (Unit)
           </h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Unit ID / Effect</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Unit ID / Effect</label>
             <input
               type="text"
               placeholder="e.g. Fire_Wall"
               value={currentUnit.Id || ''}
               onChange={(e) => updateUnitField('Id', e.target.value || undefined)}
-              className="text-xs font-mono bg-[#141416] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+              className="text-sm font-mono bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Unit Target Selector</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Unit Target Selector</label>
             <Select
               value={currentUnitTarget}
               onValueChange={(val) => updateUnitField('Target', val as SkillUnitTarget)}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Target" />
               </SelectTrigger>
               <SelectContent>
@@ -268,13 +271,13 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
             </Select>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Layout Size</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Layout Size</label>
             <Select
               value={String(currentUnitLayout)}
               onValueChange={(val) => updateUnitField('Layout', Number(val))}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Layout" />
               </SelectTrigger>
               <SelectContent>
@@ -287,8 +290,8 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
             </Select>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Interval (ms)</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Interval (ms)</label>
             <input
               type="number"
               placeholder="e.g. 1000"
@@ -296,22 +299,22 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
               onChange={(e) =>
                 updateUnitField('Interval', e.target.value === '' ? undefined : Number(e.target.value))
               }
-              className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+              className="text-sm font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* Damage & Engine Flags */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
-        <div className="flex items-center gap-1.5 mb-1">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="w-4 h-4 text-pastel-blue" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Damage &amp; Execution Flags ({Object.keys(currentDamageFlags).length + Object.keys(currentFlags).length})
           </h3>
         </div>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {COMMON_DAMAGE_FLAGS.map((df) => {
             const isSelected = Boolean(currentDamageFlags[df]);
             return (
@@ -319,10 +322,10 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
                 key={df}
                 type="button"
                 onClick={() => toggleDamageFlag(df)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors border shadow-2xs ${
                   isSelected
-                    ? 'bg-red-950/50 text-red-200 border-red-500/50 font-medium'
-                    : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border-[#27272a]'
+                    ? 'bg-pastel-rose/20 text-pastel-rose border-pastel-rose/40 font-semibold'
+                    : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
                 }`}
               >
                 {df}
@@ -331,7 +334,7 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
           })}
         </div>
 
-        <div className="flex flex-wrap gap-1 pt-1">
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {COMMON_SKILL_FLAGS.map((sf) => {
             const isSelected = Boolean(currentFlags[sf]);
             return (
@@ -339,10 +342,10 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
                 key={sf}
                 type="button"
                 onClick={() => toggleSkillFlag(sf)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors border shadow-2xs ${
                   isSelected
-                    ? 'bg-sky-600/30 text-sky-200 border-sky-500/50 font-medium'
-                    : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border-[#27272a]'
+                    ? 'bg-primary/15 text-primary border-primary/30 font-semibold'
+                    : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
                 }`}
               >
                 {sf}
@@ -352,9 +355,9 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
         </div>
 
         {/* Copy Flags */}
-        <div className="pt-2 border-t border-[#27272a]/50 flex items-center justify-between text-xs">
-          <span className="text-neutral-400">Copyable (Plagiarism / Reproduce)</span>
-          <div className="flex items-center gap-2 font-mono text-[11px]">
+        <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
+          <span className="text-muted-foreground font-medium">Copyable (Plagiarism / Reproduce)</span>
+          <div className="flex items-center gap-2 font-mono text-xs">
             <button
               type="button"
               onClick={() => {
@@ -364,10 +367,10 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
                   Skill: { ...current, Plagiarism: !current.Plagiarism },
                 });
               }}
-              className={`px-2 py-0.5 rounded border ${
+              className={`px-2.5 py-1 rounded-lg border shadow-2xs transition-colors ${
                 currentCopyFlags.Skill?.Plagiarism
-                  ? 'bg-emerald-950/50 text-emerald-300 border-emerald-500/40'
-                  : 'bg-[#141416] text-neutral-400 border-[#27272a]'
+                  ? 'bg-pastel-mint/20 text-pastel-mint border-pastel-mint/40 font-semibold'
+                  : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
               }`}
             >
               Plagiarism
@@ -381,10 +384,10 @@ export function SkillAreaUnitSection({ skill }: SkillAreaUnitSectionProps) {
                   Skill: { ...current, Reproduce: !current.Reproduce },
                 });
               }}
-              className={`px-2 py-0.5 rounded border ${
+              className={`px-2.5 py-1 rounded-lg border shadow-2xs transition-colors ${
                 currentCopyFlags.Skill?.Reproduce
-                  ? 'bg-emerald-950/50 text-emerald-300 border-emerald-500/40'
-                  : 'bg-[#141416] text-neutral-400 border-[#27272a]'
+                  ? 'bg-pastel-mint/20 text-pastel-mint border-pastel-mint/40 font-semibold'
+                  : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
               }`}
             >
               Reproduce
