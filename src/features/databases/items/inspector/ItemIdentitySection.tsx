@@ -46,10 +46,10 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
     const isNum = type === 'number';
 
     return (
-      <div className="flex flex-col py-1.5 border-b border-[#27272a] last:border-0 relative">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-neutral-400 whitespace-nowrap flex items-center gap-1">
-            {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+      <div className="flex flex-col py-2.5 border-b border-border/50 last:border-0 relative">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-muted-foreground whitespace-nowrap flex items-center gap-1.5 font-medium">
+            {isModified && <span className="w-2 h-2 rounded-full bg-pastel-blue" title="Modified" />}
             {label}
           </span>
           <input
@@ -66,20 +66,20 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
                 (setField as (f: keyof ItemRawFields, v: unknown) => void)(fieldName, val);
               }
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 h-6.5 shrink-0 ${
-              isNum ? 'w-14' : 'w-36'
+            className={`text-sm font-mono text-right bg-card border rounded-lg px-3 py-1.5 h-9 shrink-0 transition-all ${
+              isNum ? 'w-24' : 'w-48'
             } ${
               errorMsg
-                ? 'border-red-500/50 text-red-200'
+                ? 'border-destructive text-destructive bg-destructive/5'
                 : isModified
-                ? 'border-sky-500/50 text-sky-200'
-                : 'border-[#27272a] text-neutral-200'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-border/80 text-foreground focus:border-primary/50'
             }`}
           />
         </div>
-        {errorMsg && <div className="text-[10px] text-red-400 mt-1 text-right">{errorMsg}</div>}
+        {errorMsg && <div className="text-xs text-destructive mt-1 text-right font-medium">{errorMsg}</div>}
         {!isModified && origin && origin.layerId !== 'item-db-base-root' && origin.layerId !== layerProvenance[0] && (
-          <div className="text-[9px] text-neutral-500 mt-0.5 text-right truncate font-mono">
+          <div className="text-xs text-muted-foreground mt-1 text-right truncate font-mono opacity-80">
             via {origin.filePath || origin.layerId}
           </div>
         )}
@@ -94,21 +94,21 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
   const currentSubType = isSubTypeModified ? (pendingChanges.SubType || '') : (fields.SubType || '');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
           Identification
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a]">
+        <div className="bg-card p-4 rounded-xl border border-border/70 shadow-2xs">
           {renderField('ID', 'Id', 'number')}
         </div>
       </div>
 
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
           Identity & Names
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a]">
+        <div className="bg-card p-4 rounded-xl border border-border/70 shadow-2xs">
           {renderField('AegisName', 'AegisName', 'text')}
           {renderField('Name', 'Name', 'text')}
           {renderField('AliasName', 'AliasName', 'text', 'None')}
@@ -116,24 +116,24 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
       </div>
 
       <div>
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
           Classification & Appearance
         </h3>
-        <div className="bg-[#1f1f23] p-2.5 rounded border border-[#27272a] space-y-2">
+        <div className="bg-card p-4 rounded-xl border border-border/70 shadow-2xs space-y-2">
           {/* Item Type Dropdown */}
-          <div className="flex items-center justify-between gap-2 py-1 border-b border-[#27272a]">
-            <span className="text-xs text-neutral-400 flex items-center gap-1">
-              {isTypeModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center justify-between gap-3 py-2 border-b border-border/50">
+            <span className="text-sm text-muted-foreground flex items-center gap-1.5 font-medium">
+              {isTypeModified && <span className="w-2 h-2 rounded-full bg-pastel-blue" title="Modified" />}
               Type
             </span>
-            <div className="w-36 shrink-0">
+            <div className="w-48 shrink-0">
               <Select
                 value={currentType || 'Etc'}
                 onValueChange={(val) => setField('Type', val as ItemType)}
               >
                 <SelectTrigger
-                  className={`h-6.5 text-xs font-mono ${
-                    isTypeModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                  className={`h-9 text-sm font-mono ${
+                    isTypeModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground'
                   }`}
                 >
                   <SelectValue placeholder="Type" />
@@ -150,20 +150,20 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
           </div>
 
           {/* SubType Dropdown / Input */}
-          <div className="flex items-center justify-between gap-2 py-1 border-b border-[#27272a]">
-            <span className="text-xs text-neutral-400 flex items-center gap-1">
-              {isSubTypeModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center justify-between gap-3 py-2 border-b border-border/50">
+            <span className="text-sm text-muted-foreground flex items-center gap-1.5 font-medium">
+              {isSubTypeModified && <span className="w-2 h-2 rounded-full bg-pastel-blue" title="Modified" />}
               SubType
             </span>
-            <div className="w-36 shrink-0">
+            <div className="w-48 shrink-0">
               {currentType === 'Weapon' ? (
                 <Select
                   value={String(currentSubType) || 'none'}
                   onValueChange={(val) => setField('SubType', val === 'none' ? undefined : val)}
                 >
                   <SelectTrigger
-                    className={`h-6.5 text-xs font-mono ${
-                      isSubTypeModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                    className={`h-9 text-sm font-mono ${
+                      isSubTypeModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground'
                     }`}
                   >
                     <SelectValue placeholder="None" />
@@ -183,8 +183,8 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
                   onValueChange={(val) => setField('SubType', val === 'none' ? undefined : val)}
                 >
                   <SelectTrigger
-                    className={`h-6.5 text-xs font-mono ${
-                      isSubTypeModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                    className={`h-9 text-sm font-mono ${
+                      isSubTypeModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground'
                     }`}
                   >
                     <SelectValue placeholder="None" />
@@ -204,8 +204,8 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
                   onValueChange={(val) => setField('SubType', val === 'none' ? undefined : val)}
                 >
                   <SelectTrigger
-                    className={`h-6.5 text-xs font-mono ${
-                      isSubTypeModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                    className={`h-9 text-sm font-mono ${
+                      isSubTypeModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground'
                     }`}
                   >
                     <SelectValue placeholder="None" />
@@ -225,8 +225,8 @@ export function ItemIdentitySection({ item }: ItemIdentitySectionProps) {
                   placeholder="None"
                   value={String(currentSubType)}
                   onChange={(e) => setField('SubType', e.target.value || undefined)}
-                  className={`text-xs font-mono text-right bg-[#141416] border rounded px-2 py-0.5 h-6.5 w-36 ${
-                    isSubTypeModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                  className={`text-sm font-mono text-right bg-card border rounded-lg px-3 py-1.5 h-9 w-48 transition-all ${
+                    isSubTypeModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground'
                   }`}
                 />
               )}

@@ -42,12 +42,14 @@ export function ItemInspector({ itemId }: { itemId: number }) {
     setIsCommitting,
   } = useItemEditStore();
 
+  const itemMeta = useDatabaseStore((s) => s.metadataMap['item']);
+
   const item: EffectiveItem | undefined = useMemo(() => {
     if (!provider || !itemId) return undefined;
     const repository = provider.getRepository() as LayeredItemRepository | undefined;
     if (!repository || typeof repository.findById !== 'function') return undefined;
     return repository.findById(itemId);
-  }, [provider, itemId]);
+  }, [provider, itemId, itemMeta]);
 
   // When item changes, start a new session
   useEffect(() => {
@@ -94,6 +96,8 @@ export function ItemInspector({ itemId }: { itemId: number }) {
 
       await service.commitSession(currentSession, provider as unknown as ItemDatabaseProvider);
 
+      useDatabaseStore.getState().refreshMetadata();
+
       // Reload UI state with newly committed item
       const repo = provider.getRepository() as LayeredItemRepository | undefined;
       const updatedItem = repo?.findById(itemId);
@@ -122,61 +126,60 @@ export function ItemInspector({ itemId }: { itemId: number }) {
 
   return (
     <div
-      className="flex flex-col h-full bg-[#141416] outline-none select-none"
+      className="flex flex-col h-full bg-card outline-none select-none"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-lg font-bold text-neutral-100 leading-tight">
+      <div className="p-5 border-b border-border/80 bg-card/80 backdrop-blur">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-xl font-bold text-foreground leading-snug truncate">
               {fields.Name || 'Unknown'}
             </div>
-            <div className="text-xs font-mono text-sky-400 mt-0.5">{fields.AegisName || 'Unknown'}</div>
+            <div className="text-xs font-mono text-pastel-blue mt-0.5 font-semibold tracking-wide">{fields.AegisName || 'Unknown'}</div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => {
                 const primaryPath = Object.values(item.fieldOrigins)[0]?.filePath || layerProvenance[0] || 'item_db.yml';
                 openEntityInYamlEditor(primaryPath, item.id, layerProvenance[0]);
               }}
-              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              className="text-xs font-mono px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border/60 hover:border-primary/40 flex items-center gap-1.5 transition-colors shadow-2xs"
               title="Open in YAML Editor"
             >
-              <FileCode className="w-3 h-3 text-sky-400" />
+              <FileCode className="w-3.5 h-3.5 text-primary" />
               <span>YAML</span>
             </button>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400 border border-[#27272a]">
+            <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-secondary text-muted-foreground border border-border/60 font-semibold">
               #{item.id}
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+        <div className="flex flex-wrap items-center gap-1.5 mt-4 border-t border-border/60 pt-3">
           <button
             type="button"
             onClick={() => setCurrentTab('general')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'general'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>General & Combat</span>
           </button>
 
-
           <button
             type="button"
             onClick={() => setCurrentTab('requirements')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'requirements'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -186,10 +189,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('flags_trade')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'flags_trade'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Flag className="w-3.5 h-3.5" />
@@ -199,10 +202,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('scripts')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'scripts'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <ScrollText className="w-3.5 h-3.5" />
@@ -212,10 +215,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('linked_systems')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'linked_systems'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Link2 className="w-3.5 h-3.5" />
@@ -225,10 +228,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('provenance')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'provenance'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -238,7 +241,7 @@ export function ItemInspector({ itemId }: { itemId: number }) {
       </div>
 
       {/* Body Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 select-text">
+      <div className="flex-1 overflow-y-auto p-5 space-y-5 select-text bg-background/40">
         {/* Semantic Diff Notification */}
         {currentSession.isDirty && (
           <SemanticDiffViewer
@@ -308,38 +311,38 @@ export function ItemInspector({ itemId }: { itemId: number }) {
                   return (
                     <div
                       key={layerId}
-                      className={`p-3 rounded border transition-colors ${
+                      className={`p-3.5 rounded-xl border transition-all ${
                         isFinalLayer
-                          ? 'bg-sky-950/20 border-sky-500/30'
-                          : 'bg-[#1f1f23] border-[#27272a]'
+                          ? 'bg-primary/10 border-primary/30 shadow-2xs'
+                          : 'bg-card border-border/70'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-3">
                           <div
-                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono font-semibold ${
                               isFinalLayer
-                                ? 'bg-sky-600 text-white'
-                                : 'bg-[#27272a] text-neutral-400'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-secondary text-secondary-foreground'
                             }`}
                           >
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="text-xs font-mono font-semibold text-neutral-100">
+                            <div className="text-xs font-mono font-semibold text-foreground">
                               {relativePath}
                             </div>
-                            <div className="text-[11px] text-neutral-400">{layerName}</div>
+                            <div className="text-xs text-muted-foreground">{layerName}</div>
                           </div>
                         </div>
 
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                          className={`text-xs font-mono px-2 py-0.5 rounded-md border whitespace-nowrap font-medium ${
                             relativePath.includes('import')
-                              ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                              ? 'bg-purple-500/12 text-purple-700 dark:text-purple-300 border-purple-500/25'
                               : isBaseLayer
-                              ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                              : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                              ? 'bg-secondary text-muted-foreground border-border/70'
+                              : 'bg-sky-500/12 text-sky-700 dark:text-sky-300 border-sky-500/25'
                           }`}
                         >
                           {relativePath.includes('import')
@@ -351,15 +354,15 @@ export function ItemInspector({ itemId }: { itemId: number }) {
                       </div>
 
                       {contributingFields.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                          <div className="text-[10px] text-neutral-500 mb-1">
+                        <div className="mt-3 pt-2.5 border-t border-border/60">
+                          <div className="text-xs text-muted-foreground mb-1.5 font-medium">
                             Active fields from this file ({contributingFields.length}):
                           </div>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {contributingFields.map((f) => (
                               <span
                                 key={f}
-                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                className="px-2 py-0.5 rounded-md text-xs font-mono bg-secondary text-secondary-foreground border border-border/60"
                               >
                                 {f}
                               </span>
@@ -377,12 +380,12 @@ export function ItemInspector({ itemId }: { itemId: number }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-between">
-        <div className="flex items-center gap-1">
+      <div className="p-4 border-t border-border/80 bg-card/80 backdrop-blur flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canUndo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canUndo ? 'text-foreground hover:bg-accent/80' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={undo}
             disabled={!currentSession.canUndo}
@@ -392,8 +395,8 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canRedo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canRedo ? 'text-foreground hover:bg-accent/80' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={redo}
             disabled={!currentSession.canRedo}
@@ -403,10 +406,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
-            className="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/60 transition-colors"
             onClick={() => {
               cancelSession();
               startSession(item);
@@ -417,10 +420,10 @@ export function ItemInspector({ itemId }: { itemId: number }) {
           </button>
           <button
             type="button"
-            className={`px-3 py-1.5 text-xs rounded font-medium flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
               currentSession.isDirty && validationIssues.length === 0
-                ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                : 'bg-[#27272a] text-neutral-500 cursor-not-allowed'
+                ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs'
+                : 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
             }`}
             onClick={handleSave}
             disabled={!currentSession.isDirty || validationIssues.length > 0 || isCommitting}

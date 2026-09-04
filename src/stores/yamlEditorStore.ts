@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { parseDocument } from 'yaml';
 import { TauriFileContentWriter } from '@/domain/database/workspace/fileContentWriter';
+import { TauriLayerFileContentProvider } from '@/services/database/providers/tauriLayerFileContentProvider';
 import { useDatabaseStore } from './databaseStore';
 import { useAppStore } from './appStore';
+import { useWorkspaceStore } from './workspaceStore';
 import { YamlDocumentAdapter } from '@/services/database/yamlDocumentAdapter';
 
 export interface YamlFileState {
@@ -12,6 +14,7 @@ export interface YamlFileState {
   layerId?: string;
   isDirty: boolean;
   totalLines: number;
+  hasConflict?: boolean;
 }
 
 interface YamlEditorState {
@@ -31,6 +34,9 @@ interface YamlEditorState {
   discardChanges: (filePath: string) => void;
   saveFile: (filePath: string, rootPath: string) => Promise<boolean>;
   openFileAtEntity: (filePath: string, entityQuery: string | number, fallbackContent?: string, layerId?: string) => void;
+  handleExternalModification: (filePath: string) => Promise<void>;
+  resolveConflict: (filePath: string, strategy: 'overwrite' | 'reload') => Promise<void>;
+  reloadFileFromDisk: (filePath: string) => Promise<void>;
 }
 
 export function findEntityLineInYaml(yamlText: string, query: string | number): number {
@@ -282,6 +288,110 @@ export const useYamlEditorStore = create<YamlEditorState>((set, get) => ({
       cursorTarget: { line: targetLine, column: 1 },
     });
   },
+  
+  reloadFileFromDisk: async (filePath) => {
+    const rootPath = useWorkspaceStore.getState().activeWorkspace?.rootPath;
+    if (!rootPath) return;
+
+    try {
+      const provider = new TauriLayerFileContentProvider(rootPath);
+      // Construct a relative path for the provider as it expects relative paths in typical usage
+      let relativePath = filePath;
+      if (filePath.startsWith(rootPath)) {
+        relativePath = filePath.substring(rootPath.length);
+        if (relativePath.startsWith('/') || relativePath.startsWith('\\')) {
+          relativePath = relativePath.substring(1);
+        }
+      }
+
+      const content = await provider.readFile(relativePath);
+      
+      set((state) => {
+        const file = state.files[filePath];
+        if (!file) return state;
+
+        return {
+          files: {
+            ...state.files,
+            [filePath]: {
+              ...file,
+              originalContent: content,
+              currentContent: content,
+              isDirty: false,
+              hasConflict: false,
+              totalLines: content.split('\n').length,
+            },
+          },
+        };
+      });
+
+      // Update the DB store if necessary by reloading the db layer
+      const dbStore = useDatabaseStore.getState();
+      if (dbStore.registry) {
+         // Re-trigger load to refresh UI visually
+         await dbStore.loadAllDatabases(rootPath);
+      }
+    } catch (e) {
+      console.warn('Failed to reload file from disk', e);
+    }
+  },
+
+  handleExternalModification: async (filePath) => {
+    const state = get();
+    // Verify if this file is actually opened in the editor
+    // The paths coming from the watcher might be absolute, so we check if any open file ends with it
+    const openedPath = state.openFiles.find(p => p === filePath || filePath.endsWith(p) || p.endsWith(filePath));
+    
+    if (openedPath) {
+      const fileState = state.files[openedPath];
+      if (fileState.isDirty) {
+        // Has local unsaved changes, mark as conflict
+        set((s) => ({
+          files: {
+            ...s.files,
+            [openedPath]: {
+              ...s.files[openedPath],
+              hasConflict: true
+            }
+          }
+        }));
+      } else {
+        // Clean, so just reload it
+        await get().reloadFileFromDisk(openedPath);
+      }
+    } else {
+      // Not opened in editor, maybe just reload DB
+      const rootPath = useWorkspaceStore.getState().activeWorkspace?.rootPath;
+      if (rootPath) {
+        // Silently reload DB to reflect changes
+        const dbStore = useDatabaseStore.getState();
+        if (dbStore.registry) {
+           await dbStore.loadAllDatabases(rootPath);
+        }
+      }
+    }
+  },
+
+  resolveConflict: async (filePath, strategy) => {
+    if (strategy === 'reload') {
+      await get().reloadFileFromDisk(filePath);
+    } else if (strategy === 'overwrite') {
+      // Just clear the conflict flag, the user will save normally
+      set((state) => {
+        const file = state.files[filePath];
+        if (!file) return state;
+        return {
+          files: {
+            ...state.files,
+            [filePath]: {
+              ...file,
+              hasConflict: false
+            }
+          }
+        };
+      });
+    }
+  }
 }));
 
 export function openEntityInYamlEditor(filePath: string, entityQuery: string | number, layerId?: string): void {

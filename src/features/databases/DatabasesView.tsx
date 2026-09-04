@@ -39,49 +39,49 @@ const AVAILABLE_DATABASES: DatabaseLoadItem[] = [
     name: 'Item Database',
     description: 'item_db.yml, item_db_usable, item_db_equip, item_db_etc, db/import',
     icon: Sword,
-    color: 'text-sky-400',
+    color: 'text-pastel-blue',
   },
   {
     id: 'mob',
     name: 'Monster Database',
     description: 'mob_db.yml, mob_avail_db.yml, db/import',
     icon: Skull,
-    color: 'text-amber-400',
+    color: 'text-pastel-amber',
   },
   {
     id: 'skill',
     name: 'Skill Database',
     description: 'skill_db.yml, db/import',
     icon: Zap,
-    color: 'text-emerald-400',
+    color: 'text-pastel-mint',
   },
   {
     id: 'combo',
     name: 'Item Combos',
     description: 'item_combos.yml, db/import/item_combos.yml',
     icon: Sparkles,
-    color: 'text-yellow-400',
+    color: 'text-pastel-peach',
   },
   {
     id: 'group',
     name: 'Item Groups',
     description: 'item_group_db.yml, db/import/item_group_db.yml',
     icon: Layers,
-    color: 'text-teal-400',
+    color: 'text-pastel-periwinkle',
   },
   {
     id: 'package',
     name: 'Item Packages',
     description: 'item_packages.yml, db/import/item_packages.yml',
     icon: Package,
-    color: 'text-purple-400',
+    color: 'text-pastel-lavender',
   },
   {
     id: 'randomopt',
     name: 'Random Options',
     description: 'item_randomopt_db.yml, item_randomopt_group.yml, db/import',
     icon: Dices,
-    color: 'text-pink-400',
+    color: 'text-pastel-rose',
   },
 ];
 
@@ -111,8 +111,8 @@ export function DatabasesView() {
 
   if (!activeWorkspace) {
     return (
-      <div className="h-full w-full p-6 flex flex-col items-center justify-center bg-[#18181b] overflow-auto">
-        <div className="text-neutral-500 text-sm">No active workspace. Please open a workspace first.</div>
+      <div className="h-full w-full p-6 flex flex-col items-center justify-center bg-background overflow-auto">
+        <div className="text-muted-foreground text-sm">No active workspace. Please open a workspace first.</div>
       </div>
     );
   }
@@ -146,9 +146,9 @@ export function DatabasesView() {
   // Sub-header for switching between active databases when loaded
   if (isAnyLoaded && !isBulkLoading) {
     return (
-      <div className="h-full w-full flex flex-col bg-[#18181b] overflow-hidden">
+      <div className="h-full w-full flex flex-col bg-background overflow-hidden">
         {/* Database Switcher Navigation Bar */}
-        <div className="flex items-center gap-1 px-3 py-1.5 bg-[#141416] border-b border-[#27272a] overflow-x-auto">
+        <div className="flex items-center gap-1.5 px-4 py-2 bg-card border-b border-border/80 overflow-x-auto shadow-2xs">
           {AVAILABLE_DATABASES.map((db) => {
             const meta = metadataMap[db.id];
             const Icon = db.icon;
@@ -164,18 +164,20 @@ export function DatabasesView() {
                     loadDatabase(db.id, activeWorkspace.rootPath);
                   }
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors shrink-0 ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
                   isActive
-                    ? 'bg-sky-600 text-white shadow-sm'
-                    : 'text-neutral-400 hover:text-neutral-200 hover:bg-[#1f1f23]'
+                    ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/70'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-primary-foreground' : db.color}`} />
                 <span>{db.name.replace(' Database', '')}</span>
                 {meta?.state === 'loaded' && (
-                  <span className="text-[10px] opacity-75 font-mono">({meta.entityCount})</span>
+                  <span className={`text-xs font-mono opacity-80 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
+                    ({meta.entityCount})
+                  </span>
                 )}
-                {meta?.state === 'loading' && <Loader2 className="w-3 h-3 animate-spin" />}
+                {meta?.state === 'loading' && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               </button>
             );
           })}
@@ -193,14 +195,14 @@ export function DatabasesView() {
 
           {activeDatabase && metadataMap[activeDatabase]?.state !== 'loaded' && (
             <div className="h-full flex flex-col items-center justify-center space-y-3">
-              <div className="text-neutral-400 text-xs">
+              <div className="text-muted-foreground text-sm">
                 {AVAILABLE_DATABASES.find((d) => d.id === activeDatabase)?.name} is not loaded.
               </div>
               <button
                 onClick={() => loadDatabase(activeDatabase, activeWorkspace.rootPath)}
-                className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs px-3 py-1.5 rounded font-medium"
+                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-4 py-2 rounded-lg font-medium shadow-xs"
               >
-                <Play className="w-3.5 h-3.5" /> Load Database
+                <Play className="w-4 h-4" /> Load Database
               </button>
             </div>
           )}
@@ -210,32 +212,32 @@ export function DatabasesView() {
   }
 
   return (
-    <div className="h-full w-full p-6 flex flex-col items-center justify-center bg-[#18181b] overflow-auto">
-      <Card className="max-w-xl w-full bg-[#1f1f23] border-[#27272a] shadow-xl">
+    <div className="h-full w-full p-6 flex flex-col items-center justify-center bg-background overflow-auto">
+      <Card className="max-w-xl w-full bg-card border-border/80 shadow-md rounded-2xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl mb-2 w-fit">
-            <Database className="h-6 w-6 text-sky-400" />
+          <div className="mx-auto p-3.5 bg-primary/10 border border-primary/20 rounded-2xl mb-2 w-fit">
+            <Database className="h-7 w-7 text-primary" />
           </div>
-          <CardTitle className="text-sm font-semibold text-neutral-100">Database Explorer</CardTitle>
-          <CardDescription className="text-xs text-neutral-400 truncate max-w-md mx-auto" title={activeWorkspace.rootPath}>
+          <CardTitle className="text-base font-semibold text-foreground">Database Explorer</CardTitle>
+          <CardDescription className="text-xs text-muted-foreground truncate max-w-md mx-auto" title={activeWorkspace.rootPath}>
             Workspace: {activeWorkspace.rootPath}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-2">
           {/* Target Variant Selector */}
-          <div className="flex items-center justify-between p-3 rounded bg-[#141416] border border-[#27272a] text-xs">
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/40 border border-border/60 text-xs">
             <div>
-              <div className="font-medium text-neutral-200">Target Variant</div>
-              <div className="text-[11px] text-neutral-500">Selecione o modo de compatibilidade do servidor</div>
+              <div className="font-medium text-foreground">Target Variant</div>
+              <div className="text-xs text-muted-foreground">Selecione o modo de compatibilidade do servidor</div>
             </div>
-            <div className="flex bg-[#1f1f23] p-1 rounded border border-[#27272a]">
+            <div className="flex bg-secondary p-1 rounded-lg border border-border/60">
               <button
                 type="button"
-                className={`px-3 py-1 rounded-l text-xs transition-all ${
+                className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                   activeVariant === 'RE'
-                    ? 'bg-sky-600 text-white font-medium shadow-xs'
-                    : 'text-neutral-400 hover:text-neutral-200'
+                    ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
                 onClick={() => setVariant('RE')}
                 disabled={isBulkLoading}
@@ -244,10 +246,10 @@ export function DatabasesView() {
               </button>
               <button
                 type="button"
-                className={`px-3 py-1 rounded-r text-xs transition-all ${
+                className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                   activeVariant === 'PRE_RE'
-                    ? 'bg-sky-600 text-white font-medium shadow-xs'
-                    : 'text-neutral-400 hover:text-neutral-200'
+                    ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
                 onClick={() => setVariant('PRE_RE')}
                 disabled={isBulkLoading}
@@ -258,15 +260,15 @@ export function DatabasesView() {
           </div>
 
           {/* Included Databases Overview */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-neutral-300">Bancos de Dados para Carregamento</span>
-              <span className="text-[11px] text-neutral-500 font-mono">
+              <span className="font-semibold text-foreground">Bancos de Dados para Carregamento</span>
+              <span className="text-xs text-muted-foreground font-mono">
                 {loadedCount} de {totalDatabases} prontos
               </span>
             </div>
 
-            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {AVAILABLE_DATABASES.map((db) => {
                 const meta = metadataMap[db.id];
                 const IconComponent = db.icon;
@@ -277,45 +279,45 @@ export function DatabasesView() {
                 return (
                   <div
                     key={db.id}
-                    className={`flex items-center justify-between p-2.5 rounded border transition-all ${
+                    className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                       isLoading
-                        ? 'bg-sky-950/20 border-sky-500/40'
+                        ? 'bg-primary/10 border-primary/30'
                         : isLoaded
-                        ? 'bg-[#141416] border-[#27272a]'
-                        : 'bg-[#141416]/60 border-[#27272a]/60'
+                        ? 'bg-card border-border/80 shadow-2xs'
+                        : 'bg-secondary/30 border-border/50'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="p-1.5 rounded bg-[#1f1f23] border border-[#27272a] shrink-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2 rounded-lg bg-secondary border border-border/60 shrink-0">
                         <IconComponent className={`w-4 h-4 ${db.color}`} />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs font-medium text-neutral-200 truncate">{db.name}</div>
-                        <div className="text-[10px] text-neutral-500 truncate font-mono">{db.description}</div>
+                        <div className="text-sm font-medium text-foreground truncate">{db.name}</div>
+                        <div className="text-xs text-muted-foreground truncate font-mono">{db.description}</div>
                       </div>
                     </div>
 
                     <div className="shrink-0 pl-2">
                       {isLoaded && (
-                        <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-mono">
+                          <CheckCircle2 className="w-4 h-4" />
                           <span>{meta.entityCount} registros</span>
                         </div>
                       )}
                       {isLoading && (
-                        <div className="flex items-center gap-1.5 text-[11px] text-sky-400 font-mono">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <div className="flex items-center gap-1.5 text-xs text-primary font-mono">
+                          <Loader2 className="w-4 h-4 animate-spin" />
                           <span>Carregando...</span>
                         </div>
                       )}
                       {isError && (
-                        <div className="flex items-center gap-1 text-[11px] text-red-400 font-mono">
-                          <AlertCircle className="w-3.5 h-3.5" />
+                        <div className="flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-mono">
+                          <AlertCircle className="w-4 h-4" />
                           <span>Falha</span>
                         </div>
                       )}
                       {!isLoaded && !isLoading && !isError && (
-                        <span className="text-[11px] text-neutral-500 font-mono">Pendente</span>
+                        <span className="text-xs text-muted-foreground font-mono">Pendente</span>
                       )}
                     </div>
                   </div>
@@ -326,17 +328,17 @@ export function DatabasesView() {
 
           {/* Progress Bar & Status Text (Visible when loading) */}
           {isBulkLoading && (
-            <div className="space-y-1.5 p-3 rounded bg-[#141416] border border-[#27272a]">
+            <div className="space-y-2 p-3.5 rounded-xl bg-secondary/40 border border-border/60">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-sky-400 flex items-center gap-1.5">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span className="text-primary flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   {currentLoadingStep || 'Processando arquivos...'}
                 </span>
-                <span className="text-neutral-400">{loadingProgressPercent}%</span>
+                <span className="text-muted-foreground font-medium">{loadingProgressPercent}%</span>
               </div>
-              <div className="w-full h-1.5 bg-[#27272a] rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-sky-500 transition-all duration-300 rounded-full"
+                  className="h-full bg-primary transition-all duration-300 rounded-full"
                   style={{ width: `${Math.max(loadingProgressPercent, 10)}%` }}
                 />
               </div>
@@ -349,7 +351,7 @@ export function DatabasesView() {
               type="button"
               disabled={isBulkLoading}
               onClick={handleLoadAllDatabases}
-              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-medium text-xs py-2.5 rounded shadow-sm transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-semibold text-sm py-3 rounded-xl shadow-xs transition-all"
             >
               {isBulkLoading ? (
                 <>

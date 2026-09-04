@@ -36,12 +36,14 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
     setIsCommitting,
   } = useItemPackageEditStore();
 
+  const pkgMeta = useDatabaseStore((s) => s.metadataMap['itemPackage']);
+
   const pkg: EffectiveItemPackage | undefined = useMemo(() => {
     if (!provider || !packageName) return undefined;
     const repository = provider.getRepository() as LayeredItemPackageRepository | undefined;
     if (!repository || typeof repository.findByPackage !== 'function') return undefined;
     return repository.findByPackage(packageName);
-  }, [provider, packageName]);
+  }, [provider, packageName, pkgMeta]);
 
   useEffect(() => {
     if (pkg) {
@@ -87,6 +89,8 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
 
       await service.commitSession(currentSession, provider as unknown as ItemPackageDatabaseProvider);
 
+      useDatabaseStore.getState().refreshMetadata();
+
       const repo = provider.getRepository() as LayeredItemPackageRepository | undefined;
       const updated = repo?.findByPackage(packageName);
       if (updated) {
@@ -126,18 +130,18 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
 
   return (
     <div
-      className="flex flex-col h-full bg-[#141416] outline-none select-none"
+      className="flex flex-col h-full bg-card/60 outline-none select-none"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
+      <div className="p-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-base font-bold text-neutral-100 font-mono leading-tight">
+            <div className="text-base font-bold text-foreground font-mono leading-tight">
               {pkg.package}
             </div>
-            <div className="text-xs text-neutral-400 mt-0.5">Item Package Bundle</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Item Package Bundle</div>
           </div>
           <div className="flex items-center gap-1.5">
             <button
@@ -146,28 +150,28 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                 const primaryPath = layerProvenance[0] || 'item_package_db.yml';
                 openEntityInYamlEditor(primaryPath, pkg.package, layerProvenance[0]);
               }}
-              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-background text-muted-foreground hover:text-pastel-blue border border-border/80 hover:border-pastel-blue/40 flex items-center gap-1.5 transition-colors"
               title="Open in YAML Editor"
             >
-              <FileCode className="w-3 h-3 text-sky-400" />
+              <FileCode className="w-3.5 h-3.5 text-pastel-blue" />
               <span>YAML</span>
             </button>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-purple-400 border border-[#27272a] flex items-center gap-1">
-              <Package className="w-3 h-3" />
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-pastel-lavender/15 text-pastel-lavender border border-pastel-lavender/30 flex items-center gap-1.5 font-semibold">
+              <Package className="w-3.5 h-3.5" />
               <span>PACKAGE</span>
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+        <div className="flex items-center gap-1.5 mt-3.5 border-t border-border/60 pt-2.5">
           <button
             type="button"
             onClick={() => setCurrentTab('random_options')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'random_options'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Random Options
@@ -175,10 +179,10 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
           <button
             type="button"
             onClick={() => setCurrentTab('groups')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'groups'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Fixed Groups ({effectiveFields.Groups?.length || 0})
@@ -186,10 +190,10 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
           <button
             type="button"
             onClick={() => setCurrentTab('layers')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'layers'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Layers
@@ -208,21 +212,21 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
         )}
 
         {commitError && (
-          <div className="bg-red-950/20 p-3 rounded border border-red-500/20 text-xs text-red-400 break-all">
+          <div className="bg-destructive/10 p-3 rounded-xl border border-destructive/20 text-xs text-destructive break-all">
             {commitError}
           </div>
         )}
 
         {currentTab === 'random_options' && (
-          <div className="space-y-3 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
+          <div className="space-y-3 bg-card p-4 rounded-xl border border-border/80 shadow-xs">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                 Random Options Roll List
               </h3>
               <button
                 type="button"
                 onClick={handleAddRandomOptionItem}
-                className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300"
+                className="flex items-center gap-1.5 text-xs text-pastel-blue font-medium bg-pastel-blue/15 hover:bg-pastel-blue/25 px-2.5 py-1.5 rounded-lg border border-pastel-blue/30 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Item</span>
@@ -230,7 +234,7 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
             </div>
 
             <div className="flex items-center gap-2 mb-2">
-              <label className="text-xs text-neutral-400">Roll Count:</label>
+              <label className="text-xs text-muted-foreground font-medium">Roll Count:</label>
               <Input
                 type="number"
                 value={effectiveFields.RandomOptions?.Count || 1}
@@ -240,14 +244,14 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                     List: effectiveFields.RandomOptions?.List || [],
                   })
                 }
-                className="h-7 w-20 bg-[#141416] border-[#27272a] text-xs font-mono"
+                className="h-8 w-24 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
               />
             </div>
 
             <div className="space-y-2">
               {(effectiveFields.RandomOptions?.List || []).map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-2 rounded bg-[#141416] border border-[#27272a]">
-                  <span className="text-[11px] font-mono text-neutral-500 w-4">{idx + 1}.</span>
+                <div key={idx} className="flex items-center gap-2 p-2.5 rounded-lg bg-background border border-border/80 shadow-xs">
+                  <span className="text-[11px] font-mono text-muted-foreground w-5">{idx + 1}.</span>
                   <Input
                     value={String(item.Item)}
                     onChange={(e) => {
@@ -256,7 +260,7 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                       setField('RandomOptions', { ...effectiveFields.RandomOptions!, List: next });
                     }}
                     placeholder="Item AegisName"
-                    className="h-7 bg-[#1f1f23] border-[#27272a] text-xs font-mono flex-1"
+                    className="h-8 bg-card border-border/80 text-xs font-mono text-foreground flex-1 rounded-lg"
                   />
                   <Input
                     type="number"
@@ -267,12 +271,12 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                       setField('RandomOptions', { ...effectiveFields.RandomOptions!, List: next });
                     }}
                     placeholder="Rate"
-                    className="h-7 w-24 bg-[#1f1f23] border-[#27272a] text-xs font-mono"
+                    className="h-8 w-28 bg-card border-border/80 text-xs font-mono text-foreground rounded-lg"
                   />
                   <button
                     type="button"
                     onClick={() => handleRemoveRandomOptionItem(idx)}
-                    className="p-1 text-neutral-500 hover:text-red-400"
+                    className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-muted transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -283,24 +287,24 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
         )}
 
         {currentTab === 'groups' && (
-          <div className="space-y-3 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
-            <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+          <div className="space-y-3 bg-card p-4 rounded-xl border border-border/80 shadow-xs">
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
               Package Fixed Groups
             </h3>
             {(!effectiveFields.Groups || effectiveFields.Groups.length === 0) ? (
-              <div className="text-xs text-neutral-500 italic">No fixed groups configured for this package.</div>
+              <div className="text-xs text-muted-foreground italic">No fixed groups configured for this package.</div>
             ) : (
               <div className="space-y-3">
                 {effectiveFields.Groups.map((grp, gIdx) => (
-                  <div key={gIdx} className="p-3 rounded bg-[#141416] border border-[#27272a] space-y-2">
+                  <div key={gIdx} className="p-3.5 rounded-xl bg-background border border-border/80 space-y-2 shadow-xs">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-neutral-300">Group Slot #{grp.Group ?? (gIdx + 1)} {grp.Count ? `(Count: ${grp.Count})` : ''}</span>
+                      <span className="font-semibold text-foreground">Group Slot #{grp.Group ?? (gIdx + 1)} {grp.Count ? `(Count: ${grp.Count})` : ''}</span>
                     </div>
                     <div className="space-y-1.5">
                       {(grp.Items || grp.List || []).map((entry, eIdx) => (
-                        <div key={eIdx} className="flex items-center justify-between text-xs font-mono text-neutral-300">
-                          <span>{entry.Item}</span>
-                          <span className="text-neutral-500">
+                        <div key={eIdx} className="flex items-center justify-between text-xs font-mono text-foreground p-1.5 rounded-md hover:bg-muted/40">
+                          <span className="font-medium">{entry.Item}</span>
+                          <span className="text-muted-foreground">
                             {entry.Rate !== undefined ? `Rate: ${entry.Rate / 100}% ` : ''}
                             {entry.Refine ? `+${entry.Refine} ` : ''}
                             {entry.Amount ? `(x${entry.Amount})` : ''}
@@ -320,10 +324,10 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Layer Hierarchy & File Provenance
                 </h3>
-                <span className="text-[10px] font-mono text-neutral-400">
+                <span className="text-[10px] font-mono text-muted-foreground">
                   {layerProvenance.length} layer{layerProvenance.length > 1 ? 's' : ''} loaded
                 </span>
               </div>
@@ -347,38 +351,38 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                   return (
                     <div
                       key={layerId}
-                      className={`p-3 rounded border transition-colors ${
+                      className={`p-3.5 rounded-xl border transition-colors shadow-xs ${
                         isFinalLayer
-                          ? 'bg-sky-950/20 border-sky-500/30'
-                          : 'bg-[#1f1f23] border-[#27272a]'
+                          ? 'bg-pastel-blue/5 border-pastel-blue/40'
+                          : 'bg-card border-border/80'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5">
                           <div
-                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
                               isFinalLayer
-                                ? 'bg-sky-600 text-white'
-                                : 'bg-[#27272a] text-neutral-400'
+                                ? 'bg-pastel-blue text-background font-bold'
+                                : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="text-xs font-mono font-semibold text-neutral-100">
+                            <div className="text-xs font-mono font-semibold text-foreground">
                               {relativePath}
                             </div>
-                            <div className="text-[11px] text-neutral-400">{layerName}</div>
+                            <div className="text-[11px] text-muted-foreground">{layerName}</div>
                           </div>
                         </div>
 
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md border whitespace-nowrap ${
                             relativePath.includes('import')
-                              ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                              ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
                               : isBaseLayer
-                              ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                              : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                              ? 'bg-muted/60 text-muted-foreground border-border/70'
+                              : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30'
                           }`}
                         >
                           {relativePath.includes('import')
@@ -390,15 +394,15 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
                       </div>
 
                       {contributingFields.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                          <div className="text-[10px] text-neutral-500 mb-1">
+                        <div className="mt-2.5 pt-2 border-t border-border/60">
+                          <div className="text-[10px] text-muted-foreground mb-1.5">
                             Active fields from this file ({contributingFields.length}):
                           </div>
                           <div className="flex flex-wrap gap-1">
                             {contributingFields.map((f) => (
                               <span
                                 key={f}
-                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-background text-foreground border border-border/80"
                               >
                                 {f}
                               </span>
@@ -416,12 +420,12 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-between">
+      <div className="p-3.5 border-t border-border/80 bg-card/90 backdrop-blur-xs flex items-center justify-between">
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canUndo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canUndo ? 'text-foreground hover:bg-muted' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={undo}
             disabled={!currentSession.canUndo}
@@ -431,8 +435,8 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canRedo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canRedo ? 'text-foreground hover:bg-muted' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={redo}
             disabled={!currentSession.canRedo}
@@ -445,7 +449,7 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-1.5 text-xs text-muted-foreground hover:text-foreground rounded-lg transition-colors"
             onClick={() => {
               cancelSession();
               startSession(pkg);
@@ -456,10 +460,10 @@ export function ItemPackageInspector({ packageName }: { packageName: string }) {
           </button>
           <button
             type="button"
-            className={`px-3 py-1.5 text-xs rounded font-medium flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs rounded-xl font-medium flex items-center gap-1.5 transition-colors ${
               currentSession.isDirty && validationIssues.length === 0
-                ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                : 'bg-[#27272a] text-neutral-500 cursor-not-allowed'
+                ? 'bg-pastel-blue/20 text-pastel-blue hover:bg-pastel-blue/30 border border-pastel-blue/30 shadow-sm'
+                : 'bg-muted/40 text-muted-foreground/50 border border-border/50 cursor-not-allowed'
             }`}
             onClick={handleSave}
             disabled={!currentSession.isDirty || validationIssues.length > 0 || isCommitting}

@@ -120,18 +120,18 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
   };
 
   const renderSwitch = (label: string, checked: boolean, onChange: (checked: boolean) => void) => (
-    <div className="flex items-center justify-between py-1 border-b border-[#27272a] last:border-0">
-      <span className="text-xs text-neutral-400">{label}</span>
+    <div className="flex items-center justify-between py-2 border-b border-border/60 last:border-0">
+      <span className="text-xs text-muted-foreground font-medium">{label}</span>
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
-          checked ? 'bg-sky-600' : 'bg-[#27272a]'
+        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pastel-blue/30 ${
+          checked ? 'bg-pastel-blue' : 'bg-secondary border border-border/80'
         }`}
       >
         <span
-          className={`inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-3.5' : 'translate-x-0.5'
+          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-xs transition-transform ${
+            checked ? 'translate-x-4.5' : 'translate-x-0.5'
           }`}
         />
       </button>
@@ -139,28 +139,28 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
   );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Flags Section */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setFlagsExpanded(!flagsExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {flagsExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isFlagsModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {flagsExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isFlagsModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Item Flags
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {Object.keys(currentFlags).length === 0 ? 'None' : `${Object.keys(currentFlags).length} set`}
           </span>
         </button>
 
         {flagsExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-1.5">
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-2">
             {renderSwitch('BuyingStore (Available in Buying Stores)', Boolean(currentFlags.BuyingStore), (v) => updateFlags('BuyingStore', v))}
             {renderSwitch('DeadBranch (Dead Branch spawn logic)', Boolean(currentFlags.DeadBranch), (v) => updateFlags('DeadBranch', v))}
             {renderSwitch('Container (Item package/box)', Boolean(currentFlags.Container), (v) => updateFlags('Container', v))}
@@ -169,12 +169,12 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
             {renderSwitch('DropAnnounce (Special drop broadcast)', Boolean(currentFlags.DropAnnounce), (v) => updateFlags('DropAnnounce', v))}
             {renderSwitch('NoConsume (Infinite use / not consumed)', Boolean(currentFlags.NoConsume), (v) => updateFlags('NoConsume', v))}
 
-            <div className="flex items-center justify-between gap-2 py-1 pt-2 border-t border-[#27272a]">
-              <span className="text-xs text-neutral-400">DropEffect</span>
+            <div className="flex items-center justify-between gap-3 py-2 pt-2.5 border-t border-border/60">
+              <span className="text-xs font-medium text-muted-foreground">DropEffect</span>
               <select
                 value={currentFlags.DropEffect || 'None'}
                 onChange={(e) => updateFlags('DropEffect', (e.target.value as ItemDropEffect) || undefined)}
-                className="text-xs font-mono bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-32 text-neutral-200"
+                className="text-xs font-mono bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-36 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               >
                 {ITEM_DROP_EFFECTS.map((eff) => (
                   <option key={eff} value={eff}>
@@ -188,34 +188,34 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
       </div>
 
       {/* Trade Restrictions */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setTradeExpanded(!tradeExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {tradeExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isTradeModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {tradeExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isTradeModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Trade Restrictions (Trade)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {Object.keys(currentTrade).length === 0 ? 'Default' : `${Object.keys(currentTrade).length} rules`}
           </span>
         </button>
 
         {tradeExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-1.5">
-            <div className="flex items-center justify-between py-1 border-b border-[#27272a]">
-              <span className="text-xs text-neutral-400">GM Override Group</span>
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-2">
+            <div className="flex items-center justify-between py-2 border-b border-border/60">
+              <span className="text-xs font-medium text-muted-foreground">GM Override Group</span>
               <input
                 type="number"
                 placeholder="100"
                 value={currentTrade.Override === undefined ? '' : String(currentTrade.Override)}
                 onChange={(e) => updateTrade('Override', e.target.value === '' ? undefined : Number(e.target.value))}
-                className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-24 text-neutral-200"
+                className="text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-28 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               />
             </div>
             {renderSwitch('NoDrop (Cannot drop on ground)', Boolean(currentTrade.NoDrop), (v) => updateTrade('NoDrop', v))}
@@ -232,34 +232,34 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
       </div>
 
       {/* Stack Settings */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setStackExpanded(!stackExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {stackExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isStackModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {stackExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isStackModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Stack Settings (Stack)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {currentStack.Amount ? `Max ${currentStack.Amount}` : 'Default'}
           </span>
         </button>
 
         {stackExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-1.5">
-            <div className="flex items-center justify-between py-1 border-b border-[#27272a]">
-              <span className="text-xs text-neutral-400">Max Stack Amount</span>
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-2">
+            <div className="flex items-center justify-between py-2 border-b border-border/60">
+              <span className="text-xs font-medium text-muted-foreground">Max Stack Amount</span>
               <input
                 type="number"
                 placeholder="None"
                 value={currentStack.Amount === undefined ? '' : String(currentStack.Amount)}
                 onChange={(e) => updateStack('Amount', e.target.value === '' ? undefined : Number(e.target.value))}
-                className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-24 text-neutral-200"
+                className="text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-28 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               />
             </div>
             {renderSwitch('Apply to Inventory', currentStack.Inventory ?? true, (v) => updateStack('Inventory', v))}
@@ -271,44 +271,44 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
       </div>
 
       {/* Delay Settings */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setDelayExpanded(!delayExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {delayExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isDelayModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {delayExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isDelayModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Item Delay (Delay)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {currentDelay.Duration ? `${currentDelay.Duration}s` : 'None'}
           </span>
         </button>
 
         {delayExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-1.5">
-            <div className="flex items-center justify-between py-1 border-b border-[#27272a]">
-              <span className="text-xs text-neutral-400">Duration (Seconds)</span>
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-2">
+            <div className="flex items-center justify-between py-2 border-b border-border/60">
+              <span className="text-xs font-medium text-muted-foreground">Duration (Seconds)</span>
               <input
                 type="number"
                 placeholder="0"
                 value={currentDelay.Duration === undefined ? '' : String(currentDelay.Duration)}
                 onChange={(e) => updateDelay('Duration', e.target.value === '' ? undefined : Number(e.target.value))}
-                className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-24 text-neutral-200"
+                className="text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-28 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               />
             </div>
-            <div className="flex items-center justify-between py-1">
-              <span className="text-xs text-neutral-400">Status Change ID</span>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-xs font-medium text-muted-foreground">Status Change ID</span>
               <input
                 type="text"
                 placeholder="None"
                 value={currentDelay.Status || ''}
                 onChange={(e) => updateDelay('Status', e.target.value || undefined)}
-                className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-32 text-neutral-200"
+                className="text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-36 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               />
             </div>
           </div>
@@ -316,34 +316,34 @@ export function ItemSubstructuresSection({ item }: ItemSubstructuresSectionProps
       </div>
 
       {/* NoUse Restrictions */}
-      <div className="bg-[#1f1f23] rounded border border-[#27272a] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
         <button
           type="button"
           onClick={() => setNoUseExpanded(!noUseExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-left hover:bg-[#27272a]/50 transition-colors"
+          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-accent/40 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            {noUseExpanded ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
-            <span className="text-xs font-medium text-neutral-200 flex items-center gap-1">
-              {isNoUseModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" title="Modified" />}
+          <div className="flex items-center gap-2.5">
+            {noUseExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              {isNoUseModified && <span className="w-2 h-2 rounded-full bg-pastel-blue ring-2 ring-pastel-blue/20" title="Modified" />}
               Unusable Conditions (NoUse)
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
             {Object.keys(currentNoUse).length === 0 ? 'None' : `${Object.keys(currentNoUse).length} rules`}
           </span>
         </button>
 
         {noUseExpanded && (
-          <div className="p-3 border-t border-[#27272a] bg-[#141416]/50 space-y-1.5">
-            <div className="flex items-center justify-between py-1 border-b border-[#27272a]">
-              <span className="text-xs text-neutral-400">GM Override Group</span>
+          <div className="p-4 border-t border-border/60 bg-muted/20 space-y-2">
+            <div className="flex items-center justify-between py-2 border-b border-border/60">
+              <span className="text-xs font-medium text-muted-foreground">GM Override Group</span>
               <input
                 type="number"
                 placeholder="100"
                 value={currentNoUse.Override === undefined ? '' : String(currentNoUse.Override)}
                 onChange={(e) => updateNoUse('Override', e.target.value === '' ? undefined : Number(e.target.value))}
-                className="text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-1 w-24 text-neutral-200"
+                className="text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 w-28 text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-pastel-blue/40"
               />
             </div>
             {renderSwitch('Sitting (Unusable while sitting)', Boolean(currentNoUse.Sitting), (v) => updateNoUse('Sitting', v))}

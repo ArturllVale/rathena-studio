@@ -56,36 +56,36 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
   const totalLinked = combos.length + groups.length + packages.length;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
-          <Link2 className="w-3.5 h-3.5 text-sky-400" />
-          <span>Cross-References & Linked Systems</span>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between px-0.5">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+          <Link2 className="w-4 h-4 text-pastel-blue" />
+          <span>Cross-References &amp; Linked Systems</span>
         </h3>
-        <span className="text-[11px] font-mono text-neutral-400">
+        <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground">
           {totalLinked} linked relation{totalLinked !== 1 ? 's' : ''}
         </span>
       </div>
 
       {/* Item Combos Section */}
-      <div className="bg-[#1f1f23] p-3 rounded border border-[#27272a] space-y-2.5">
+      <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-neutral-200">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <Sparkles className="w-4 h-4 text-pastel-amber" />
             <span>Active Item Combos ({combos.length})</span>
           </div>
         </div>
 
         {combos.length === 0 ? (
-          <div className="text-[11px] text-neutral-500 italic py-1">
+          <div className="text-xs text-muted-foreground italic py-1">
             No item combos found containing this item.
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {combos.map((combo) => (
               <div
                 key={combo.key}
-                className="p-2.5 rounded bg-[#141416] border border-[#27272a] text-xs space-y-1.5"
+                className="p-3 rounded-lg bg-background border border-border/80 text-xs space-y-2 shadow-2xs"
               >
                 <div className="flex flex-wrap items-center gap-1.5">
                   {combo.fields.Combo.map((ci) => {
@@ -93,10 +93,10 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
                     return (
                       <span
                         key={String(ci)}
-                        className={`px-1.5 py-0.5 rounded text-[11px] font-mono border ${
+                        className={`px-2 py-0.5 rounded-md text-xs font-mono border ${
                           isSelf
-                            ? 'bg-sky-950/60 text-sky-300 border-sky-500/40 font-semibold'
-                            : 'bg-[#1f1f23] text-neutral-300 border-[#27272a]'
+                            ? 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/40 font-semibold'
+                            : 'bg-secondary text-secondary-foreground border-border/80'
                         }`}
                       >
                         {String(ci)}
@@ -105,7 +105,7 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
                   })}
                 </div>
                 {combo.fields.Script && (
-                  <pre className="font-mono text-[10px] bg-[#101012] p-1.5 rounded border border-[#27272a]/60 text-emerald-400 whitespace-pre-wrap overflow-x-auto">
+                  <pre className="font-mono text-xs bg-muted/40 p-2.5 rounded-md border border-border/60 text-foreground whitespace-pre-wrap overflow-x-auto leading-relaxed">
                     {combo.fields.Script}
                   </pre>
                 )}
@@ -116,20 +116,20 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
       </div>
 
       {/* Item Groups Section */}
-      <div className="bg-[#1f1f23] p-3 rounded border border-[#27272a] space-y-2.5">
+      <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-neutral-200">
-            <Layers className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Item Groups & Boxes ({groups.length})</span>
+          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <Layers className="w-4 h-4 text-mint" />
+            <span>Item Groups &amp; Boxes ({groups.length})</span>
           </div>
         </div>
 
         {groups.length === 0 ? (
-          <div className="text-[11px] text-neutral-500 italic py-1">
+          <div className="text-xs text-muted-foreground italic py-1">
             This item is not present in any Item Group / Random Box.
           </div>
         ) : (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {groups.map((group) => {
               const allEntries = getItemGroupAllEntries(group.fields);
               const matchedEntries = allEntries.filter(
@@ -140,17 +140,17 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
               return (
                 <div
                   key={group.key}
-                  className="p-2 rounded bg-[#141416] border border-[#27272a] text-xs flex items-center justify-between"
+                  className="p-3 rounded-lg bg-background border border-border/80 text-xs flex items-center justify-between shadow-2xs"
                 >
                   <div>
-                    <span className="font-medium text-neutral-200 font-mono">{group.group}</span>
+                    <span className="font-semibold text-foreground font-mono">{group.group}</span>
                     {group.subGroup !== undefined && (
-                      <span className="text-[10px] text-neutral-400 ml-1.5">SubGroup: {group.subGroup}</span>
+                      <span className="text-xs text-muted-foreground ml-2">SubGroup: {group.subGroup}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+                  <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
                     {matchedEntries.map((m, idx) => (
-                      <span key={idx} className="text-emerald-400">
+                      <span key={idx} className="text-mint font-medium">
                         {m.Rate !== undefined ? `Rate: ${m.Rate / 100}% ` : ''}
                         {m.Amount ? `(x${m.Amount})` : ''}
                       </span>
@@ -164,27 +164,27 @@ export function ItemLinkedSystemsSection({ item }: { item: EffectiveItem }) {
       </div>
 
       {/* Item Packages Section */}
-      <div className="bg-[#1f1f23] p-3 rounded border border-[#27272a] space-y-2.5">
+      <div className="bg-card p-4 rounded-xl border border-border/80 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-neutral-200">
-            <Package className="w-3.5 h-3.5 text-purple-400" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <Package className="w-4 h-4 text-lavender" />
             <span>Item Packages ({packages.length})</span>
           </div>
         </div>
 
         {packages.length === 0 ? (
-          <div className="text-[11px] text-neutral-500 italic py-1">
+          <div className="text-xs text-muted-foreground italic py-1">
             This item is not contained in any Item Package.
           </div>
         ) : (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {packages.map((pkg) => (
               <div
                 key={pkg.key}
-                className="p-2 rounded bg-[#141416] border border-[#27272a] text-xs flex items-center justify-between"
+                className="p-3 rounded-lg bg-background border border-border/80 text-xs flex items-center justify-between shadow-2xs"
               >
-                <span className="font-medium text-neutral-200 font-mono">{pkg.package}</span>
-                <span className="text-[10px] text-neutral-400 font-mono">Package Bundle</span>
+                <span className="font-semibold text-foreground font-mono">{pkg.package}</span>
+                <span className="text-xs text-muted-foreground font-mono px-2 py-0.5 rounded bg-secondary">Package Bundle</span>
               </div>
             ))}
           </div>

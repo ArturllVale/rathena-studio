@@ -20,31 +20,31 @@ export function WorkspaceLandingView() {
     useWorkspaceStore();
 
   return (
-    <div className="h-full w-full overflow-auto p-8 flex flex-col items-center justify-center bg-[#18181b]">
-      <div className="max-w-2xl w-full flex flex-col space-y-6">
+    <div className="h-full w-full overflow-auto p-8 lg:p-12 flex flex-col items-center justify-center bg-background text-foreground">
+      <div className="max-w-2xl w-full flex flex-col space-y-8">
         {/* Main Branding Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl mb-2">
-            <FolderGit2 className="h-8 w-8 text-sky-400" />
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center p-4 bg-pastel-blue/15 border border-pastel-blue/30 rounded-2xl mb-1 shadow-xs">
+            <FolderGit2 className="h-10 w-10 text-pastel-blue" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-100 font-sans">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground font-sans">
             rAthena Studio
           </h1>
-          <p className="text-xs text-neutral-400 font-mono">
+          <p className="text-sm text-muted-foreground font-mono">
             Development Environment for rAthena
           </p>
         </div>
 
         {/* Global Error Banner */}
         {error && (
-          <div className="bg-rose-500/10 border border-rose-500/30 rounded-md p-3 text-xs text-rose-300 flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+          <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 text-xs text-destructive flex items-start justify-between">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
               <span>{error.message}</span>
             </div>
             <button
               onClick={clearError}
-              className="text-neutral-400 hover:text-neutral-200 text-xs ml-2"
+              className="text-muted-foreground hover:text-foreground text-xs ml-3 transition-colors"
             >
               Dismiss
             </button>
@@ -52,25 +52,25 @@ export function WorkspaceLandingView() {
         )}
 
         {/* Workspace State Card */}
-        <Card className="bg-[#1f1f23] border-[#27272a]">
-          <CardHeader className="pb-3">
+        <Card className="border-border/80 shadow-sm rounded-2xl">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="h-4 w-4 text-neutral-400" />
-                <CardTitle className="text-sm font-medium">Workspace Status</CardTitle>
+              <div className="flex items-center gap-2.5">
+                <Layers className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-base font-semibold">Workspace Status</CardTitle>
               </div>
               {activeWorkspace ? (
-                <Badge variant="success" className="gap-1 font-mono text-[10px]">
-                  <CheckCircle2 className="h-3 w-3" />
+                <Badge variant="success" className="gap-1.5 font-mono text-xs px-2.5 py-0.5">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
                   Active
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="font-mono text-[10px] text-neutral-400">
+                <Badge variant="secondary" className="font-mono text-xs text-muted-foreground px-2.5 py-0.5">
                   No workspace selected
                 </Badge>
               )}
             </div>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-muted-foreground mt-1">
               {activeWorkspace
                 ? 'Target directory configured for rAthena server repository.'
                 : 'Select an rAthena server root directory to initialize the workspace engine.'}
@@ -79,42 +79,42 @@ export function WorkspaceLandingView() {
 
           <CardContent className="space-y-4">
             {activeWorkspace ? (
-              <div className="space-y-3">
-                <div className="bg-[#141416] p-3 rounded-md border border-[#27272a] space-y-1">
-                  <div className="text-[11px] text-neutral-500 font-mono uppercase tracking-wider">
+              <div className="space-y-3.5">
+                <div className="bg-muted/30 p-3.5 rounded-xl border border-border/80 space-y-1">
+                  <div className="text-[11px] text-muted-foreground font-mono uppercase tracking-wider font-semibold">
                     Root Path
                   </div>
-                  <div className="text-xs font-mono text-neutral-200 break-all">
+                  <div className="text-xs font-mono text-foreground break-all">
                     {activeWorkspace.rootPath}
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <div className="bg-[#141416] p-2.5 rounded border border-[#27272a] flex items-center gap-2">
-                    <Database className="h-4 w-4 text-sky-400 shrink-0" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-muted/20 p-3 rounded-xl border border-border/80 flex items-center gap-3">
+                    <Database className="h-5 w-5 text-pastel-blue shrink-0" />
                     <div className="truncate">
-                      <div className="text-[10px] text-neutral-500 font-mono">Database</div>
-                      <div className="text-xs font-mono text-neutral-300 truncate">
+                      <div className="text-[10px] text-muted-foreground font-mono">Database</div>
+                      <div className="text-xs font-mono text-foreground font-medium truncate">
                         {activeWorkspace.detectedPaths?.dbPath ? 'db/' : 'Not found'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#141416] p-2.5 rounded border border-[#27272a] flex items-center gap-2">
-                    <FileCode className="h-4 w-4 text-amber-400 shrink-0" />
+                  <div className="bg-muted/20 p-3 rounded-xl border border-border/80 flex items-center gap-3">
+                    <FileCode className="h-5 w-5 text-amber-500 shrink-0" />
                     <div className="truncate">
-                      <div className="text-[10px] text-neutral-500 font-mono">Configuration</div>
-                      <div className="text-xs font-mono text-neutral-300 truncate">
+                      <div className="text-[10px] text-muted-foreground font-mono">Configuration</div>
+                      <div className="text-xs font-mono text-foreground font-medium truncate">
                         {activeWorkspace.detectedPaths?.confPath ? 'conf/' : 'Not found'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#141416] p-2.5 rounded border border-[#27272a] flex items-center gap-2">
-                    <Server className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <div className="bg-muted/20 p-3 rounded-xl border border-border/80 flex items-center gap-3">
+                    <Server className="h-5 w-5 text-mint shrink-0" />
                     <div className="truncate">
-                      <div className="text-[10px] text-neutral-500 font-mono">NPC Scripts</div>
-                      <div className="text-xs font-mono text-neutral-300 truncate">
+                      <div className="text-[10px] text-muted-foreground font-mono">NPC Scripts</div>
+                      <div className="text-xs font-mono text-foreground font-medium truncate">
                         {activeWorkspace.detectedPaths?.npcPath ? 'npc/' : 'Not found'}
                       </div>
                     </div>
@@ -122,36 +122,40 @@ export function WorkspaceLandingView() {
                 </div>
               </div>
             ) : (
-              <div className="py-6 flex flex-col items-center justify-center text-center space-y-2 border border-dashed border-[#2e2e33] rounded-md bg-[#141416]/50">
-                <FolderOpen className="h-8 w-8 text-neutral-600 mb-1" />
-                <p className="text-xs text-neutral-400">
-                  Choose the root folder of your rAthena repository.
-                </p>
-                <p className="text-[11px] text-neutral-600 font-mono">
-                  Contains db/, conf/, and server binaries
-                </p>
+              <div className="py-10 flex flex-col items-center justify-center text-center space-y-3 border border-dashed border-border rounded-xl bg-muted/20">
+                <div className="p-3 bg-secondary rounded-xl">
+                  <FolderOpen className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-foreground">
+                    Choose the root folder of your rAthena repository
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-mono">
+                    Must contain db/, conf/, or server configuration files
+                  </p>
+                </div>
               </div>
             )}
           </CardContent>
 
-          <CardFooter className="pt-2 flex items-center justify-between border-t border-[#27272a]">
+          <CardFooter className="pt-3 flex items-center justify-between border-t border-border/80">
             {activeWorkspace ? (
               <>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={closeWorkspace}
-                  className="text-xs gap-1.5 text-neutral-400 hover:text-rose-400"
+                  className="text-xs gap-2 text-muted-foreground hover:text-destructive hover:border-destructive/40"
                 >
                   <XCircle className="h-3.5 w-3.5" />
                   Close Workspace
                 </Button>
                 <Button
-                  variant="ide"
+                  variant="default"
                   size="sm"
                   onClick={openWorkspaceDirectory}
                   disabled={isLoading}
-                  className="text-xs gap-1.5"
+                  className="text-xs gap-2"
                 >
                   {isLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -165,10 +169,10 @@ export function WorkspaceLandingView() {
               <div className="w-full flex justify-center">
                 <Button
                   variant="default"
-                  size="default"
+                  size="lg"
                   onClick={openWorkspaceDirectory}
                   disabled={isLoading}
-                  className="w-full max-w-sm gap-2 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white"
+                  className="w-full max-w-sm gap-2.5 text-xs font-semibold"
                 >
                   {isLoading ? (
                     <>

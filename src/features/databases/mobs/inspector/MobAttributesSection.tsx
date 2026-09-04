@@ -46,22 +46,22 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
   };
 
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
       {/* Primary Classification */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Classification &amp; Element
         </h3>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Size */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Monster Size</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Monster Size</label>
             <Select
               value={currentSize}
               onValueChange={(val) => setField('Size', val as MobSize)}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background">
                 <SelectValue placeholder="Size" />
               </SelectTrigger>
               <SelectContent>
@@ -75,13 +75,13 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
           </div>
 
           {/* Race */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Monster Race</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Monster Race</label>
             <Select
               value={currentRace}
               onValueChange={(val) => setField('Race', val as MobRace)}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background">
                 <SelectValue placeholder="Race" />
               </SelectTrigger>
               <SelectContent>
@@ -95,13 +95,13 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
           </div>
 
           {/* Element */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Element Attribute</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Element Attribute</label>
             <Select
               value={currentElement}
               onValueChange={(val) => setField('Element', val as MobElement)}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background">
                 <SelectValue placeholder="Element" />
               </SelectTrigger>
               <SelectContent>
@@ -115,13 +115,13 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
           </div>
 
           {/* Element Level */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Element Level (1-4)</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Element Level (1-4)</label>
             <Select
               value={String(currentElementLevel)}
               onValueChange={(val) => setField('ElementLevel', Number(val))}
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background">
                 <SelectValue placeholder="Level" />
               </SelectTrigger>
               <SelectContent>
@@ -137,23 +137,23 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
       </div>
 
       {/* Secondary Race Groups */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-1.5">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-2.5">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Secondary Race Groups ({Object.keys(currentRaceGroups).length} active)
           </h3>
           {Object.keys(currentRaceGroups).length > 0 && (
             <button
               type="button"
               onClick={() => setField('RaceGroups', undefined)}
-              className="text-[10px] text-red-400 hover:text-red-300 font-mono"
+              className="text-xs text-destructive hover:underline font-mono"
             >
               Clear All
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap gap-1 pt-0.5">
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {MOB_RACE_GROUPS.map((grp) => {
             const isSelected = Boolean(currentRaceGroups[grp]);
             return (
@@ -161,10 +161,10 @@ export function MobAttributesSection({ mob }: MobAttributesSectionProps) {
                 key={grp}
                 type="button"
                 onClick={() => toggleRaceGroup(grp)}
-                className={`px-1.5 py-0.5 rounded text-[11px] font-mono transition-colors border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors border shadow-2xs ${
                   isSelected
-                    ? 'bg-sky-600/30 text-sky-200 border-sky-500/50 font-medium'
-                    : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border-[#27272a]'
+                    ? 'bg-primary/15 text-primary border-primary/30 font-semibold'
+                    : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
                 }`}
               >
                 {grp}

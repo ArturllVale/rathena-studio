@@ -99,37 +99,37 @@ export function CreateComboModal({ isOpen, onClose }: CreateComboModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-      <div className="bg-[#1f1f23] border border-[#27272a] rounded-lg max-w-lg w-full p-4 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-[#27272a] pb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded bg-sky-500/10 text-sky-400">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-card border border-border/80 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-border/80 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-pastel-blue/15 text-pastel-blue border border-pastel-blue/30">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-neutral-100">Create New Item Combo</h2>
-              <p className="text-[11px] text-neutral-400">Define a set of items and the bonus script granted</p>
+              <h2 className="text-sm font-semibold text-foreground">Create New Item Combo</h2>
+              <p className="text-[11px] text-muted-foreground">Define a set of items and the bonus script granted</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 text-neutral-400 hover:text-neutral-200">
+          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {errorMessage && (
-          <div className="bg-red-950/20 border border-red-500/20 p-2.5 rounded text-xs text-red-400">
+          <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-xl text-xs text-destructive">
             {errorMessage}
           </div>
         )}
 
-        <div className="space-y-3 text-xs">
+        <div className="space-y-3.5 text-xs">
           {/* Target Layer */}
           <div>
-            <label className="block text-neutral-400 mb-1">Target File Layer</label>
+            <label className="block text-muted-foreground mb-1 font-medium">Target File Layer</label>
             <select
               value={selectedLayerId}
               onChange={(e) => setSelectedLayerId(e.target.value)}
-              className="w-full bg-[#141416] border border-[#27272a] rounded px-2.5 py-1.5 text-neutral-200"
+              className="w-full h-9 bg-background border border-border/80 rounded-xl px-3 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-pastel-blue/40"
             >
               {availableLayers.map((l) => (
                 <option key={l.layer.id} value={l.layer.id}>
@@ -140,13 +140,13 @@ export function CreateComboModal({ isOpen, onClose }: CreateComboModalProps) {
           </div>
 
           {/* Combo Items */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-neutral-400">Combo Items (AegisName or ID)</label>
+              <label className="text-muted-foreground font-medium">Combo Items (AegisName or ID)</label>
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300"
+                className="flex items-center gap-1 text-[11px] text-pastel-blue hover:underline font-medium"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Item</span>
@@ -156,18 +156,18 @@ export function CreateComboModal({ isOpen, onClose }: CreateComboModalProps) {
             <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
               {items.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-neutral-500 w-4">{idx + 1}.</span>
+                  <span className="text-[11px] font-mono text-muted-foreground w-4">{idx + 1}.</span>
                   <Input
                     value={item}
                     onChange={(e) => handleItemChange(idx, e.target.value)}
                     placeholder={`e.g. ${idx === 0 ? 'Apple' : 'Banana'}`}
-                    className="h-8 bg-[#141416] border-[#27272a] text-xs"
+                    className="h-9 bg-background border-border/80 text-xs text-foreground rounded-xl"
                   />
                   {items.length > 2 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(idx)}
-                      className="p-1.5 text-neutral-500 hover:text-red-400"
+                      className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-muted transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -179,21 +179,21 @@ export function CreateComboModal({ isOpen, onClose }: CreateComboModalProps) {
 
           {/* Script */}
           <div>
-            <label className="block text-neutral-400 mb-1">Bonus Script</label>
+            <label className="block text-muted-foreground mb-1 font-medium">Bonus Script</label>
             <textarea
               value={script}
               onChange={(e) => setScript(e.target.value)}
               rows={3}
-              className="w-full bg-[#141416] border border-[#27272a] rounded p-2 text-xs font-mono text-emerald-400"
+              className="w-full bg-background border border-border/80 rounded-xl p-3 text-xs font-mono text-emerald-500 dark:text-emerald-400 focus-visible:ring-1 focus-visible:ring-pastel-blue/40"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-[#27272a] pt-3">
+        <div className="flex items-center justify-end gap-2 border-t border-border/80 pt-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             Cancel
           </button>
@@ -201,7 +201,7 @@ export function CreateComboModal({ isOpen, onClose }: CreateComboModalProps) {
             type="button"
             disabled={isSubmitting}
             onClick={handleCreate}
-            className="px-3 py-1.5 rounded text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-pastel-blue/20 text-pastel-blue border border-pastel-blue/30 hover:bg-pastel-blue/30 flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
             <span>Create Combo</span>

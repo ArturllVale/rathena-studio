@@ -40,11 +40,13 @@ export function MobInspector({ mobId }: { mobId: number }) {
     setIsCommitting,
   } = useMobEditStore();
 
+  const mobMeta = useDatabaseStore((s) => s.metadataMap['mob']);
+
   const mob = useMemo(() => {
     if (!provider) return null;
     const repo = provider.getRepository() as LayeredMobRepository | undefined;
     return repo?.findById ? repo.findById(mobId) : null;
-  }, [provider, mobId]);
+  }, [provider, mobId, mobMeta]);
 
   useEffect(() => {
     if (mob) {
@@ -92,6 +94,14 @@ export function MobInspector({ mobId }: { mobId: number }) {
 
     try {
       await transactionService.commitSession(currentSession, provider as unknown as MobDatabaseProvider);
+
+      useDatabaseStore.getState().refreshMetadata();
+
+      const repo = provider.getRepository() as LayeredMobRepository | undefined;
+      const updatedMob = repo?.findById(mobId);
+      if (updatedMob) {
+        startSession(updatedMob);
+      }
     } catch (e) {
       setCommitError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -114,52 +124,54 @@ export function MobInspector({ mobId }: { mobId: number }) {
 
   return (
     <div
-      className="flex flex-col h-full bg-[#141416] outline-none select-none"
+      className="flex flex-col h-full bg-card outline-none select-none"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-lg font-bold text-neutral-100 leading-tight">
+      <div className="p-5 border-b border-border/80 bg-card/80 backdrop-blur">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-xl font-bold text-foreground leading-snug truncate">
               {fields.Name || 'Unknown Monster'}
             </div>
-            <div className="text-xs font-mono text-sky-400 mt-0.5">{fields.AegisName || 'Unknown'}</div>
+            <div className="text-xs font-mono text-pastel-blue mt-0.5 font-semibold tracking-wide">
+              {fields.AegisName || 'Unknown'}
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => {
                 const primaryPath = (Object.values(mob.fieldOrigins) as MobFieldOrigin[])[0]?.filePath || layerProvenance[0] || 'mob_db.yml';
                 openEntityInYamlEditor(primaryPath, mob.id, layerProvenance[0]);
               }}
-              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              className="text-xs font-mono px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border/60 hover:border-primary/40 flex items-center gap-1.5 transition-colors shadow-2xs"
               title="Open in YAML Editor"
             >
-              <FileCode className="w-3 h-3 text-sky-400" />
+              <FileCode className="w-3.5 h-3.5 text-primary" />
               <span>YAML</span>
             </button>
             {fields.Class && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-500/30">
+              <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-pastel-blue/15 text-pastel-blue border border-pastel-blue/30 font-semibold">
                 {fields.Class}
               </span>
             )}
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-400 border border-[#27272a]">
+            <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-secondary text-muted-foreground border border-border/60 font-semibold">
               #{mob.id}
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+        <div className="flex flex-wrap items-center gap-1.5 mt-4 border-t border-border/60 pt-3">
           <button
             type="button"
             onClick={() => setCurrentTab('general')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'general'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
@@ -169,10 +181,10 @@ export function MobInspector({ mobId }: { mobId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('attributes')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'attributes'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
@@ -182,10 +194,10 @@ export function MobInspector({ mobId }: { mobId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('modes')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'modes'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -195,10 +207,10 @@ export function MobInspector({ mobId }: { mobId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('drops')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'drops'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Gift className="w-3.5 h-3.5" />
@@ -208,10 +220,10 @@ export function MobInspector({ mobId }: { mobId: number }) {
           <button
             type="button"
             onClick={() => setCurrentTab('provenance')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
               currentTab === 'provenance'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -221,7 +233,7 @@ export function MobInspector({ mobId }: { mobId: number }) {
       </div>
 
       {/* Main Tab Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
         {/* Semantic Diff Preview */}
         {isDirty && (
           <SemanticDiffViewer
@@ -232,7 +244,7 @@ export function MobInspector({ mobId }: { mobId: number }) {
         )}
 
         {currentTab === 'general' && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <MobIdentitySection mob={mob} />
             <MobCombatSection mob={mob} />
           </div>
@@ -247,15 +259,15 @@ export function MobInspector({ mobId }: { mobId: number }) {
         {currentTab === 'provenance' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Layer Hierarchy &amp; File Provenance
               </h3>
-              <span className="text-[10px] font-mono text-neutral-400">
+              <span className="text-xs font-mono text-muted-foreground">
                 {layerProvenance.length} layer{layerProvenance.length > 1 ? 's' : ''} loaded
               </span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {layerProvenance.map((layerId: string, idx: number) => {
                 const repository = provider ? (provider.getRepository() as LayeredMobRepository | undefined) : undefined;
                 const layerData = repository?.getLayer ? repository.getLayer(layerId) : undefined;
@@ -274,34 +286,34 @@ export function MobInspector({ mobId }: { mobId: number }) {
                 return (
                   <div
                     key={layerId}
-                    className={`p-3 rounded border transition-colors ${
+                    className={`p-4 rounded-xl border transition-all ${
                       isFinalLayer
-                        ? 'bg-sky-950/20 border-sky-500/30'
-                        : 'bg-[#1f1f23] border-[#27272a]'
+                        ? 'bg-primary/5 border-primary/30 shadow-2xs'
+                        : 'bg-card border-border/80'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
-                            isFinalLayer ? 'bg-sky-600 text-white' : 'bg-[#27272a] text-neutral-400'
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono font-bold ${
+                            isFinalLayer ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
                           }`}
                         >
                           {idx + 1}
                         </div>
                         <div>
-                          <div className="text-xs font-mono font-semibold text-neutral-100">{relativePath}</div>
-                          <div className="text-[11px] text-neutral-400">{layerName}</div>
+                          <div className="text-sm font-mono font-semibold text-foreground">{relativePath}</div>
+                          <div className="text-xs text-muted-foreground">{layerName}</div>
                         </div>
                       </div>
 
                       <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                        className={`text-xs font-mono px-2.5 py-1 rounded-full border whitespace-nowrap font-medium ${
                           relativePath.includes('import')
-                            ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                            ? 'bg-lavender/15 text-lavender border-lavender/30'
                             : isBaseLayer
-                            ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                            : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                            ? 'bg-secondary text-muted-foreground border-border/60'
+                            : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30'
                         }`}
                       >
                         {relativePath.includes('import')
@@ -313,15 +325,15 @@ export function MobInspector({ mobId }: { mobId: number }) {
                     </div>
 
                     {contributingFields.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                        <div className="text-[10px] text-neutral-500 mb-1">
+                      <div className="mt-3 pt-3 border-t border-border/60">
+                        <div className="text-xs text-muted-foreground mb-1.5 font-medium">
                           Active fields from this file ({contributingFields.length}):
                         </div>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1.5">
                           {contributingFields.map((f) => (
                             <span
                               key={f}
-                              className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                              className="px-2 py-0.5 rounded-md text-xs font-mono bg-secondary text-secondary-foreground border border-border/60"
                             >
                               {f}
                             </span>
@@ -338,12 +350,12 @@ export function MobInspector({ mobId }: { mobId: number }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-between">
-        <div className="flex items-center gap-1">
+      <div className="p-4 border-t border-border/80 bg-card/80 backdrop-blur flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canUndo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canUndo ? 'text-foreground hover:bg-accent/80' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={undo}
             disabled={!currentSession.canUndo}
@@ -353,8 +365,8 @@ export function MobInspector({ mobId }: { mobId: number }) {
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canRedo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canRedo ? 'text-foreground hover:bg-accent/80' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={redo}
             disabled={!currentSession.canRedo}
@@ -364,13 +376,13 @@ export function MobInspector({ mobId }: { mobId: number }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          {commitError && <div className="text-xs text-red-400 font-mono truncate max-w-xs">{commitError}</div>}
+        <div className="flex items-center gap-2.5">
+          {commitError && <div className="text-xs text-destructive font-mono truncate max-w-xs">{commitError}</div>}
           <button
             type="button"
             disabled={!isDirty || isCommitting}
             onClick={reset}
-            className="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200 disabled:opacity-40"
+            className="px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/60 transition-colors disabled:opacity-40"
           >
             Discard
           </button>
@@ -378,7 +390,11 @@ export function MobInspector({ mobId }: { mobId: number }) {
             type="button"
             disabled={!isDirty || isCommitting || validationIssues.some((i) => i.severity === 'error')}
             onClick={handleCommit}
-            className="px-4 py-1.5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white rounded flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-sky-600 transition-colors shadow-sm"
+            className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all shadow-xs ${
+              isDirty && !validationIssues.some((i) => i.severity === 'error')
+                ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                : 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
+            }`}
           >
             {isCommitting ? (
               <>

@@ -154,17 +154,17 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
   };
 
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
       {/* Resource Costs Card */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
-        <div className="flex items-center gap-1.5 mb-1">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="w-4 h-4 text-pastel-blue" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Resource &amp; Stat Costs
           </h3>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {RESOURCE_COST_FIELDS.map(({ key, label, desc }) => {
             const rawVal = currentRequires[key];
             const isMatrix = Array.isArray(rawVal);
@@ -175,20 +175,20 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
             return (
               <div
                 key={key}
-                className="bg-[#141416] p-2 rounded border border-[#27272a]/60 space-y-1.5"
+                className="bg-accent/20 p-3 rounded-xl border border-border/70 space-y-2"
               >
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex flex-col">
-                    <span className="text-xs font-medium text-neutral-300 flex items-center gap-1">
-                      {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />}
+                    <span className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                      {isModified && <span className="w-1.5 h-1.5 rounded-full bg-pastel-blue shrink-0" />}
                       {label}
                     </span>
-                    <span className="text-[10px] text-neutral-500">{desc}</span>
+                    <span className="text-xs text-muted-foreground mt-0.5">{desc}</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     {!isMatrix ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <input
                           type="number"
                           placeholder="0"
@@ -199,32 +199,32 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
                               e.target.value === '' ? undefined : Number(e.target.value)
                             )
                           }
-                          className={`w-20 sm:w-24 text-xs font-mono text-right bg-[#1f1f23] border rounded px-2 py-0.5 h-6.5 ${
-                            isModified ? 'border-sky-500/50 text-sky-200' : 'border-[#27272a] text-neutral-200'
+                          className={`w-24 sm:w-28 text-sm font-mono text-right bg-background border rounded-lg px-3 py-1.5 h-9 ${
+                            isModified ? 'border-primary text-primary bg-primary/5' : 'border-border/80 text-foreground focus:border-primary/50'
                           }`}
                         />
                         <button
                           type="button"
                           onClick={() => convertToCostMatrix(key)}
-                          className="px-1.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 hover:text-sky-300 bg-[#1f1f23] border border-[#27272a] flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-mono text-muted-foreground hover:text-foreground bg-secondary border border-border/60 flex items-center gap-1 shadow-2xs transition-colors"
                           title="Convert to Per-Level Matrix"
                         >
-                          <Layers className="w-3 h-3" /> Scale
+                          <Layers className="w-3.5 h-3.5" /> Scale
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => toggleCostMatrix(key)}
-                          className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-600/20 text-sky-300 border border-sky-500/40"
+                          className="px-3 py-1.5 rounded-lg text-xs font-mono bg-primary/15 text-primary border border-primary/30 font-medium shadow-2xs"
                         >
                           {rawVal.length} Levels Defined {expandedCostMatrix[key] ? '▲' : '▼'}
                         </button>
                         <button
                           type="button"
                           onClick={() => convertToCostScalar(key)}
-                          className="px-1.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 hover:text-neutral-200 bg-[#1f1f23] border border-[#27272a]"
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-mono text-muted-foreground hover:text-foreground bg-secondary border border-border/60 transition-colors shadow-2xs"
                           title="Convert back to single uniform value"
                         >
                           Uniform
@@ -236,20 +236,20 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
 
                 {/* Level Cost Matrix Table View */}
                 {isMatrix && expandedCostMatrix[key] && (
-                  <div className="pt-2 border-t border-[#27272a]/50 grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                  <div className="pt-2.5 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {rawVal.map((item, idx) => (
                       <div
                         key={item.Level || idx + 1}
-                        className="flex items-center justify-between bg-[#1f1f23] border border-[#27272a] rounded px-2 py-1 text-xs font-mono"
+                        className="flex items-center justify-between bg-card border border-border/80 rounded-lg px-3 py-2 text-xs font-mono shadow-2xs"
                       >
-                        <span className="text-[10px] text-neutral-400 font-medium shrink-0">
+                        <span className="text-xs text-muted-foreground font-medium shrink-0">
                           Lv.{item.Level}
                         </span>
                         <input
                           type="number"
                           value={item.Amount}
                           onChange={(e) => updateCostMatrixLevel(key, idx, Number(e.target.value))}
-                          className="w-full min-w-0 text-right bg-transparent text-neutral-200 outline-none text-xs font-mono pl-1.5"
+                          className="w-full min-w-0 text-right bg-transparent text-foreground outline-none text-xs font-mono pl-2 font-semibold"
                         />
                       </div>
                     ))}
@@ -262,25 +262,25 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
       </div>
 
       {/* State & Ammo Special Conditions */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2.5">
-        <div className="flex items-center gap-1.5">
-          <Crosshair className="w-3.5 h-3.5 text-emerald-400" />
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-center gap-2">
+          <Crosshair className="w-4 h-4 text-pastel-mint" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Required State &amp; Ammunition
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Required State Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Required State</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Required State</label>
             <Select
               value={currentState}
               onValueChange={(val) =>
                 updateRequiresField('State', val === 'None' ? undefined : (val as SkillRequiredState))
               }
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent>
@@ -294,15 +294,15 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
           </div>
 
           {/* Required Ammo Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-neutral-400 font-medium">Required Ammo</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground font-medium">Required Ammo</label>
             <Select
               value={currentAmmo}
               onValueChange={(val) =>
                 updateRequiresField('Ammo', val === 'None' ? undefined : (val as SkillAmmoType))
               }
             >
-              <SelectTrigger className="h-6.5 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-sm font-mono border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Ammo" />
               </SelectTrigger>
               <SelectContent>
@@ -317,8 +317,8 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
         </div>
 
         {/* Ammo Amount per Cast */}
-        <div className="flex items-center justify-between py-1 border-t border-[#27272a]/40">
-          <span className="text-xs text-neutral-400 font-medium">Ammo Amount per Cast</span>
+        <div className="flex items-center justify-between py-2 border-t border-border/60">
+          <span className="text-xs text-muted-foreground font-medium">Ammo Amount per Cast</span>
           {typeof currentRequires.AmmoAmount === 'number' || currentRequires.AmmoAmount === undefined ? (
             <input
               type="number"
@@ -330,47 +330,47 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
                   e.target.value === '' ? undefined : Number(e.target.value)
                 )
               }
-              className="w-20 sm:w-24 text-xs font-mono text-right bg-[#141416] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+              className="w-24 sm:w-28 text-sm font-mono text-right bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
             />
           ) : (
-            <span className="text-[11px] font-mono text-sky-400">Scaled Array</span>
+            <span className="text-xs font-mono text-pastel-blue">Scaled Array</span>
           )}
         </div>
       </div>
 
       {/* Item Requirements Table */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Item / Catalyst Consumables ({currentItemCosts.length})
           </h3>
           <button
             type="button"
             onClick={addItemCost}
-            className="flex items-center gap-1 text-[11px] font-mono bg-sky-600 hover:bg-sky-500 text-white px-2 py-0.5 rounded transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
           >
-            <Plus className="w-3 h-3" /> Add Item
+            <Plus className="w-3.5 h-3.5" /> Add Item
           </button>
         </div>
 
         {currentItemCosts.length === 0 ? (
-          <div className="p-2 text-center text-[11px] text-neutral-500 bg-[#141416] rounded border border-[#27272a]/40 font-mono">
+          <div className="p-6 text-center text-xs text-muted-foreground bg-accent/20 rounded-xl border border-dashed border-border/80 font-mono">
             No item catalysts or consumables required.
           </div>
         ) : (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {currentItemCosts.map((cost, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1.5 p-1.5 rounded bg-[#141416] border border-[#27272a]"
+                className="flex items-center gap-2 p-2 rounded-xl bg-card border border-border/80 hover:border-border transition-colors shadow-2xs"
               >
-                <div className="w-4 text-center text-[10px] font-mono text-neutral-500 shrink-0">#{idx + 1}</div>
+                <div className="w-6 text-center text-xs font-mono text-muted-foreground shrink-0">#{idx + 1}</div>
                 <input
                   type="text"
                   placeholder="Item AegisName (e.g. Red_Gemstone)"
                   value={cost.Item}
                   onChange={(e) => updateItemCost(idx, { Item: e.target.value })}
-                  className="flex-1 min-w-0 text-xs font-mono bg-[#1f1f23] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+                  className="flex-1 min-w-0 text-xs font-mono bg-background border border-border/80 rounded-lg px-3 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
                   autoFocus={cost.Item === ''}
                 />
                 <input
@@ -378,14 +378,14 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
                   placeholder="Qty"
                   value={cost.Amount}
                   onChange={(e) => updateItemCost(idx, { Amount: Number(e.target.value) })}
-                  className="w-16 text-xs font-mono text-right bg-[#1f1f23] border border-[#27272a] rounded px-2 py-0.5 h-6.5 text-neutral-200"
+                  className="w-20 text-xs font-mono text-right bg-background border border-border/80 rounded-lg px-2.5 py-1.5 h-9 text-foreground focus:border-primary/50 outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => removeItemCost(idx)}
-                  className="p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-red-950/20 transition-colors"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -394,24 +394,24 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
       </div>
 
       {/* Weapon Requirements Grid */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-2">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-            <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-pastel-peach" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Weapon Requirements ({Object.keys(currentWeapons).length === 0 ? 'All / None' : Object.keys(currentWeapons).length})
             </h3>
           </div>
           <button
             type="button"
             onClick={toggleAllWeapons}
-            className="text-[10px] font-mono text-sky-400 hover:text-sky-300"
+            className="text-xs font-mono text-primary hover:underline font-medium"
           >
             {ALL_SKILL_WEAPONS.every((w) => currentWeapons[w]) ? 'Clear All' : 'Select All'}
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {ALL_SKILL_WEAPONS.map((w) => {
             const isSelected = Boolean(currentWeapons[w]);
             return (
@@ -419,10 +419,10 @@ export function SkillRequirementsSection({ skill }: SkillRequirementsSectionProp
                 key={w}
                 type="button"
                 onClick={() => toggleWeapon(w)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors border shadow-2xs ${
                   isSelected
-                    ? 'bg-sky-600/30 text-sky-200 border-sky-500/50 font-medium'
-                    : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border-[#27272a]'
+                    ? 'bg-primary/15 text-primary border-primary/30 font-semibold'
+                    : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
                 }`}
               >
                 {w}

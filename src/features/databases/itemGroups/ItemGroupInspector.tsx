@@ -29,33 +29,33 @@ interface ItemGroupEntryCardProps {
 
 function ItemGroupEntryCard({ entry, index, totalInList, onChange, onRemove }: ItemGroupEntryCardProps) {
   return (
-    <div className="p-3 rounded bg-[#1f1f23] border border-[#27272a] space-y-2.5 text-xs">
+    <div className="p-4 rounded-xl bg-card border border-border/80 space-y-3 text-xs shadow-xs">
       {/* Top Row: Index + Item + Remove */}
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-mono text-neutral-500 w-5 shrink-0">#{index + 1}</span>
+        <span className="text-[11px] font-mono text-muted-foreground w-6 shrink-0">#{index + 1}</span>
         <div className="flex-1 min-w-0">
           <Input
             value={String(entry.Item ?? '')}
             onChange={(e) => onChange({ Item: e.target.value })}
             placeholder="Item AegisName or ID"
-            className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
-        <div className="w-20 shrink-0">
+        <div className="w-24 shrink-0">
           <Input
             type="number"
             value={entry.Index ?? ''}
             onChange={(e) => onChange({ Index: e.target.value ? Number(e.target.value) : undefined })}
             placeholder="Index"
             title="Explicit Index (optional)"
-            className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono text-center"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-center text-foreground rounded-lg"
           />
         </div>
         {totalInList > 1 && (
           <button
             type="button"
             onClick={onRemove}
-            className="p-1.5 text-neutral-500 hover:text-red-400 shrink-0 rounded hover:bg-[#27272a]"
+            className="p-2 text-muted-foreground hover:text-destructive shrink-0 rounded-lg hover:bg-muted transition-colors"
             title="Remove item entry"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -64,52 +64,52 @@ function ItemGroupEntryCard({ entry, index, totalInList, onChange, onRemove }: I
       </div>
 
       {/* Row 2: Rate, Amount, Duration, RandomOptionGroup */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Rate</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Rate</label>
           <Input
             type="number"
             value={entry.Rate ?? 0}
             onChange={(e) => onChange({ Rate: Number(e.target.value) })}
             placeholder="0"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Amount</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Amount</label>
           <Input
             type="number"
             value={entry.Amount ?? 1}
             onChange={(e) => onChange({ Amount: Number(e.target.value) })}
             placeholder="1"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Duration (min)</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Duration (min)</label>
           <Input
             type="number"
             value={entry.Duration ?? 0}
             onChange={(e) => onChange({ Duration: e.target.value ? Number(e.target.value) : undefined })}
             placeholder="0"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Random Option Group</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Random Option Group</label>
           <Input
             value={entry.RandomOptionGroup ?? ''}
             onChange={(e) => onChange({ RandomOptionGroup: e.target.value || undefined })}
             placeholder="e.g. ROPTG_PHYSICAL"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
       </div>
 
       {/* Row 3: Refine Min/Max & Bound */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2.5">
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Refine Min</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Refine Min</label>
           <Input
             type="number"
             min={0}
@@ -117,11 +117,11 @@ function ItemGroupEntryCard({ entry, index, totalInList, onChange, onRemove }: I
             value={entry.RefineMinimum ?? 0}
             onChange={(e) => onChange({ RefineMinimum: e.target.value ? Number(e.target.value) : undefined })}
             placeholder="0"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Refine Max</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Refine Max</label>
           <Input
             type="number"
             min={0}
@@ -129,15 +129,15 @@ function ItemGroupEntryCard({ entry, index, totalInList, onChange, onRemove }: I
             value={entry.RefineMaximum ?? 0}
             onChange={(e) => onChange({ RefineMaximum: e.target.value ? Number(e.target.value) : undefined })}
             placeholder="0"
-            className="h-7 bg-[#141416] border-[#27272a] text-xs font-mono"
+            className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
           />
         </div>
         <div>
-          <label className="text-[10px] text-neutral-400 block mb-1">Bound</label>
+          <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Bound</label>
           <select
             value={String(entry.Bound ?? 'None')}
             onChange={(e) => onChange({ Bound: e.target.value === 'None' ? undefined : e.target.value })}
-            className="w-full h-7 bg-[#141416] border border-[#27272a] rounded px-2 text-xs font-mono text-neutral-200 outline-none focus:border-sky-500"
+            className="w-full h-9 bg-background border border-border/80 rounded-lg px-2.5 text-xs font-mono text-foreground outline-none focus:border-pastel-blue/40"
           >
             {BOUND_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>
@@ -149,53 +149,53 @@ function ItemGroupEntryCard({ entry, index, totalInList, onChange, onRemove }: I
       </div>
 
       {/* Row 4: Flags */}
-      <div className="flex flex-wrap items-center gap-4 pt-1.5 border-t border-[#27272a]/60">
-        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-neutral-300">
+      <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/60">
+        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground">
           <input
             type="checkbox"
             checked={!!(entry.Announced ?? entry.Announce)}
             onChange={(e) => onChange({ Announced: e.target.checked ? true : undefined, Announce: undefined })}
-            className="rounded border-[#27272a] bg-[#141416] text-sky-600 focus:ring-0 w-3.5 h-3.5"
+            className="rounded border-border/80 bg-background text-pastel-blue focus:ring-0 w-3.5 h-3.5"
           />
           <span>Announced</span>
         </label>
 
-        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-neutral-300">
+        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground">
           <input
             type="checkbox"
             checked={!!entry.UniqueId}
             onChange={(e) => onChange({ UniqueId: e.target.checked ? true : undefined })}
-            className="rounded border-[#27272a] bg-[#141416] text-sky-600 focus:ring-0 w-3.5 h-3.5"
+            className="rounded border-border/80 bg-background text-pastel-blue focus:ring-0 w-3.5 h-3.5"
           />
           <span>UniqueId</span>
         </label>
 
-        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-neutral-300">
+        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground">
           <input
             type="checkbox"
             checked={entry.Stacked !== false}
             onChange={(e) => onChange({ Stacked: e.target.checked ? undefined : false })}
-            className="rounded border-[#27272a] bg-[#141416] text-sky-600 focus:ring-0 w-3.5 h-3.5"
+            className="rounded border-border/80 bg-background text-pastel-blue focus:ring-0 w-3.5 h-3.5"
           />
           <span>Stacked</span>
         </label>
 
-        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-neutral-300">
+        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground">
           <input
             type="checkbox"
             checked={!!entry.Named}
             onChange={(e) => onChange({ Named: e.target.checked ? true : undefined })}
-            className="rounded border-[#27272a] bg-[#141416] text-sky-600 focus:ring-0 w-3.5 h-3.5"
+            className="rounded border-border/80 bg-background text-pastel-blue focus:ring-0 w-3.5 h-3.5"
           />
           <span>Named</span>
         </label>
 
-        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-neutral-300">
+        <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-foreground">
           <input
             type="checkbox"
             checked={!!entry.Clear}
             onChange={(e) => onChange({ Clear: e.target.checked ? true : undefined })}
-            className="rounded border-[#27272a] bg-[#141416] text-sky-600 focus:ring-0 w-3.5 h-3.5"
+            className="rounded border-border/80 bg-background text-pastel-blue focus:ring-0 w-3.5 h-3.5"
           />
           <span>Clear</span>
         </label>
@@ -224,12 +224,14 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
     setIsCommitting,
   } = useItemGroupEditStore();
 
+  const groupMeta = useDatabaseStore((s) => s.metadataMap['itemGroup']);
+
   const group: EffectiveItemGroup | undefined = useMemo(() => {
     if (!provider || !groupKey) return undefined;
     const repository = provider.getRepository() as LayeredItemGroupRepository | undefined;
     if (!repository || typeof repository.findByKey !== 'function') return undefined;
     return repository.findByKey(groupKey);
-  }, [provider, groupKey]);
+  }, [provider, groupKey, groupMeta]);
 
   useEffect(() => {
     if (group) {
@@ -274,6 +276,8 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
       const service = new ItemGroupEditTransactionService(validator, serializer, writer);
 
       await service.commitSession(currentSession, provider as unknown as ItemGroupDatabaseProvider);
+
+      useDatabaseStore.getState().refreshMetadata();
 
       const repo = provider.getRepository() as LayeredItemGroupRepository | undefined;
       const updated = repo?.findByKey(groupKey);
@@ -380,18 +384,18 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
 
   return (
     <div
-      className="flex flex-col h-full bg-[#141416] outline-none select-none"
+      className="flex flex-col h-full bg-card/60 outline-none select-none"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#27272a] bg-[#1f1f23]">
+      <div className="p-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-base font-bold text-neutral-100 font-mono leading-tight">
+            <div className="text-base font-bold text-foreground font-mono leading-tight">
               {group.group}
             </div>
-            <div className="text-xs text-neutral-400 mt-0.5">
+            <div className="text-xs text-muted-foreground mt-0.5">
               {totalItemsCount} Drop Entries
               {group.subGroup !== undefined && ` • SubGroup ${group.subGroup}`}
               {effectiveFields.SubGroups && ` • ${effectiveFields.SubGroups.length} SubGroups`}
@@ -404,28 +408,28 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                 const primaryPath = layerProvenance[0] || 'item_group_db.yml';
                 openEntityInYamlEditor(primaryPath, group.group, layerProvenance[0]);
               }}
-              className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-neutral-300 hover:text-sky-300 border border-[#27272a] hover:border-sky-500/40 flex items-center gap-1 transition-colors"
+              className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-background text-muted-foreground hover:text-pastel-blue border border-border/80 hover:border-pastel-blue/40 flex items-center gap-1.5 transition-colors"
               title="Open in YAML Editor"
             >
-              <FileCode className="w-3 h-3 text-sky-400" />
+              <FileCode className="w-3.5 h-3.5 text-pastel-blue" />
               <span>YAML</span>
             </button>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#141416] text-emerald-400 border border-[#27272a] flex items-center gap-1">
-              <Layers className="w-3 h-3" />
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-pastel-mint/15 text-pastel-mint border border-pastel-mint/30 flex items-center gap-1.5 font-semibold">
+              <Layers className="w-3.5 h-3.5" />
               <span>GROUP</span>
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 mt-3.5 border-t border-[#27272a]/60 pt-2.5">
+        <div className="flex items-center gap-1.5 mt-3.5 border-t border-border/60 pt-2.5">
           <button
             type="button"
             onClick={() => setCurrentTab('items')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'items'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Group Items ({totalItemsCount})
@@ -433,10 +437,10 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
           <button
             type="button"
             onClick={() => setCurrentTab('identity')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'identity'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Identity
@@ -444,10 +448,10 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
           <button
             type="button"
             onClick={() => setCurrentTab('layers')}
-            className={`px-2.5 py-1 rounded text-xs transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
               currentTab === 'layers'
-                ? 'bg-sky-600/20 text-sky-300 font-medium border border-sky-500/30'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-pastel-blue/20 text-pastel-blue font-semibold border border-pastel-blue/30 shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             Layers
@@ -466,7 +470,7 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
         )}
 
         {commitError && (
-          <div className="bg-red-950/20 p-3 rounded border border-red-500/20 text-xs text-red-400 break-all">
+          <div className="bg-destructive/10 p-3 rounded-xl border border-destructive/20 text-xs text-destructive break-all">
             {commitError}
           </div>
         )}
@@ -476,13 +480,13 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
             {effectiveFields.SubGroups && effectiveFields.SubGroups.length > 0 ? (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Configured SubGroups ({effectiveFields.SubGroups.length})
                   </span>
                   <button
                     type="button"
                     onClick={handleAddSubGroup}
-                    className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 bg-[#1f1f23] px-2.5 py-1 rounded border border-[#27272a]"
+                    className="flex items-center gap-1.5 text-xs text-pastel-mint font-medium bg-pastel-mint/15 hover:bg-pastel-mint/25 px-3 py-1.5 rounded-lg border border-pastel-mint/30 transition-colors"
                   >
                     <FolderPlus className="w-3.5 h-3.5" />
                     <span>Add SubGroup</span>
@@ -490,24 +494,24 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                 </div>
 
                 {effectiveFields.SubGroups.map((sg, sgIdx) => (
-                  <div key={sgIdx} className="space-y-3 bg-[#18181b] p-3.5 rounded border border-[#27272a]">
-                    <div className="flex items-center justify-between border-b border-[#27272a]/60 pb-2">
+                  <div key={sgIdx} className="space-y-3 bg-card p-4 rounded-xl border border-border/80 shadow-xs">
+                    <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-neutral-200">SubGroup #</span>
+                          <span className="text-xs font-semibold text-foreground">SubGroup #</span>
                           <Input
                             type="number"
                             value={sg.SubGroup}
                             onChange={(e) => handleSubGroupHeaderChange(sgIdx, { SubGroup: Number(e.target.value) })}
-                            className="h-6 w-14 bg-[#141416] border-[#27272a] text-xs font-mono text-center"
+                            className="h-7 w-16 bg-background border-border/80 text-xs font-mono text-center text-foreground rounded-lg"
                           />
                         </div>
                         {sg.SubGroup === 0 && (
-                          <span className="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-500/30 px-1.5 py-0.5 rounded font-mono">
+                          <span className="text-[10px] text-pastel-amber bg-pastel-amber/15 border border-pastel-amber/30 px-2 py-0.5 rounded-md font-mono font-medium">
                             Always Obtained
                           </span>
                         )}
-                        <span className="text-[10px] text-neutral-500 font-mono">
+                        <span className="text-[11px] text-muted-foreground font-mono">
                           ({sg.List.length} items)
                         </span>
                       </div>
@@ -516,7 +520,7 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                         <button
                           type="button"
                           onClick={() => handleAddSubGroupEntry(sgIdx)}
-                          className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 bg-[#1f1f23] px-2 py-1 rounded border border-[#27272a]"
+                          className="flex items-center gap-1.5 text-xs text-pastel-blue font-medium bg-pastel-blue/15 hover:bg-pastel-blue/25 px-2.5 py-1.5 rounded-lg border border-pastel-blue/30 transition-colors"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Add Item</span>
@@ -525,7 +529,7 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                           <button
                             type="button"
                             onClick={() => handleRemoveSubGroup(sgIdx)}
-                            className="p-1 text-neutral-500 hover:text-red-400 rounded hover:bg-[#27272a]"
+                            className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-muted transition-colors"
                             title="Remove SubGroup"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -552,14 +556,14 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
             ) : (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Item Drop Entries
                   </h3>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={handleAddDirectEntry}
-                      className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 bg-[#1f1f23] px-2.5 py-1 rounded border border-[#27272a]"
+                      className="flex items-center gap-1.5 text-xs text-pastel-blue font-medium bg-pastel-blue/15 hover:bg-pastel-blue/25 px-3 py-1.5 rounded-lg border border-pastel-blue/30 transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add Item Entry</span>
@@ -567,7 +571,7 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                     <button
                       type="button"
                       onClick={handleAddSubGroup}
-                      className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 bg-[#1f1f23] px-2.5 py-1 rounded border border-[#27272a]"
+                      className="flex items-center gap-1.5 text-xs text-pastel-mint font-medium bg-pastel-mint/15 hover:bg-pastel-mint/25 px-3 py-1.5 rounded-lg border border-pastel-mint/30 transition-colors"
                     >
                       <FolderPlus className="w-3.5 h-3.5" />
                       <span>Convert to SubGroups</span>
@@ -593,26 +597,26 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
         )}
 
         {currentTab === 'identity' && (
-          <div className="space-y-3 bg-[#1f1f23] p-3.5 rounded border border-[#27272a]">
-            <h3 className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+          <div className="space-y-3 bg-card p-4 rounded-xl border border-border/80 shadow-xs">
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
               Group Identity
             </h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-neutral-400 block mb-1">Group Name / ID</label>
+                <label className="text-[10px] text-muted-foreground block mb-1 font-medium">Group Name / ID</label>
                 <Input
                   value={effectiveFields.Group || ''}
                   onChange={(e) => setField('Group', e.target.value)}
-                  className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                  className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-neutral-400 block mb-1">SubGroup</label>
+                <label className="text-[10px] text-muted-foreground block mb-1 font-medium">SubGroup</label>
                 <Input
                   type="number"
                   value={effectiveFields.SubGroup ?? ''}
                   onChange={(e) => setField('SubGroup', e.target.value ? Number(e.target.value) : undefined)}
-                  className="h-8 bg-[#141416] border-[#27272a] text-xs font-mono"
+                  className="h-9 bg-background border-border/80 text-xs font-mono text-foreground rounded-lg"
                 />
               </div>
             </div>
@@ -623,10 +627,10 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Layer Hierarchy & File Provenance
                 </h3>
-                <span className="text-[10px] font-mono text-neutral-400">
+                <span className="text-[10px] font-mono text-muted-foreground">
                   {layerProvenance.length} layer{layerProvenance.length > 1 ? 's' : ''} loaded
                 </span>
               </div>
@@ -650,38 +654,38 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                   return (
                     <div
                       key={layerId}
-                      className={`p-3 rounded border transition-colors ${
+                      className={`p-3.5 rounded-xl border transition-colors shadow-xs ${
                         isFinalLayer
-                          ? 'bg-sky-950/20 border-sky-500/30'
-                          : 'bg-[#1f1f23] border-[#27272a]'
+                          ? 'bg-pastel-blue/5 border-pastel-blue/40'
+                          : 'bg-card border-border/80'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5">
                           <div
-                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-medium ${
                               isFinalLayer
-                                ? 'bg-sky-600 text-white'
-                                : 'bg-[#27272a] text-neutral-400'
+                                ? 'bg-pastel-blue text-background font-bold'
+                                : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="text-xs font-mono font-semibold text-neutral-100">
+                            <div className="text-xs font-mono font-semibold text-foreground">
                               {relativePath}
                             </div>
-                            <div className="text-[11px] text-neutral-400">{layerName}</div>
+                            <div className="text-[11px] text-muted-foreground">{layerName}</div>
                           </div>
                         </div>
 
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded border whitespace-nowrap ${
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md border whitespace-nowrap ${
                             relativePath.includes('import')
-                              ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                              ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
                               : isBaseLayer
-                              ? 'bg-[#141416] text-neutral-400 border-[#27272a]'
-                              : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                              ? 'bg-muted/60 text-muted-foreground border-border/70'
+                              : 'bg-pastel-blue/15 text-pastel-blue border-pastel-blue/30'
                           }`}
                         >
                           {relativePath.includes('import')
@@ -693,15 +697,15 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
                       </div>
 
                       {contributingFields.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-[#27272a]/60">
-                          <div className="text-[10px] text-neutral-500 mb-1">
+                        <div className="mt-2.5 pt-2 border-t border-border/60">
+                          <div className="text-[10px] text-muted-foreground mb-1.5">
                             Active fields from this file ({contributingFields.length}):
                           </div>
                           <div className="flex flex-wrap gap-1">
                             {contributingFields.map((f) => (
                               <span
                                 key={f}
-                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#141416] text-neutral-300 border border-[#27272a]"
+                                className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-background text-foreground border border-border/80"
                               >
                                 {f}
                               </span>
@@ -719,12 +723,12 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-3 border-t border-[#27272a] bg-[#1f1f23] flex items-center justify-between">
+      <div className="p-3.5 border-t border-border/80 bg-card/90 backdrop-blur-xs flex items-center justify-between">
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canUndo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canUndo ? 'text-foreground hover:bg-muted' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={undo}
             disabled={!currentSession.canUndo}
@@ -734,8 +738,8 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
           </button>
           <button
             type="button"
-            className={`p-1.5 rounded ${
-              currentSession.canRedo ? 'text-neutral-300 hover:bg-[#27272a]' : 'text-neutral-600 cursor-not-allowed'
+            className={`p-2 rounded-lg transition-colors ${
+              currentSession.canRedo ? 'text-foreground hover:bg-muted' : 'text-muted-foreground/40 cursor-not-allowed'
             }`}
             onClick={redo}
             disabled={!currentSession.canRedo}
@@ -748,7 +752,7 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+            className="px-3.5 py-1.5 text-xs text-muted-foreground hover:text-foreground rounded-lg transition-colors"
             onClick={() => {
               cancelSession();
               startSession(group);
@@ -759,10 +763,10 @@ export function ItemGroupInspector({ groupKey }: { groupKey: string }) {
           </button>
           <button
             type="button"
-            className={`px-3 py-1.5 text-xs rounded font-medium flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs rounded-xl font-medium flex items-center gap-1.5 transition-colors ${
               currentSession.isDirty && validationIssues.length === 0
-                ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
-                : 'bg-[#27272a] text-neutral-500 cursor-not-allowed'
+                ? 'bg-pastel-blue/20 text-pastel-blue hover:bg-pastel-blue/30 border border-pastel-blue/30 shadow-sm'
+                : 'bg-muted/40 text-muted-foreground/50 border border-border/50 cursor-not-allowed'
             }`}
             onClick={handleSave}
             disabled={!currentSession.isDirty || validationIssues.length > 0 || isCommitting}

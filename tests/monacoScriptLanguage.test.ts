@@ -40,6 +40,16 @@ describe('Monaco rAthena Script Language Definition', () => {
     expect(rathenaLanguageConfiguration.comments?.blockComment).toEqual(['/*', '*/']);
     expect(rathenaLanguageConfiguration.autoClosingPairs).toBeDefined();
   });
+
+  it('should define symbols regex and have valid monarch tokenizer rules without undefined macro references', () => {
+    expect(rathenaMonarchTokensProvider.symbols).toBeDefined();
+    expect(rathenaMonarchTokensProvider.symbols).toBeInstanceOf(RegExp);
+
+    const rootRules = rathenaMonarchTokensProvider.tokenizer.root;
+    const ruleStrings = JSON.stringify(rootRules);
+    // Ensure no unhandled @symbols lookarounds exist in regex patterns
+    expect(ruleStrings).not.toContain('@symbols');
+  });
 });
 
 describe('findEntityLineInYaml', () => {

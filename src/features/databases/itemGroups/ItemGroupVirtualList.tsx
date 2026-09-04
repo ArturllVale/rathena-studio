@@ -10,12 +10,13 @@ export function ItemGroupVirtualList() {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const groupProvider = registry?.getProvider('group');
+  const groupMeta = useDatabaseStore((s) => s.metadataMap['group']);
   const groups = useMemo(() => {
-    if (!groupProvider) return [];
+    if (!groupProvider || groupMeta?.state !== 'loaded') return [];
     const repository = groupProvider.getRepository() as LayeredItemGroupRepository | undefined;
     if (!repository || typeof repository.getAllEffectiveGroups !== 'function') return [];
     return repository.getAllEffectiveGroups();
-  }, [groupProvider]);
+  }, [groupProvider, groupMeta]);
 
   const filteredGroups = useMemo(() => {
     return groups.filter((group) => {
@@ -48,7 +49,7 @@ export function ItemGroupVirtualList() {
 
   if (filteredGroups.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-neutral-500 text-xs">
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-xs">
         <Layers className="w-8 h-8 mb-2 opacity-30" />
         <span>No item groups match current filter criteria.</span>
       </div>
@@ -56,7 +57,7 @@ export function ItemGroupVirtualList() {
   }
 
   return (
-    <div ref={parentRef} className="h-full w-full overflow-auto bg-[#141416]">
+    <div ref={parentRef} className="h-full w-full overflow-auto bg-background/50">
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
@@ -81,24 +82,24 @@ export function ItemGroupVirtualList() {
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
               }}
-              className={`flex items-center justify-between px-3 py-2 border-b border-[#27272a]/60 cursor-pointer text-xs transition-colors ${
+              className={`flex items-center justify-between px-3.5 py-2 border-b border-border/40 cursor-pointer text-xs transition-colors ${
                 isSelected
-                  ? 'bg-sky-950/40 border-l-2 border-l-sky-500 text-neutral-100'
-                  : 'hover:bg-[#1f1f23]/60 text-neutral-300'
+                  ? 'bg-pastel-blue/15 border-l-2 border-l-pastel-blue text-foreground font-medium'
+                  : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
               }`}
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Layers className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Layers className="w-4 h-4 text-pastel-mint shrink-0" />
                 <div className="min-w-0">
-                  <div className="font-mono font-medium truncate text-neutral-200">
+                  <div className="font-mono font-medium truncate text-foreground">
                     {group.group}
                     {group.subGroup !== undefined && (
-                      <span className="text-[11px] text-neutral-400 ml-1.5 font-normal">
+                      <span className="text-[11px] text-muted-foreground ml-1.5 font-normal">
                         (SubGroup: {group.subGroup})
                       </span>
                     )}
                   </div>
-                  <div className="text-[10px] text-neutral-500 truncate font-mono">
+                  <div className="text-[10px] text-muted-foreground truncate font-mono">
                     {getItemGroupAllEntries(group.fields).length} items in group
                   </div>
                 </div>
@@ -106,10 +107,10 @@ export function ItemGroupVirtualList() {
 
               <div className="flex items-center gap-1.5 shrink-0 pl-2">
                 <span
-                  className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+                  className={`text-[9px] font-mono px-2 py-0.5 rounded-md border ${
                     isImport
-                      ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
-                      : 'bg-[#1f1f23] text-neutral-400 border-[#27272a]'
+                      ? 'bg-pastel-lavender/15 text-pastel-lavender border-pastel-lavender/30'
+                      : 'bg-muted/60 text-muted-foreground border-border/70'
                   }`}
                 >
                   {isImport ? 'IMPORT' : 'BASE'}

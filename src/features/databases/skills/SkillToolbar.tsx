@@ -49,15 +49,15 @@ export function SkillToolbar() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 p-3 bg-[#1f1f23] border-b border-[#27272a]">
+      <div className="flex flex-col gap-3 p-3.5 bg-card/60 backdrop-blur border-b border-border/80">
         {/* Search Line */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1.5 h-4 w-4 text-neutral-500" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search skill by ID, AegisName or Description..."
-              className="pl-9 h-8 bg-[#141416] border-[#27272a] text-xs text-neutral-200"
+              className="pl-9 h-10 bg-background border-border/80 text-sm text-foreground rounded-lg"
               value={skillFilters.query}
               onChange={handleQueryChange}
             />
@@ -65,7 +65,7 @@ export function SkillToolbar() {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center justify-center p-1.5 text-neutral-400 hover:text-neutral-200 hover:bg-[#27272a] rounded"
+              className="flex items-center justify-center h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-accent/70 rounded-lg transition-colors border border-border/60"
               title="Clear Skill Filters"
             >
               <X className="h-4 w-4" />
@@ -73,7 +73,7 @@ export function SkillToolbar() {
           )}
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-1.5 px-3 h-8 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold shrink-0 transition-colors shadow-xs"
+            className="flex items-center gap-2 px-4 h-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-xs font-semibold shrink-0 transition-colors shadow-xs"
             title="Create New Skill (+1)"
           >
             <Plus className="w-4 h-4" />
@@ -91,9 +91,9 @@ export function SkillToolbar() {
                 setSkillFilters({ folder: val === 'all' ? undefined : (val as 'import' | 'general') })
               }
             >
-              <SelectTrigger className="h-7 text-xs">
-                <div className="flex items-center gap-1 truncate">
-                  <Folder className="w-3 h-3 text-neutral-400 shrink-0" />
+              <SelectTrigger className="h-9 text-xs font-medium border-border/80 bg-background rounded-lg">
+                <div className="flex items-center gap-1.5 truncate">
+                  <Folder className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                   <SelectValue placeholder="Folder" />
                 </div>
               </SelectTrigger>
@@ -113,7 +113,7 @@ export function SkillToolbar() {
                 setSkillFilters({ type: val === 'all' ? undefined : (val as SkillType) })
               }
             >
-              <SelectTrigger className="h-7 text-xs">
+              <SelectTrigger className="h-9 text-xs font-medium border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Skill Type" />
               </SelectTrigger>
               <SelectContent>
@@ -135,7 +135,7 @@ export function SkillToolbar() {
                 setSkillFilters({ targetType: val === 'all' ? undefined : (val as SkillTargetType) })
               }
             >
-              <SelectTrigger className="h-7 text-xs">
+              <SelectTrigger className="h-9 text-xs font-medium border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Target Type" />
               </SelectTrigger>
               <SelectContent>
@@ -157,7 +157,7 @@ export function SkillToolbar() {
                 setSkillFilters({ element: val === 'all' ? undefined : (val as SkillElement) })
               }
             >
-              <SelectTrigger className="h-7 text-xs">
+              <SelectTrigger className="h-9 text-xs font-medium border-border/80 bg-background rounded-lg">
                 <SelectValue placeholder="Element" />
               </SelectTrigger>
               <SelectContent>
@@ -172,9 +172,13 @@ export function SkillToolbar() {
           </div>
 
           {/* RE / PRE-RE Variant Switcher */}
-          <div className="flex bg-[#141416] rounded border border-[#27272a] ml-auto">
+          <div className="flex bg-secondary p-0.5 rounded-lg border border-border/60 ml-auto">
             <button
-              className={`px-3 py-1 rounded-l ${activeVariant === 'RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'}`}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                activeVariant === 'RE'
+                  ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
               onClick={() => {
                 setVariant('RE');
                 if (activeWorkspace) loadDatabase('skill', activeWorkspace.rootPath);
@@ -183,7 +187,11 @@ export function SkillToolbar() {
               RE
             </button>
             <button
-              className={`px-3 py-1 rounded-r ${activeVariant === 'PRE_RE' ? 'bg-sky-500/20 text-sky-400 font-medium' : 'text-neutral-500'}`}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                activeVariant === 'PRE_RE'
+                  ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
               onClick={() => {
                 setVariant('PRE_RE');
                 if (activeWorkspace) loadDatabase('skill', activeWorkspace.rootPath);
@@ -195,7 +203,7 @@ export function SkillToolbar() {
 
           <button
             onClick={() => activeWorkspace && loadDatabase('skill', activeWorkspace.rootPath)}
-            className="px-2 py-1 bg-[#27272a] hover:bg-[#3f3f46] text-neutral-300 rounded flex items-center justify-center"
+            className="h-8 px-2.5 bg-secondary hover:bg-secondary/80 border border-border/60 text-secondary-foreground rounded-lg flex items-center justify-center transition-colors shadow-2xs"
             title="Reload Skill Database"
           >
             <RefreshCw className="w-3.5 h-3.5" />

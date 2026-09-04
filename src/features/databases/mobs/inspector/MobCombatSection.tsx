@@ -27,19 +27,19 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
 
     return (
       <div
-        className={`flex flex-col bg-[#141416] p-1.5 rounded border transition-all ${
+        className={`flex flex-col bg-card p-2.5 rounded-xl border transition-all shadow-2xs ${
           error
-            ? 'border-red-500/50'
+            ? 'border-destructive bg-destructive/5'
             : isModified
-            ? 'border-sky-500/50 bg-sky-950/20'
-            : 'border-[#27272a] hover:border-neutral-700'
+            ? 'border-primary/50 bg-primary/5'
+            : 'border-border/80 hover:border-border'
         }`}
       >
-        <div className="flex items-center justify-between mb-0.5">
-          <span className={`text-[9px] font-bold font-mono tracking-wider ${accentClass}`}>
+        <div className="flex items-center justify-between mb-1">
+          <span className={`text-[11px] font-bold font-mono tracking-wider ${accentClass}`}>
             {label}
           </span>
-          {isModified && <span className="w-1.5 h-1.5 rounded-full bg-sky-400" title="Modified" />}
+          {isModified && <span className="w-1.5 h-1.5 rounded-full bg-pastel-blue shrink-0" title="Modified" />}
         </div>
         <input
           type="number"
@@ -51,10 +51,10 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
               val === '' ? undefined : Number(val)
             );
           }}
-          className="w-full text-xs font-mono text-center bg-transparent border-0 outline-none text-neutral-100 font-semibold p-0 h-5"
+          className="w-full text-base font-mono text-center bg-accent/30 rounded-lg border border-border/40 focus:border-primary/50 text-foreground font-semibold p-0 h-8 outline-none transition-colors"
         />
         {!isModified && origin && origin.layerId !== 'mob-db-mode-root-re' && origin.layerId !== 'mob-db-mode-root-pre_re' && origin.layerId !== layerProvenance[0] && (
-          <div className="text-[8px] text-neutral-500 mt-0.5 text-center truncate font-mono">
+          <div className="text-[9px] text-muted-foreground mt-1 text-center truncate font-mono opacity-80">
             {origin.filePath || origin.layerId}
           </div>
         )}
@@ -70,9 +70,10 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
     const errorMsg = error ? error.message : null;
 
     return (
-      <div className="flex flex-col py-1 border-b border-[#27272a]/40 last:border-0">
-        <div className="flex items-center justify-between gap-1.5">
-          <label className="text-[11px] text-neutral-400 font-medium select-none truncate" title={label}>
+      <div className="flex flex-col py-2 border-b border-border/50 last:border-0">
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs text-muted-foreground font-medium select-none truncate flex items-center gap-1.5" title={label}>
+            {isModified && <span className="w-1.5 h-1.5 rounded-full bg-pastel-blue shrink-0" />}
             {label}
           </label>
           <input
@@ -85,18 +86,18 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
                 val === '' ? undefined : Number(val)
               );
             }}
-            className={`text-xs font-mono text-right bg-[#141416] border rounded px-1.5 py-0.5 w-14 shrink-0 h-6.5 ${
+            className={`text-sm font-mono text-right bg-card border rounded-lg px-2.5 py-1 w-20 shrink-0 h-9 transition-all ${
               errorMsg
-                ? 'border-red-500/50 text-red-200'
+                ? 'border-destructive text-destructive bg-destructive/5'
                 : isModified
-                ? 'border-sky-500/50 text-sky-200'
-                : 'border-[#27272a] text-neutral-200'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-border/80 text-foreground focus:border-primary/50'
             }`}
           />
         </div>
-        {errorMsg && <div className="text-[10px] text-red-400 mt-0.5 text-right">{errorMsg}</div>}
+        {errorMsg && <div className="text-xs text-destructive mt-1 text-right font-medium">{errorMsg}</div>}
         {!isModified && origin && origin.layerId !== 'mob-db-mode-root-re' && origin.layerId !== 'mob-db-mode-root-pre_re' && origin.layerId !== layerProvenance[0] && (
-          <div className="text-[9px] text-neutral-500 mt-0.5 text-right truncate font-mono">
+          <div className="text-[9px] text-muted-foreground mt-1 text-right truncate font-mono opacity-80">
             via {origin.filePath || origin.layerId}
           </div>
         )}
@@ -105,39 +106,39 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
   };
 
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
       {/* Vitals & Health */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-1">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
           Health &amp; Energy
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           {renderField('Max HP', 'Hp')}
           {renderField('Max SP', 'Sp')}
         </div>
       </div>
 
       {/* Primary Base Stats (STR/AGI/VIT/INT/DEX/LUK) */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-1.5">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-2">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
           Base Attributes
         </h3>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-          {renderStatCard('STR', 'Str', 'text-red-400')}
-          {renderStatCard('AGI', 'Agi', 'text-emerald-400')}
-          {renderStatCard('VIT', 'Vit', 'text-amber-400')}
-          {renderStatCard('INT', 'Int', 'text-sky-400')}
-          {renderStatCard('DEX', 'Dex', 'text-purple-400')}
-          {renderStatCard('LUK', 'Luk', 'text-yellow-400')}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {renderStatCard('STR', 'Str', 'text-pastel-rose')}
+          {renderStatCard('AGI', 'Agi', 'text-pastel-mint')}
+          {renderStatCard('VIT', 'Vit', 'text-pastel-peach')}
+          {renderStatCard('INT', 'Int', 'text-pastel-blue')}
+          {renderStatCard('DEX', 'Dex', 'text-pastel-lavender')}
+          {renderStatCard('LUK', 'Luk', 'text-pastel-amber')}
         </div>
       </div>
 
       {/* Combat Power & Defenses */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-1">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
           Offense &amp; Defense Ratings
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           {renderField('Attack (Min)', 'Attack')}
           {renderField('Attack2 (Max)', 'Attack2')}
           {renderField('Physical DEF', 'Defense')}
@@ -148,11 +149,11 @@ export function MobCombatSection({ mob }: MobCombatSectionProps) {
       </div>
 
       {/* Ranges & Animation Timings */}
-      <div className="bg-[#18181b] p-3 rounded border border-[#27272a] space-y-1">
-        <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+      <div className="bg-card border border-border/80 rounded-xl p-4 space-y-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
           Ranges &amp; Speed Motions
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           {renderField('Attack Range', 'AttackRange')}
           {renderField('Skill Range', 'SkillRange')}
           {renderField('Chase Range', 'ChaseRange')}

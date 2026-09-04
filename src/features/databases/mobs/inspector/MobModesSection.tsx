@@ -78,15 +78,15 @@ export function MobModesSection({ mob }: MobModesSectionProps) {
   return (
     <div className="space-y-4">
       {/* AI Context Summary Banner */}
-      <div className="bg-[#18181b] p-3.5 rounded border border-[#27272a] space-y-2">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <Bot className="w-4 h-4 text-sky-400" />
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Bot className="w-5 h-5 text-pastel-blue" />
             <div>
-              <div className="text-xs font-semibold text-neutral-200">
+              <div className="text-sm font-semibold text-foreground">
                 Base AI: {aiDef ? aiDef.label : `Custom AI (${normalizedAi})`}
               </div>
-              <div className="text-[11px] text-neutral-400">
+              <div className="text-xs text-muted-foreground">
                 {aiDef ? aiDef.description : 'Custom AI behavior ID'}
               </div>
             </div>
@@ -96,33 +96,33 @@ export function MobModesSection({ mob }: MobModesSectionProps) {
             <button
               type="button"
               onClick={handleResetToDefaults}
-              className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 font-mono bg-sky-950/40 border border-sky-500/30 px-2 py-1 rounded transition-colors"
+              className="flex items-center gap-1.5 text-xs text-pastel-blue hover:text-pastel-blue/80 font-mono bg-pastel-blue/15 border border-pastel-blue/30 px-2.5 py-1 rounded-lg transition-colors shadow-2xs"
               title="Remove all YAML mode overrides and reset to base AI defaults"
             >
-              <RotateCcw className="w-3 h-3" /> Reset Overrides
+              <RotateCcw className="w-3.5 h-3.5" /> Reset Overrides
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] font-mono pt-1 text-neutral-400 border-t border-[#27272a]/60">
-          <span>Active Modes: <strong className="text-neutral-200">{activeCount}</strong></span>
+        <div className="flex items-center gap-2.5 text-xs font-mono pt-2 text-muted-foreground border-t border-border/60">
+          <span>Active Modes: <strong className="text-foreground">{activeCount}</strong></span>
           <span>•</span>
-          <span>Explicit Overrides: <strong className={hasExplicitOverrides ? 'text-amber-400' : 'text-neutral-500'}>{Object.keys(currentExplicitModes).length}</strong></span>
+          <span>Explicit Overrides: <strong className={hasExplicitOverrides ? 'text-amber-500 dark:text-amber-300' : 'text-muted-foreground'}>{Object.keys(currentExplicitModes).length}</strong></span>
         </div>
       </div>
 
       {/* Modes Grid */}
-      <div className="bg-[#18181b] p-3.5 rounded border border-[#27272a] space-y-3">
+      <div className="bg-card border border-border/80 p-4 rounded-xl space-y-3.5">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Behavior &amp; Combat Modes Matrix
           </h3>
-          <span className="text-[10px] text-neutral-500 font-mono">
+          <span className="text-xs text-muted-foreground font-mono">
             Click to override • Hover for description
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {MOB_MODES.map((mode) => {
             const resolved = resolvedModes[mode];
             const isExplicit = Object.prototype.hasOwnProperty.call(currentExplicitModes, mode);
@@ -131,26 +131,26 @@ export function MobModesSection({ mob }: MobModesSectionProps) {
             const description = MOB_MODE_DESCRIPTIONS_PT_BR[mode] || mode;
 
             let badgeText = 'OFF';
-            let badgeClass = 'bg-neutral-800 text-neutral-500 border-[#27272a]';
+            let badgeClass = 'bg-secondary text-muted-foreground/60 border-border/60';
 
             if (isExplicit) {
               if (explicitVal === true) {
                 badgeText = 'Explicit ON';
-                badgeClass = 'bg-sky-950 text-sky-300 border-sky-500/50';
+                badgeClass = 'bg-pastel-blue/20 text-pastel-blue border-pastel-blue/40 font-semibold';
               } else {
                 badgeText = 'Explicit OFF';
-                badgeClass = 'bg-red-950 text-red-300 border-red-500/50';
+                badgeClass = 'bg-pastel-rose/20 text-pastel-rose border-pastel-rose/40 font-semibold';
               }
             } else if (isEnabled && resolved) {
               if (resolved.origin === 'ai') {
                 badgeText = `AI (${normalizedAi})`;
-                badgeClass = 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30';
+                badgeClass = 'bg-pastel-mint/20 text-pastel-mint border-pastel-mint/40 font-medium';
               } else if (resolved.origin === 'class') {
                 badgeText = `Class (${currentClass})`;
-                badgeClass = 'bg-cyan-950/60 text-cyan-300 border-cyan-500/30';
+                badgeClass = 'bg-pastel-lavender/20 text-pastel-lavender border-pastel-lavender/40 font-medium';
               } else if (resolved.origin === 'race') {
                 badgeText = `Race (${currentRace})`;
-                badgeClass = 'bg-purple-950/60 text-purple-300 border-purple-500/30';
+                badgeClass = 'bg-pastel-peach/20 text-pastel-peach border-pastel-peach/40 font-medium';
               }
             }
 
@@ -164,31 +164,31 @@ export function MobModesSection({ mob }: MobModesSectionProps) {
                 onMouseEnter={() => setHoveredMode(mode)}
                 onMouseLeave={() => setHoveredMode((curr) => (curr === mode ? null : curr))}
                 onClick={() => handleToggleMode(mode)}
-                className={`flex items-center justify-between p-2 rounded text-xs font-mono transition-all border text-left group ${
+                className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-mono transition-all border text-left group shadow-2xs ${
                   isHovered
-                    ? 'ring-1 ring-sky-500/50 bg-[#1e2832]'
+                    ? 'ring-1 ring-primary/60 bg-accent/60 border-primary/40'
                     : isEnabled
-                    ? 'bg-[#18232c]/50 text-neutral-100 border-sky-500/30 hover:border-sky-500/60'
-                    : 'bg-[#141416] text-neutral-400 hover:text-neutral-200 border-[#27272a] hover:border-neutral-700'
+                    ? 'bg-primary/5 text-foreground border-primary/30 hover:border-primary/50'
+                    : 'bg-card text-muted-foreground hover:text-foreground border-border/80 hover:border-border'
                 }`}
               >
                 <div className="flex items-center gap-2 truncate">
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    className={`w-2 h-2 rounded-full shrink-0 ${
                       isEnabled
                         ? isExplicit
-                          ? 'bg-sky-400 shadow-sm shadow-sky-400/80'
-                          : 'bg-emerald-400 shadow-sm shadow-emerald-400/50'
+                          ? 'bg-pastel-blue shadow-xs shadow-pastel-blue/80'
+                          : 'bg-pastel-mint shadow-xs shadow-pastel-mint/50'
                         : isExplicit
-                        ? 'bg-red-400 shadow-sm shadow-red-400/50'
-                        : 'bg-neutral-600'
+                        ? 'bg-pastel-rose shadow-xs shadow-pastel-rose/50'
+                        : 'bg-muted-foreground/30'
                     }`}
                   />
-                  <span className={`truncate ${isEnabled ? 'font-medium' : ''}`}>{mode}</span>
+                  <span className={`truncate ${isEnabled ? 'font-semibold text-foreground' : ''}`}>{mode}</span>
                 </div>
 
                 <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded border whitespace-nowrap font-mono ${badgeClass}`}
+                  className={`text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap font-mono ${badgeClass}`}
                 >
                   {badgeText}
                 </span>
@@ -198,18 +198,18 @@ export function MobModesSection({ mob }: MobModesSectionProps) {
         </div>
 
         {/* Live Description Card on Hover */}
-        <div className="bg-[#141416] p-2.5 rounded border border-sky-500/20 flex items-start gap-2 text-xs">
-          <Info className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+        <div className="bg-accent/40 p-3 rounded-xl border border-border/80 flex items-start gap-2.5 text-xs">
+          <Info className="w-4 h-4 text-pastel-blue shrink-0 mt-0.5" />
           <div className="space-y-0.5">
-            <div className="font-mono font-semibold text-neutral-200 flex items-center gap-2">
+            <div className="font-mono font-semibold text-foreground flex items-center gap-2">
               <span>{activeHoverMode}</span>
               {activeHoverResolved && (
-                <span className="text-[10px] font-normal text-neutral-400 font-mono">
+                <span className="text-xs font-normal text-muted-foreground font-mono">
                   • {activeHoverResolved.originDetail}
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-neutral-300 leading-snug">
+            <div className="text-xs text-muted-foreground leading-snug">
               {activeHoverDescription}
             </div>
           </div>

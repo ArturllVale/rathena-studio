@@ -109,49 +109,51 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-      <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+      <div className="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a] bg-[#1f1f23]">
-          <div className="flex items-center gap-2">
-            <Plus className="w-4 h-4 text-sky-400" />
-            <h2 className="text-sm font-semibold text-neutral-100">Create New Item</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/80 bg-card/90 backdrop-blur-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-pastel-blue/15 text-pastel-blue border border-pastel-blue/30">
+              <Plus className="w-4 h-4" />
+            </div>
+            <h2 className="text-sm font-semibold text-foreground">Create New Item</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded text-neutral-400 hover:text-neutral-200 hover:bg-[#27272a] transition-colors"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-3.5 text-xs">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
           {errorMessage && (
-            <div className="flex items-start gap-2 p-2.5 rounded bg-red-950/40 border border-red-500/40 text-red-300 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* ID */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">
-              Item ID <span className="text-red-400">*</span>
+            <label className="text-[11px] font-medium text-foreground">
+              Item ID <span className="text-destructive">*</span>
             </label>
             <input
               type="number"
               value={id}
               onChange={(e) => setId(Number(e.target.value))}
               placeholder="e.g. 20001"
-              className={`w-full h-8 px-2.5 rounded bg-[#141416] border font-mono text-xs text-neutral-100 outline-none ${
-                existingItemById ? 'border-red-500 text-red-300' : 'border-[#27272a] focus:border-sky-500'
+              className={`w-full h-9 px-3 rounded-xl bg-background border font-mono text-xs text-foreground outline-none transition-colors ${
+                existingItemById ? 'border-destructive text-destructive' : 'border-border/80 focus:border-pastel-blue/60'
               }`}
               required
             />
             {existingItemById && (
-              <span className="text-[10px] text-red-400 font-mono">
+              <span className="text-[10px] text-destructive font-mono">
                 ID #{id} already exists ({existingItemById.fields.Name || existingItemById.fields.AegisName})!
               </span>
             )}
@@ -159,21 +161,21 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
 
           {/* AegisName */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">
-              Aegis Name (Identifier) <span className="text-red-400">*</span>
+            <label className="text-[11px] font-medium text-foreground">
+              Aegis Name (Identifier) <span className="text-destructive">*</span>
             </label>
             <input
               type="text"
               value={aegisName}
               onChange={(e) => setAegisName(e.target.value)}
               placeholder="e.g. Custom_Dragon_Sword"
-              className={`w-full h-8 px-2.5 rounded bg-[#141416] border font-mono text-xs text-neutral-100 outline-none ${
-                existingItemByName ? 'border-red-500 text-red-300' : 'border-[#27272a] focus:border-sky-500'
+              className={`w-full h-9 px-3 rounded-xl bg-background border font-mono text-xs text-foreground outline-none transition-colors ${
+                existingItemByName ? 'border-destructive text-destructive' : 'border-border/80 focus:border-pastel-blue/60'
               }`}
               required
             />
             {existingItemByName && (
-              <span className="text-[10px] text-red-400 font-mono">
+              <span className="text-[10px] text-destructive font-mono">
                 AegisName &quot;{aegisName}&quot; already in use by ID #{existingItemByName.id}!
               </span>
             )}
@@ -181,22 +183,22 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
 
           {/* Display Name */}
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-neutral-300">Display Name</label>
+            <label className="text-[11px] font-medium text-foreground">Display Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Dragon Slayer V2"
-              className="w-full h-8 px-2.5 rounded bg-[#141416] border border-[#27272a] text-xs text-neutral-100 outline-none focus:border-sky-500"
+              className="w-full h-9 px-3 rounded-xl bg-background border border-border/80 text-xs text-foreground outline-none focus:border-pastel-blue/60 transition-colors"
             />
           </div>
 
           {/* Type & SubType */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-neutral-300">Type</label>
+              <label className="text-[11px] font-medium text-foreground">Type</label>
               <Select value={type} onValueChange={(val) => setType(val as ItemType)}>
-                <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,9 +213,9 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
 
             {type === 'Weapon' && (
               <div className="space-y-1">
-                <label className="text-[11px] font-medium text-neutral-300">Weapon SubType</label>
+                <label className="text-[11px] font-medium text-foreground">Weapon SubType</label>
                 <Select value={subType} onValueChange={setSubType}>
-                  <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                  <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                     <SelectValue placeholder="SubType" />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,9 +231,9 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
 
             {type === 'Ammo' && (
               <div className="space-y-1">
-                <label className="text-[11px] font-medium text-neutral-300">Ammo SubType</label>
+                <label className="text-[11px] font-medium text-foreground">Ammo SubType</label>
                 <Select value={subType} onValueChange={setSubType}>
-                  <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+                  <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                     <SelectValue placeholder="SubType" />
                   </SelectTrigger>
                   <SelectContent>
@@ -247,15 +249,15 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
           </div>
 
           {/* Target Layer / File Destination */}
-          <div className="space-y-1 pt-1 border-t border-[#27272a]/60">
+          <div className="space-y-1 pt-1 border-t border-border/60">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-medium text-neutral-300">Target File / Layer</label>
-              <span className="text-[10px] text-sky-400 font-mono">
+              <label className="text-[11px] font-medium text-foreground">Target File / Layer</label>
+              <span className="text-[10px] text-pastel-blue font-mono">
                 {targetLayerId === 'item-db-import' ? 'Default: Import' : 'Direct Layer'}
               </span>
             </div>
             <Select value={targetLayerId} onValueChange={setTargetLayerId}>
-              <SelectTrigger className="h-8 text-xs font-mono border-[#27272a]">
+              <SelectTrigger className="h-9 text-xs font-mono border-border/80 bg-background text-foreground rounded-xl">
                 <SelectValue placeholder="Select Destination" />
               </SelectTrigger>
               <SelectContent>
@@ -269,18 +271,18 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#27272a]">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/80">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 rounded text-xs text-neutral-400 hover:text-neutral-200 hover:bg-[#27272a] transition-colors"
+              className="px-3.5 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-medium text-xs px-4 py-1.5 rounded shadow-sm transition-colors"
+              className="flex items-center gap-1.5 bg-pastel-blue/20 text-pastel-blue border border-pastel-blue/30 hover:bg-pastel-blue/30 disabled:opacity-40 font-semibold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors"
             >
               {isSubmitting ? (
                 <>
