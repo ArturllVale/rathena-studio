@@ -44,9 +44,7 @@ export class ItemEditTransactionService {
     const pendingChanges = session.getPendingChanges();
     const { fieldOrigins, layerProvenance } = session.originalItem;
     
-    const importLayerId = 'item-db-import';
-    const fallbackLayerId = layerProvenance[layerProvenance.length - 1];
-    const hasImportLayer = !!repo.getLayer(importLayerId);
+    const fallbackLayerId = layerProvenance[0];
     
     const layerMutations = new Map<string, Array<{ field: string, value: unknown }>>();
 
@@ -54,12 +52,10 @@ export class ItemEditTransactionService {
       const origin = fieldOrigins[field];
       let targetLayerId: string;
 
-      if (origin && origin.layerId === importLayerId) {
-        targetLayerId = importLayerId;
-      } else if (origin && origin.layerId === fallbackLayerId && fallbackLayerId === importLayerId) {
-        targetLayerId = importLayerId;
+      if (origin && origin.layerId) {
+        targetLayerId = origin.layerId;
       } else {
-        targetLayerId = hasImportLayer ? importLayerId : fallbackLayerId;
+        targetLayerId = fallbackLayerId;
       }
 
       if (!layerMutations.has(targetLayerId)) {

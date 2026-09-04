@@ -12,6 +12,8 @@ import { DatabaseYamlEditorView } from '@/features/editor/DatabaseYamlEditorView
 import { ProcessesView } from '@/features/processes/ProcessesView';
 import { LogsView } from '@/features/logs/LogsView';
 import { SettingsView } from '@/features/settings/SettingsView';
+import { ProblemsView } from '@/features/problems/ProblemsView';
+import { ProblemScanner } from '@/features/problems/ProblemScanner';
 
 export function App() {
   const activeTab = useAppStore((s) => s.activeTab);
@@ -39,6 +41,7 @@ export function App() {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-foreground overflow-hidden font-sans">
+      <ProblemScanner />
       <TitleBar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
@@ -58,6 +61,9 @@ export function App() {
             </div>
             <div className={activeTab === 'logs' ? 'h-full w-full' : 'hidden'}>
               <LogsView />
+            </div>
+            <div className={activeTab === 'problems' ? 'h-full w-full' : 'hidden'}>
+              <ProblemsView />
             </div>
             <div className={activeTab === 'settings' ? 'h-full w-full' : 'hidden'}>
               <SettingsView />

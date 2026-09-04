@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ActiveNavTab = 'workspace' | 'databases' | 'editor' | 'processes' | 'logs' | 'settings';
+export type ActiveNavTab = 'workspace' | 'databases' | 'editor' | 'processes' | 'logs' | 'problems' | 'settings';
 
 export interface AppNotification {
   id: string;
